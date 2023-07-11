@@ -7,6 +7,10 @@ Each project is an example you can use for whatever you want. Feel free to mix t
 - Private Voting: [`./foundry-voting`](./foundry-voting)
 - Stealthdrop: [`./stealthdrop`](./stealthdrop)
 
+## Starter
+
+You can view simpler, boilerplate projects that are good templates for starting your own Noir project in the [Noir Starter](https://github.com/noir-lang/noir-starter) repo.
+
 ## Support
 
 Need help? Join the [Noir Discord](https://discord.gg/JtqzkdeQ6G) or reach out on [Twitter](https://twitter.com/NoirLang).
