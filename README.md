@@ -1,4 +1,4 @@
-# Noir By Example
+# Noir Examples
 
 This is a reference repo to help you get started with writing zero-knowledge circuits and applications with [Noir](https://noir-lang.org/).
 
