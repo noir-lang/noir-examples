@@ -4,8 +4,8 @@ fn main(root : pub Field, index : Field, hash_path : [Field; 2], secret: Field, 
     let note_commitment = std::hash::pedersen([priv_key, secret]);
     let nullifier = std::hash::pedersen([root, priv_key, proposalId]);
 
-    let is_member = std::merkle::check_membership(root, note_commitment[0], index, hash_path);
-    assert(is_member == 1);
+    let check_root = std::merkle::compute_merkle_root(note_commitment[0], index, hash_path);
+    assert(root == check_root);
     assert(vote <= 1);
 
     nullifier[0]
