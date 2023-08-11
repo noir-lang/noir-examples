@@ -10,15 +10,14 @@ contract zkVoteTest is Test {
     UltraVerifier public verifier;
 
     bytes proofBytes;
-    bytes32 merkleRoot = 0x20c77d6d51119d86868b3a37a64cd4510abd7bdb7f62a9e78e51fe8ca615a194;
-    bytes32 nullifierHash = 0x0bf0dd2fad1a8da018371f0a8dac56016d270d2e178a847a3ac724d033d1d858;
-
+    bytes32 merkleRoot = 0x19ac85420cee4b5231c575ed4ab7a4bdade6c4de28ca651a406a02307f3e6ca1;
+    bytes32 nullifierHash = 0x1f2a72a3c5164d009ac411547f6b01902ab8617fedf46801b828024a3ff75a1f;
 
     function setUp() public {
         verifier = new UltraVerifier();
         voteContract = new zkVote(merkleRoot, address(verifier));
         voteContract.propose("First proposal", block.timestamp + 10000000);
-        
+
         string memory proof = vm.readLine("./circuits/proofs/p.proof");
         proofBytes = vm.parseBytes(proof);
     }
@@ -37,7 +36,7 @@ contract zkVoteTest is Test {
         bytes32[] memory inputs = new bytes32[](4);
         inputs[0] = merkleRoot;
         inputs[1] = bytes32(0);
-        inputs[2] = bytes32(abi.encodePacked(uint(1)));
+        inputs[2] = bytes32(abi.encodePacked(uint256(1)));
         inputs[3] = nullifierHash;
         verifier.verify(hex"01", inputs);
     }
