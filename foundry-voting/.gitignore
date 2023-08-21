@@ -13,4 +13,5 @@ docs/
 # Dotenv file
 .env
 
-circuits/target/*
+node_modules
+crs

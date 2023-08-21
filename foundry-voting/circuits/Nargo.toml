@@ -1,6 +1,7 @@
 [package]
 authors = [""]
-compiler_version = "~0.9.0"
-name="foundry-voting"
+compiler_version = "~0.10.3"
+name="foundry_voting"
+type="bin"
 
 [dependencies]

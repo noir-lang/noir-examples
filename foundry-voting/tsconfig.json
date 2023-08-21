@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "isolatedModules": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "noImplicitAny": true,
+    "plugins": [],
+    "lib": [
+      "dom",
+      "EsNext"
+    ]
+    },
+    "include": [
+      "./test/**/*"
+    ],
+      "exclude": [
+    "node_modules",
+    "**/node_modules/**"
+  ]
+  
+}
