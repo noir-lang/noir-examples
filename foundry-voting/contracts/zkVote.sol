@@ -3,22 +3,21 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.19;
 
-import {UltraVerifier} from '../circuits/contract/plonk_vk.sol';
+import {UltraVerifier} from "../circuits/contract/foundry_voting/plonk_vk.sol";
 
 contract zkVote {
-
     UltraVerifier verifier;
 
     struct Proposal {
         string description;
-        uint deadline;
-        uint forVotes;
-        uint againstVotes;
+        uint256 deadline;
+        uint256 forVotes;
+        uint256 againstVotes;
     }
 
     bytes32 merkleRoot;
-    uint proposalCount;
-    mapping (uint proposalId => Proposal) public proposals;
+    uint256 proposalCount;
+    mapping(uint256 proposalId => Proposal) public proposals;
     mapping(bytes32 hash => bool isNullified) nullifiers;
 
     constructor(bytes32 _merkleRoot, address _verifier) {
@@ -26,13 +25,17 @@ contract zkVote {
         verifier = UltraVerifier(_verifier);
     }
 
-    function propose(string memory description, uint deadline) public returns (uint) {
+    function propose(string memory description, uint256 deadline) public returns (uint256) {
         proposals[proposalCount] = Proposal(description, deadline, 0, 0);
         proposalCount += 1;
         return proposalCount;
     }
 
-    function castVote(bytes calldata proof, uint proposalId, uint vote, bytes32 nullifierHash) public returns (bool) {
+    /// @param vote - Must be "1" to count as a forVote
+    function castVote(bytes calldata proof, uint256 proposalId, uint256 vote, bytes32 nullifierHash)
+        public
+        returns (bool)
+    {
         require(!nullifiers[nullifierHash], "Proof has been already submitted");
         require(block.timestamp < proposals[proposalId].deadline, "Voting period is over.");
         nullifiers[nullifierHash] = true;
@@ -44,10 +47,12 @@ contract zkVote {
         publicInputs[3] = nullifierHash;
         require(verifier.verify(proof, publicInputs), "Invalid proof");
 
-        if(vote == 1)
+        if (vote == 1) {
             proposals[proposalId].forVotes += 1;
-        else // vote = 0
+        } // vote = 0
+        else {
             proposals[proposalId].againstVotes += 1;
+        }
 
         return true;
     }
