@@ -16,12 +16,12 @@ This is the model used for creating the [circuit](circuits/src/main.nr) and the 
 
 1. Create a set of voters. A merkle root is stored in the zkVote Solidity contract that voters will use to verify membership against. In this example, there are 4 accounts in the set of voters. The private keys are 0, 1, 2, 3 and the secret value to create the commitment is 9.
 
-| Private Key | Commitment = pedersen(secret)                                      |
-| ----------- | ------------------------------------------------------------------ |
-| 1           | 0x09489945604c9686e698cb69d7bd6fc0cdb02e9faae3e1a433f1c342c1a5ecc4 |
-| 2           | 0x2d961d9814298c04a4639a56c5c95030d704340ab6d13c135a326da5e515559d |
-| 3           | 0x0a1d1f62bdd17dbdd447feccd23471821e7e43f1ce9165f636513b83a9933474 |
-| 4           | 0x273e0772e851cd0d83d77f05f334d156bc53194e42e8680c6d9469b3aa887eb1 |
+| Secret | Commitment = pedersen(secret)                                      |
+| ------ | ------------------------------------------------------------------ |
+| 1      | 0x09489945604c9686e698cb69d7bd6fc0cdb02e9faae3e1a433f1c342c1a5ecc4 |
+| 2      | 0x2d961d9814298c04a4639a56c5c95030d704340ab6d13c135a326da5e515559d |
+| 3      | 0x0a1d1f62bdd17dbdd447feccd23471821e7e43f1ce9165f636513b83a9933474 |
+| 4      | 0x273e0772e851cd0d83d77f05f334d156bc53194e42e8680c6d9469b3aa887eb1 |
 
 This gives intermediate hashes of `0x083ed6aeca136c6159a761749f6db0c192bacf04294e22ed968ae1a845f97285` (`pedersen(commitment0, commitment1)`) and `0x1501e80783ee5c988327f46f5fcdce388cb97aa7e959ad345c1e2cbaa0b42b83` (`pedersen(commitment2, commitment3)`) and a root hash of `0x29fd5ee89e33f559a7b32ac39f57400aa5a6c77492e28c088f9eb511b0c73e78`.
 
