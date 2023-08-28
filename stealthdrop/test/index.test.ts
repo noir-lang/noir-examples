@@ -123,6 +123,7 @@ describe('Setup', () => {
         "0x" + ethers.utils.hexlify(proof).slice(2).slice(4224),
         "0x" + nullifier.toString("hex")
       )
+      console.log("publicInputs", userAbi.values)
 
       const verification = await noir.verifyProof(proof);
       console.log(verification)
