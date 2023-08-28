@@ -1,7 +1,12 @@
 // @ts-ignore -- no types
-import { newBarretenbergApiSync } from '@aztec/bb.js/dest/factory';
+import {
+  BarretenbergApiSync,
+  Crs,
+  newBarretenbergApiSync,
+  RawBuffer,
+} from '@aztec/bb.js/dest/node/index.js';
 // @ts-ignore -- no types
-import { Fr } from '@aztec/bb.js/dest/types';
+import { Fr } from '@aztec/bb.js/dest/node/types';
 
 // thanks @vezenovm for this beautiful merkle tree implementation
 export interface IMerkleTree {
@@ -23,7 +28,7 @@ export class MerkleTree implements IMerkleTree {
   storage: Map<string, Fr>;
   zeros: Fr[];
   totalLeaves: number;
-  bb: any;
+  bb: BarretenbergApiSync = {} as BarretenbergApiSync;
 
   constructor(levels: number) {
     this.levels = levels;
@@ -46,7 +51,8 @@ export class MerkleTree implements IMerkleTree {
   }
 
   pedersenHash(left: Fr, right: Fr): Fr {
-    let hashRes = this.bb.pedersenHashPair(left, right);
+
+    let hashRes = this.bb.pedersenPlookupCommit([left, right])
     return hashRes;
   }
 

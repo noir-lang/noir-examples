@@ -4,8 +4,7 @@
 .tmp
 
 # dependencies
-node_modules
-.vitest
+/node_modules
 /.pnp
 .pnp.js
 
@@ -39,14 +38,17 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# nargo
-target
-
 # hardhat
 cache
-artifacts
+
+# artifacts
 typechain-types
-proofs/*.proof
+proofs
+
+# noir
+crs
 
 # other
 .vscode
+.DS_Store
+artifacts

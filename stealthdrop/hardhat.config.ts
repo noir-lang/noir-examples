@@ -9,17 +9,21 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.9',
+    version: '0.8.18',
     settings: {
-      evmVersion: 'london',
       optimizer: { enabled: true, runs: 5000 },
     },
   },
-  mocha: {
-    timeout: 100000000,
-  },
   networks: {
-    local: {
+    mumbai: {
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_ALCHEMY_KEY}`,
+      accounts: [process.env.MUMBAI_DEPLOYER_PRIVATE_KEY as string],
+    },
+    sepolia: {
+      url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_KEY}`,
+      accounts: [process.env.SEPOLIA_DEPLOYER_PRIVATE_KEY as string],
+    },
+    localhost: {
       url: 'http://127.0.0.1:8545',
     },
     hardhat: {
@@ -30,7 +34,6 @@ const config: HardhatUserConfig = {
       blockGasLimit: 1000000000,
     },
   },
-
   paths: {
     sources: './circuits/contract',
   },
