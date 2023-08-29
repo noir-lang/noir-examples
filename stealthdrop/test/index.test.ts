@@ -90,16 +90,16 @@ describe('Setup', () => {
         ...ethers.utils.arrayify("0x" + pubKey.slice(4)), 
         ...ethers.utils.arrayify(signature).slice(0, 64), 
         ...ethers.utils.arrayify(hashedMessage), 
-        ...ethers.utils.arrayify("0x" + nullifier.toString("hex")), 
-        ...mt.pathElements.map(el => el.toBuffer()),
-        "0x" + index.toString(),
-        mt.root.toString(),
-        claimer1.address,
-        claimer1.address
+        // ...ethers.utils.arrayify("0x" + nullifier.toString("hex")), 
+        // ...mt.pathElements.map(el => el.toBuffer()),
+        // "0x" + index.toString(),
+        // mt.root.toString(),
+        // claimer1.address,
+        // claimer1.address,
+        user1.address
       ]
       const userAbi = new Map<number, string>();
 
-      console.log(arr)
       for (let i = 0; i < arr.length; i++) {
         // @ts-ignore
         userAbi.set(i + 1, ethers.utils.hexZeroPad(arr[i], 32))
@@ -111,29 +111,33 @@ describe('Setup', () => {
 
     test('Collects tokens from an eligible user', async () => {
       const {userAbi, nullifier} = await getUserAbi(user1);
-      console.log(userAbi)
 
+      // console.log(JSON.stringify(Array.from(userAbi.values())))
+
+      console.log(userAbi)
       await noir.init();
       const witness = await noir.generateWitness(userAbi);
 
       const proof = await noir.generateProof(witness);
-      console.log("proof", ethers.utils.hexlify(proof))
-      console.log(
-        "cut proof",
-        "0x" + ethers.utils.hexlify(proof).slice(2).slice(4224),
-        "0x" + nullifier.toString("hex")
-      )
-      console.log("publicInputs", userAbi.values)
 
       const verification = await noir.verifyProof(proof);
       console.log(verification)
 
+      // 2240
+      const publicInputs = ethers.utils.hexlify(proof).slice(2).slice(0, 2112);
+      const cutDownProof = '0x' + ethers.utils.hexlify(proof).slice(2).slice(2112);
+
+      console.log("proof", ethers.utils.hexlify(proof))
+      console.log("cutDownProof", cutDownProof)
+      console.log("publicInputs", publicInputs.match(/.{1,64}/g).map(x => '0x' + x))
+
       const connectedAirdropContract = airdropContract.connect(claimer1);
       const balanceBefore = await connectedAirdropContract.balanceOf(claimer1.address);
       expect(balanceBefore.toNumber()).to.equal(0);
-      await connectedAirdropContract.claim(
-        "0x" + ethers.utils.hexlify(proof).slice(2).slice(4224),
-        "0x" + nullifier.toString("hex"),
+
+      await verifierContract.verify(
+        cutDownProof,
+        publicInputs.match(/.{1,64}/g).map(x => '0x' + x),
       );
 
       const balanceAfter = await connectedAirdropContract.balanceOf(claimer1.address);
