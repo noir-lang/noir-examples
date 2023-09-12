@@ -1,12 +1,11 @@
 // @ts-ignore -- no types
 import {
-  BarretenbergApiSync,
+  Barretenberg,
   Crs,
-  newBarretenbergApiSync,
   RawBuffer,
-} from '@aztec/bb.js/dest/node/index.js';
+} from '@aztec/bb.js/dest/browser/index.js';
 // @ts-ignore -- no types
-import { Fr } from '@aztec/bb.js/dest/node/types';
+import { Fr } from '@aztec/bb.js/dest/browser/types';
 
 // thanks @vezenovm for this beautiful merkle tree implementation
 export interface IMerkleTree {
@@ -28,7 +27,7 @@ export class MerkleTree implements IMerkleTree {
   storage: Map<string, Fr>;
   zeros: Fr[];
   totalLeaves: number;
-  bb: BarretenbergApiSync = {} as BarretenbergApiSync;
+  bb: Barretenberg = {} as Barretenberg;
 
   constructor(levels: number) {
     this.levels = levels;
@@ -38,20 +37,19 @@ export class MerkleTree implements IMerkleTree {
   }
 
   async initialize(defaultLeaves: Fr[]) {
-    this.bb = await newBarretenbergApiSync();
+    this.bb = await Barretenberg.new(4);
 
     // build zeros depends on tree levels
     let currentZero = this.zeroValue;
     this.zeros.push(currentZero);
 
     for (let i = 0; i < this.levels; i++) {
-      currentZero = this.pedersenHash(currentZero, currentZero);
+      currentZero = await this.pedersenHash(currentZero, currentZero);
       this.zeros.push(currentZero);
     }
   }
 
-  pedersenHash(left: Fr, right: Fr): Fr {
-
+  pedersenHash(left: Fr, right: Fr): Promise<Fr> {
     let hashRes = this.bb.pedersenPlookupCommit([left, right])
     return hashRes;
   }
@@ -132,7 +130,7 @@ export class MerkleTree implements IMerkleTree {
         key: MerkleTree.indexToKey(level, currentIndex),
         value: currentElement,
       });
-      currentElement = this.pedersenHash(left, right);
+      currentElement = await this.pedersenHash(left, right);
     };
 
     this.traverse(index, handleIndex);

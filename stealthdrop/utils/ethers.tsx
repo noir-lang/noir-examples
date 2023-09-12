@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import addresses from './addresses.json';
-import artifacts from '../artifacts/circuits/contract/noirstarter/plonk_vk.sol/UltraVerifier.json';
+import artifacts from '../artifacts/circuits/contract/stealthdrop/plonk_vk.sol/UltraVerifier.json';
 import { toast } from 'react-toastify';
 
 declare global {
@@ -51,6 +51,26 @@ class Ethers {
       }
       this.contract = this.contract.connect(this.signer);
     }
+  }
+
+  async changeSigner(acc : string) {
+    this.signer = this.provider.getSigner(acc)
+    return this.signer;
+  }
+
+  async getAccounts() {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    return accounts;
+  }
+
+  async requestPermissions() {
+    await window.ethereum.request({
+      method: 'wallet_requestPermissions',
+      params: [{
+        eth_accounts: {},
+      }]
+    });
+
   }
 }
 

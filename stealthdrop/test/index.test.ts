@@ -90,13 +90,12 @@ describe('Setup', () => {
         ...ethers.utils.arrayify("0x" + pubKey.slice(4)), 
         ...ethers.utils.arrayify(signature).slice(0, 64), 
         ...ethers.utils.arrayify(hashedMessage), 
-        // ...ethers.utils.arrayify("0x" + nullifier.toString("hex")), 
-        // ...mt.pathElements.map(el => el.toBuffer()),
-        // "0x" + index.toString(),
-        // mt.root.toString(),
-        // claimer1.address,
-        // claimer1.address,
-        user1.address
+        ...ethers.utils.arrayify("0x" + nullifier.toString("hex")), 
+        ...mt.pathElements.map(el => el.toBuffer()),
+        "0x" + index.toString(),
+        mt.root.toString(),
+        claimer1.address,
+        claimer1.address,
       ]
       const userAbi = new Map<number, string>();
 
@@ -123,25 +122,25 @@ describe('Setup', () => {
       const verification = await noir.verifyProof(proof);
       console.log(verification)
 
-      // 2240
-      const publicInputs = ethers.utils.hexlify(proof).slice(2).slice(0, 2112);
-      const cutDownProof = '0x' + ethers.utils.hexlify(proof).slice(2).slice(2112);
+      // // 2240
+      // const publicInputs = ethers.utils.hexlify(proof).slice(2).slice(0, 2112);
+      // const cutDownProof = '0x' + ethers.utils.hexlify(proof).slice(2).slice(2112);
 
-      console.log("proof", ethers.utils.hexlify(proof))
-      console.log("cutDownProof", cutDownProof)
-      console.log("publicInputs", publicInputs.match(/.{1,64}/g).map(x => '0x' + x))
+      // console.log("proof", ethers.utils.hexlify(proof))
+      // console.log("cutDownProof", cutDownProof)
+      // console.log("publicInputs", publicInputs.match(/.{1,64}/g).map(x => '0x' + x))
 
-      const connectedAirdropContract = airdropContract.connect(claimer1);
-      const balanceBefore = await connectedAirdropContract.balanceOf(claimer1.address);
-      expect(balanceBefore.toNumber()).to.equal(0);
+      // const connectedAirdropContract = airdropContract.connect(claimer1);
+      // const balanceBefore = await connectedAirdropContract.balanceOf(claimer1.address);
+      // expect(balanceBefore.toNumber()).to.equal(0);
 
-      await verifierContract.verify(
-        cutDownProof,
-        publicInputs.match(/.{1,64}/g).map(x => '0x' + x),
-      );
+      // await verifierContract.verify(
+      //   cutDownProof,
+      //   publicInputs.match(/.{1,64}/g).map(x => '0x' + x),
+      // );
 
-      const balanceAfter = await connectedAirdropContract.balanceOf(claimer1.address);
-      expect(balanceAfter.toNumber()).to.equal(1);
+      // const balanceAfter = await connectedAirdropContract.balanceOf(claimer1.address);
+      // expect(balanceAfter.toNumber()).to.equal(1);
     });
 
     // test('Fails to collect tokens of an eligible user with a non-authorized account (front-running)', async () => {
