@@ -1,16 +1,14 @@
 // @ts-ignore
 import { expect } from 'chai';
-import ethers, { Contract } from 'ethers';
 import { Noir, generateWitness } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 
-import mainCircuit from '../circuits/main/target/main.json';
-import recursiveCircuit from '../circuits/recursion/target/recursion.json';
+import mainCircuit from '../target/main.json';
+import recursiveCircuit from '../target/recursion.json';
 import { BackendInstances } from '../types';
 
 
 describe('It compiles noir program code, receiving circuit bytes and abi object.', () => {
-
   const backends : BackendInstances = {
     main: new BarretenbergBackend(mainCircuit, 8),
     recursive: new BarretenbergBackend(recursiveCircuit, 8)

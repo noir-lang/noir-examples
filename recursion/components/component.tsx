@@ -4,8 +4,8 @@ import { toast } from 'react-toastify';
 import React from 'react';
 import { Noir, generateWitness } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
-import mainCircuit from '../circuits/main/target/main.json';
-import recursiveCircuit from '../circuits/recursion/target/recursion.json';
+import mainCircuit from '../target/main.json';
+import recursiveCircuit from '../target/recursion.json';
 
 import { BackendInstances, ProofArtifacts } from '../types';
 import { ethers } from 'ethers';

@@ -1,0 +1,3 @@
+[workspace]
+members = ["circuits/main", "circuits/recursion"]
+default-member = "circuits/recursion"

@@ -12,16 +12,6 @@
     debug "^4.3.4"
     tslib "^2.4.0"
 
-"@aztec/bb.js@0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.7.2.tgz#b7c9ea19a0a382de47a24f75da7addfb444b78de"
-  integrity sha512-FX7wWcuxwUKmzE0inTVJ5cE6SUprAYuG1V/gSNDtvQplpM27SxDFq4QcfGMRM9kRkVg6JLs4IKFz5zz4pTqzQA==
-  dependencies:
-    comlink "^4.4.1"
-    commander "^10.0.1"
-    debug "^4.3.4"
-    tslib "^2.4.0"
-
 "@chainsafe/as-sha256@^0.3.1":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@chainsafe/as-sha256/-/as-sha256-0.3.1.tgz#3639df0e1435cab03f4d9870cc3ac079e57a6fc9"
@@ -552,11 +542,6 @@
   dependencies:
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
-
-"@noir-lang/acvm_js@0.26.1":
-  version "0.26.1"
-  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-0.26.1.tgz#5dc5d4f54a1663ff0096ab3e7633c126418bd0f0"
-  integrity sha512-pEZxMIV90nryLbFEzSBEWX3sYpjjN8rTnkD78Vd0ctTFFBdl202sX58LGe11NNH3BOLGvxcJXzv3XXjrVir0Tw==
 
 "@noir-lang/acvm_js@0.28.0":
   version "0.28.0"
@@ -1332,7 +1317,7 @@ at-least-node@^1.0.0:
   resolved "https://registry.yarnpkg.com/at-least-node/-/at-least-node-1.0.0.tgz#602cd4b46e844ad4effc92a8011a3c46e0238dc2"
   integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
-axios@^1.3.4, axios@^1.5.1:
+axios@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.5.1.tgz#11fbaa11fc35f431193a9564109c88c1f27b585f"
   integrity sha512-Q28iYCWzNHjAm+yEAot5QaAMxhMghWLFVf7rRdwhUI+c2jix2DUXjAHXVi+s1ibs3mjPO/cCgbA++3BjD0vP/A==
