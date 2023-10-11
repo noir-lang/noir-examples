@@ -1,41 +1,43 @@
 // @ts-ignore
 import { expect } from 'chai';
 import ethers, { Contract } from 'ethers';
-import path from 'path';
-import { Noir } from '../utils/noir';
-import { execSync } from 'child_process';
+import { Noir, generateWitness } from '@noir-lang/noir_js';
+import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 
-import verifier from '../artifacts/circuits/recursion/contract/recursion/plonk_vk.sol/UltraVerifier.json';
 import mainCircuit from '../circuits/main/target/main.json';
 import recursiveCircuit from '../circuits/recursion/target/recursion.json';
+import { BackendInstances } from '../types';
 
-// import { input } from '../input';
-import { test, beforeAll, describe } from 'vitest';
 
 describe('It compiles noir program code, receiving circuit bytes and abi object.', () => {
-  const noirInstances : {main: Noir, recursive: Noir} = {
-    main: new Noir(mainCircuit),
-    recursive: new Noir(recursiveCircuit)
+
+  const backends : BackendInstances = {
+    main: new BarretenbergBackend(mainCircuit, 8),
+    recursive: new BarretenbergBackend(recursiveCircuit, 8)
+  }
+  const noirs : {main: Noir, recursive: Noir} = {
+    main: new Noir(mainCircuit, backends.main),
+    recursive: new Noir(recursiveCircuit, backends.recursive)
   }
 
-  let recursiveInputs : string[] = [];
+  let recursiveInputs : any;
 
   it('Should generate valid proof for correct input', async () => {
-    const { main: noir } = noirInstances;
+    const { main: noir } = noirs;
+    const { main: backend } = backends
 
-    const input = [ethers.utils.hexZeroPad('0x1', 32), ethers.utils.hexZeroPad('0x2', 32)];
+    const input = { x : 1, y : 2 };
     await noir.init();
-    const witness = await noir.generateWitness(input);
-    const proof = await noir.generateInnerProof(witness);
+    const witness = await generateWitness(mainCircuit, input);
+    const proof = await backend.generateIntermediateProof(witness);
 
-    console.log(proof)
     expect(proof instanceof Uint8Array).to.be.true;
 
-    const verified = await noir.verifyInnerProof(proof);
+    const verified = await backend.verifyIntermediateProof(proof);
     expect(verified).to.be.true;
 
     const numPublicInputs = 1;
-    const { proofAsFields, vkAsFields, vkHash } = await noir.generateInnerProofArtifacts(
+    const { proofAsFields, vkAsFields, vkHash } = await backend.generateIntermediateProofArtifacts(
       proof,
       numPublicInputs,
     );
@@ -45,28 +47,29 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
     const aggregationObject = Array(16).fill(
       '0x0000000000000000000000000000000000000000000000000000000000000000',
     );
-    recursiveInputs = [
-      ...vkAsFields.map(e => e.toString()),
-      ...proofAsFields,
-      input[1],
-      vkHash.toString(),
-      ...aggregationObject,
-    ];
+    recursiveInputs = {
+      verification_key: vkAsFields,
+      proof: proofAsFields,
+      public_inputs: [input.y],
+      key_hash: vkHash,
+      input_aggregation_object: aggregationObject,
+    }
 
-    noir.destroy();
+    backend.destroy();
   });
 
   it('Should verify proof within a proof', async () => {
-    const { recursive: noir } = noirInstances;
+    const { recursive: noir } = noirs;
+    const { recursive: backend } = backends;
+
     await noir.init();
 
-    const witness = await noir.generateWitness(recursiveInputs);
-    const proof = await noir.generateOuterProof(witness);
+    const witness = await generateWitness(recursiveCircuit, recursiveInputs);
+    const proof = await backend.generateFinalProof(witness);
     expect(proof instanceof Uint8Array).to.be.true;
-    console.log(proof);
 
-    const verified = await noir.verifyOuterProof(proof);
-    console.log(verified);
-    noir.destroy();
+    const verified = await backend.verifyFinalProof(proof);
+    expect(verified).to.be.true;
+    backend.destroy();
   });
 });
