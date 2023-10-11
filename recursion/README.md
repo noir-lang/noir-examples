@@ -12,7 +12,11 @@ Why is this useful? In this example, it doesn't do much. But you could verify tw
 
 1. [Install nargo](https://noir-lang.org/getting_started/nargo_installation#option-1-noirup) version 0.11.0 with `noirup -v 0.11.0`
 
-2. Install dependencies with
+2. [Run nargo](https://noir-lang.org/dev/nargo/commands)
+   1. `nargo compile --workspace` will compile all the circuits in a `target` folder
+   2. optionally you can run `nargo prove --workspace` and `nargo verify --workspace` to see it working on the CLI
+
+3. Install dependencies with
 
 ```bash
 yarn

@@ -47,3 +47,5 @@ proofs
 crs
 .DS_Store
 artifacts
+.cache
+.target
