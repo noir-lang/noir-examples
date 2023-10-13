@@ -49,6 +49,6 @@ crs
 artifacts
 .cache
 .target
-typechain-typescript
+typechain-types
 cache
 .target
