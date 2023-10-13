@@ -49,3 +49,6 @@ crs
 artifacts
 .cache
 .target
+typechain-typescript
+cache
+.target
