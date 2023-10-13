@@ -1,6 +1,5 @@
 import { ethers } from 'ethers';
 import addresses from './addresses.json';
-import artifacts from '../artifacts/contract/main/plonk_vk.sol/UltraVerifier.json';
 import { toast } from 'react-toastify';
 
 
@@ -18,7 +17,7 @@ class Ethers {
     this.utils = ethers.utils;
     this.signer = this.provider.getSigner();
 
-    this.contract = new ethers.Contract(addresses.verifier, artifacts.abi, this.signer);
+    this.contract = new ethers.Contract(addresses.verifier, addresses.abi, this.signer);
     this.connect();
   }
 

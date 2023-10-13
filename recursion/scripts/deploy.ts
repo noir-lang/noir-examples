@@ -3,10 +3,10 @@ const hardhat = require("hardhat") // damn commonjs
 
 async function main() {
   // Deploy the verifier contract
-  const Verifier = await hardhat.ethers.getContractFactory('contract/recursion/plonk_vk.sol:UltraVerifier');
+  const Verifier = await hardhat.ethers.getContractFactory('circuits/recursion/contract/recursion/plonk_vk.sol:UltraVerifier');
   const verifier = await Verifier.deploy();
 
-  const { abi } = await import ("../artifacts/contract/recursion/plonk_vk.sol/UltraVerifier.json")
+  const { abi } = await import ("../artifacts/circuits/recursion/contract/recursion/plonk_vk.sol/UltraVerifier.json")
 
   // Get the address of the deployed verifier contract
   const verifierAddr = await verifier.deployed();

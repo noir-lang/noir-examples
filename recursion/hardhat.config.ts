@@ -21,7 +21,7 @@ const config: HardhatUserConfig = {
     timeout: 200000
   },
   paths: {
-    sources: './contract',
+    sources: './circuits',
   },
 };
 

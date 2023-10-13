@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
 import React from 'react';
-import { Noir, acvm, generateWitness, abi } from '@noir-lang/noir_js';
+import { Noir, acvm, abi } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { BackendInstances, Circuits, Noirs, ProofArtifacts } from '../types';
 import { useAccount, useConnect, usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
@@ -16,6 +16,7 @@ import { initializeResolver } from '@noir-lang/source-resolver';
 import newCompiler, { compile, init_log_level as compilerLogLevel } from '@noir-lang/noir_wasm';
 import { CompiledCircuit, ProofData } from '@noir-lang/types';
 import { Proof } from 'viem/_types/types/proof';
+import Ethers from "../utils/ethers"
 
 function splitProof(aggregatedProof: Uint8Array) {
     const splitIndex = aggregatedProof.length - 2144;
@@ -203,9 +204,18 @@ function Component() {
 
       const { proof, publicInputs } = recursiveProofArtifacts;
       console.log(bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi)))
-      write?.({
-        args: [bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi))]
-      })
+
+
+      const ethers = new Ethers();
+
+      // const publicInputs = proof.slice(0, 32);
+      // const slicedProof = proof.slice(32);
+
+      const verification = await ethers.contract.verify(proof, publicInputs);
+      console.log(verification)
+      // write?.({
+      //   args: [bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi))]
+      // })
     }
   };
 
