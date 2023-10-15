@@ -1,7 +1,13 @@
 import { ethers } from 'ethers';
-import addresses from './addresses.json';
+import abi from './verifierAbi.json';
+import addresses from "./addresses.json"
 import { toast } from 'react-toastify';
 
+declare global {
+  interface Window {
+    ethereum: any
+  }
+}
 
 // Ethers class to handle the connection to the blockchain
 class Ethers {
@@ -17,7 +23,7 @@ class Ethers {
     this.utils = ethers.utils;
     this.signer = this.provider.getSigner();
 
-    this.contract = new ethers.Contract(addresses.verifier, addresses.abi, this.signer);
+    this.contract = new ethers.Contract(addresses.verifier, abi, this.signer);
     this.connect();
   }
 

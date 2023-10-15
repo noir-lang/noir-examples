@@ -20,7 +20,7 @@ export type Noirs = {
 }
 
 export interface ProofArtifacts extends ProofData {
-  returnValue: abi.InputValue,
+  returnValue: Uint8Array,
   proofAsFields: string[],
   vkAsFields: string[],
   vkHash: string

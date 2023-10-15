@@ -3,10 +3,8 @@ const hardhat = require("hardhat") // damn commonjs
 
 async function main() {
   // Deploy the verifier contract
-  const Verifier = await hardhat.ethers.getContractFactory('circuits/recursion/contract/recursion/plonk_vk.sol:UltraVerifier');
+  const Verifier = await hardhat.ethers.getContractFactory('UltraVerifier');
   const verifier = await Verifier.deploy();
-
-  const { abi } = await import ("../artifacts/circuits/recursion/contract/recursion/plonk_vk.sol/UltraVerifier.json")
 
   // Get the address of the deployed verifier contract
   const verifierAddr = await verifier.deployed();
@@ -14,12 +12,11 @@ async function main() {
   // Create a config object
   const config = {
     chainId: hardhat.ethers.provider.network.chainId,
-    verifier: verifierAddr.address,
-    abi
+    verifier: verifierAddr.address
   };
 
   // Print the config
-  console.log('Deployed at', config.verifier);
+  console.log('Deployed with', config);
   writeFileSync('utils/addresses.json', JSON.stringify(config), { flag: 'w' });
   process.exit();
 }

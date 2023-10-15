@@ -2,12 +2,13 @@ import { useState, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
 import React from 'react';
-import { Noir, acvm, abi } from '@noir-lang/noir_js';
+import { Noir } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { BackendInstances, Circuits, Noirs, ProofArtifacts } from '../types';
 import { useAccount, useConnect, usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import deployment from "../utils/addresses.json"
+import abi from "../utils/verifierAbi.json"
 import { bytesToHex, hexToBytes, pad, toHex } from 'viem'
 import { InputMap } from '@noir-lang/noirc_abi';
 import axios from "axios";
@@ -73,7 +74,7 @@ function Component() {
 
   const contractCallConfig = {
     address: "0x0165878A594ca255338adfa4d48449f69242Eb8F" as`0x${string}`,
-    abi: [...deployment.abi]
+    abi
   }
 
   const { write, data, error, isLoading, isError } = useContractWrite({
@@ -104,7 +105,7 @@ function Component() {
         x: "2",
         y: "3"
       }
-      const { witness, returnValue} = await noirs!.main.execute(inputs);
+      const { witness, returnValue } = await noirs!.main.execute(inputs);
       const { publicInputs, proof } = await backends!.main.generateIntermediateProof(witness);
 
       console.log('inner proof generated: ', {proof: bytesToHex(proof), publicInputs});
@@ -122,7 +123,7 @@ function Component() {
         1, // 1 public input
       );
 
-      setMainProofArtifacts({ returnValue, proof, publicInputs, proofAsFields, vkAsFields, vkHash })
+      setMainProofArtifacts({ returnValue: returnValue as unknown as Uint8Array, proof, publicInputs, proofAsFields, vkAsFields, vkHash })
 
       resolve(true)
     });
@@ -154,14 +155,15 @@ function Component() {
       // console.log('generating outer proof');
       const { witness, returnValue } = await noirs!.recursive.execute(recInput);
 
-      // const witnessMap = await abi.abiEncode(recursiveCircuit.abi, recInput, null);
-
-      // const retWitness = await acvm.getReturnWitness(base64Decode(recursiveCircuit.bytecode), witnessMap);
 
       console.log("witness", witness)
       console.log("return", returnValue)
 
-      const { publicInputs, proof } = await backends!.recursive.generateFinalProof(witness);
+      const newBackend = new BarretenbergBackend(circuits!.recursive, { threads: 8 })
+      
+      const { publicInputs, proof } = await newBackend.generateFinalProof(witness);
+
+      setBackends({main: backends!.main, recursive: newBackend})
 
       // console.log('Outer proof generated: ', aggregatedProof);
       // console.log("string", bytesToHex(aggregatedProof))
@@ -169,7 +171,7 @@ function Component() {
       // const publicInputs = piArray.map((input: Uint8Array) => bytesToHex(input))
 
       console.log("recursive proof:", proof, publicInputs)
-      setRecursiveProofArtifacts({ returnValue, proof, publicInputs, proofAsFields: [], vkAsFields: [], vkHash: "" })
+      setRecursiveProofArtifacts({ returnValue: returnValue as unknown as Uint8Array, proof, publicInputs, proofAsFields: [], vkAsFields: [], vkHash: "" })
 
       resolve(proof);
     });
@@ -188,12 +190,22 @@ function Component() {
         console.log("backend here:", backends!.recursive)
 
         const { proof, publicInputs } = recursiveProofArtifacts;
+        
         const verification = await backends!.recursive.verifyFinalProof({ proof, publicInputs });
 
         console.log('Proof verified as', verification);
         await noirs!.recursive.destroy();
 
-        resolve(verification);
+        console.log("proof + public inputs")
+        console.log(bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi)))
+
+
+        const ethers = new Ethers();
+
+        const onChainVer = await ethers.contract.verify(proof, publicInputs);
+        console.log(onChainVer)
+
+        resolve(onChainVer);
       });
 
       toast.promise(proofVerification, {
@@ -202,17 +214,6 @@ function Component() {
         error: 'Error verifying recursive proof',
       });
 
-      const { proof, publicInputs } = recursiveProofArtifacts;
-      console.log(bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi)))
-
-
-      const ethers = new Ethers();
-
-      // const publicInputs = proof.slice(0, 32);
-      // const slicedProof = proof.slice(32);
-
-      const verification = await ethers.contract.verify(proof, publicInputs);
-      console.log(verification)
       // write?.({
       //   args: [bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi))]
       // })
