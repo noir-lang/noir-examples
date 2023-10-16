@@ -46,13 +46,7 @@ contract Airdrop is ERC20 {
         _publicInputs = preparePublicInputs(_publicInputs, nullifier, 32);
         _publicInputs[64] = merkleRoot;
         _publicInputs[65] = bytes32(uint256(uint160(msg.sender)));
-
-        for (uint256 i = 0; i < 66; i++) {
-            console.logBytes32(_publicInputs[i]);
-        }
-
         verifier.verify(proof, _publicInputs);
-
 
         // mint tokens
         _transfer(address(this), msg.sender, 1);

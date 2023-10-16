@@ -1,6 +1,6 @@
 import '@nomicfoundation/hardhat-toolbox';
-import '@nomiclabs/hardhat-ethers';
 import '@nomicfoundation/hardhat-chai-matchers';
+import "@nomicfoundation/hardhat-viem";
 
 import { HardhatUserConfig } from 'hardhat/config';
 

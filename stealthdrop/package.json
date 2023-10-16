@@ -7,15 +7,20 @@
     "build": "hardhat compile && yarn deploy && next build",
     "start": "next start",
     "deploy": "hardhat compile && hardhat run --network ${NETWORK} scripts/deploy.ts",
-    "test": "hardhat compile && vitest"
+    "test": "hardhat compile && hardhat test",
+    "resolve": "ts-node scripts/resolveDeps.ts"
   },
   "dependencies": {
-    "@aztec/bb.js": "0.5.1",
+    "@aztec/bb.js": "^0.8.14",
     "@ethereumjs/util": "^9.0.0",
-    "@noir-lang/acvm_js": "git+https://git@github.com/noir-lang/acvm-simulator-wasm.git#b9d9ca9dfc5140839f23998d9466307215607c42",
+    "@noir-lang/backend_barretenberg": "^0.7.10-37315f8.nightly",
+    "@noir-lang/noir_js": "^0.16.0-37315f8.nightly",
+    "@noir-lang/noir_wasm": "^0.16.0-37315f8.nightly",
+    "@noir-lang/source-resolver": "^0.16.0-37315f8.nightly",
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.6",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",
+    "@nomicfoundation/hardhat-viem": "^1.0.0",
     "@nomiclabs/hardhat-ethers": "^2.2.2",
     "@nomiclabs/hardhat-etherscan": "^3.0.0",
     "@openzeppelin/contracts": "^4.9.3",
@@ -27,7 +32,7 @@
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "fflate": "^0.8.0",
-    "hardhat": "^2.17.0",
+    "hardhat": "^2.18.1",
     "hardhat-gas-reporter": "^1.0.8",
     "keccak256": "^1.0.6",
     "next": "latest",
@@ -36,8 +41,10 @@
     "react-loader-spinner": "^5.3.4",
     "react-toastify": "^9.1.1",
     "solidity-coverage": "^0.8.1",
+    "toml": "^3.0.0",
     "ts-node": "^10.9.1",
-    "typechain": "^8.1.0"
+    "typechain": "^8.1.0",
+    "viem": "^1.16.5"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.1",

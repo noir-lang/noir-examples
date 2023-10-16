@@ -1,43 +1,46 @@
 // @ts-ignore
-import ethers, { Contract } from 'ethers';
-import fs from 'fs';
-import path from 'path';
-import { exec, execSync } from 'child_process';
 import { MerkleTree } from '../utils/merkleTree'; // MerkleTree.js
 import merkle from './merkle.json'; // merkle
-import keccak256 from 'keccak256';
+import { viem } from "hardhat"
+import { localhost } from 'viem/chains'
 
-import { NoirNode } from '../utils/noir/noirNode';
-import { Fr } from '@aztec/bb.js/dest/node/types';
+import toml from 'toml';
+import { Fr } from '@aztec/bb.js';
 
 // @ts-ignore -- no types
 import blake2 from 'blake2';
 
-import airdrop from '../artifacts/circuits/contract/Airdrop.sol/Airdrop.json';
-import verifier from '../artifacts/circuits/contract/stealthdrop/plonk_vk.sol/UltraVerifier.json';
+import { Airdrop, UltraVerifier } from '../typechain-types';
+import { Wallet } from 'ethers';
+import { PublicClient, WalletClient, fromHex, hashMessage, http, recoverPublicKey, toHex } from 'viem';
 
-import { test, beforeAll, describe, expect } from 'vitest';
+import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
+import { Noir }  from '@noir-lang/noir_js';
+import { CompiledCircuit } from "@noir-lang/types"
+import { compile } from "@noir-lang/noir_wasm"
+
+import { initializeResolver } from '@noir-lang/source-resolver';
+import path, { resolve } from 'path';
+
+import circuit from "../circuits/target/stealthdrop.json"
+import { readFileSync } from 'fs';
+import axios from 'axios';
 
 describe('Setup', () => {
-  let verifierContract: Contract;
-  let airdropContract: Contract;
+  let publicClient : PublicClient;
+  
+  let verifierContract: UltraVerifier;
+  let airdropContract: Airdrop;
   let merkleTree: MerkleTree;
-  let messageToHash = '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
+  let messageToHash : `0x${string}`= '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
   let hashedMessage: string;
-  let provider = ethers.getDefaultProvider('http://127.0.0.1:8545');
-  let deployerWallet = new ethers.Wallet(
-    process.env.DEPLOYER_PRIVATE_KEY as unknown as string,
-    provider,
-  );
 
-  beforeAll(async () => {
-    const Verifier = new ethers.ContractFactory(verifier.abi, verifier.bytecode, deployerWallet);
-    verifierContract = await Verifier.deploy();
+  before(async () => {
+    publicClient = await viem.getPublicClient();
+  
+    const verifier = await viem.deployContract('UltraVerifier');
+    console.log(`Verifier deployed to ${verifier.address}`);
 
-    const verifierAddr = await verifierContract.deployed();
-    console.log(`Verifier deployed to ${verifierAddr.address}`);
-
-    const Airdrop = new ethers.ContractFactory(airdrop.abi, airdrop.bytecode, deployerWallet);
 
     // Setup merkle tree
     merkleTree = new MerkleTree(4);
@@ -45,82 +48,87 @@ describe('Setup', () => {
 
     await Promise.all(
       merkle.map(async (addr: any) => {
-        // @ts-ignore
-        const leaf = Fr.fromString(addr);
-        merkleTree.insert(leaf);
+        merkleTree.insert(Fr.fromString(addr));
       }),
     );
 
-    hashedMessage = ethers.utils.hashMessage(messageToHash); // keccak of "signthis"
-    airdropContract = await Airdrop.deploy(
+    hashedMessage = hashMessage(messageToHash); // keccak of "signthis"
+
+    const airdrop = await viem.deployContract('Airdrop', [
       merkleTree.root().toString(),
       hashedMessage,
-      verifierAddr.address,
+      verifier.address,
       '3500000000000000000000',
-    );
-    await airdropContract.deployed();
-    console.log('Airdrop deployed to:', airdropContract.address);
+    ]);
+
+    console.log(`Airdrop deployed to ${airdrop.address}`);
   });
 
   describe('Airdrop', () => {
-    let user1: ethers.Wallet;
-    let user2: ethers.Wallet;
-    let claimer1: ethers.Wallet;
-    let claimer2: ethers.Wallet;
+    let user1: WalletClient;
+    let user2: WalletClient;
+    let claimer1: WalletClient;
+    let claimer2: WalletClient;
 
-    beforeAll(async () => {
-      const provider = ethers.getDefaultProvider('http://127.0.0.1:8545');
-      user1 = new ethers.Wallet(process.env.USER1_PRIVATE_KEY as string, provider);
-      claimer1 = new ethers.Wallet(process.env.CLAIMER1_PRIVATE_KEY as string, provider);
-      claimer2 = new ethers.Wallet(process.env.CLAIMER2_PRIVATE_KEY as string, provider);
+    let circuit : CompiledCircuit
+    let backend : BarretenbergBackend;
+    let noir : Noir;
+
+    before(async () => {
+      ([user1, user2, claimer1, claimer2] = await viem.getWalletClients());
+      
+      initializeResolver((id : string) => {
+        console.log('source-resolver: resolving:', id);
+
+        return id;
+      })
+
+      const circuitPath = path.resolve("circuits/src/main.nr")
+      console.log(circuitPath)
+      // circuit = await compile(circuitPath);
+
+      backend = new BarretenbergBackend(circuit, { threads: 8 });
+      noir = new Noir(circuit, backend);
+
     });
 
-    const getUserAbi = async (user: ethers.Wallet) => {
-      const leaf = Fr.fromString(user.address);
-      const pubKey = user.publicKey;
-      const signature = await user1.signMessage(messageToHash);
-      const index = merkleTree.getIndex(leaf);
-      const mt = merkleTree.proof(index);
+    const getClaimInputs = async ({user} : { user: WalletClient }) => {
+      const leaf = user.account!.address;
+      const index = merkleTree.getIndex(Fr.fromString(leaf));
+      const signature = await user1.signMessage({ account: user1.account!.address, message: messageToHash })
       const nullifier = blake2
-        .createHash('blake2s')
-        .update(ethers.utils.arrayify(signature).slice(0, 64))
-        .digest();
+          .createHash('blake2s')
+          .update(fromHex(signature, "bytes").slice(0, 64))
+          .digest("hex")
 
-      const arr = [
-        ...ethers.utils.arrayify("0x" + pubKey.slice(4)), 
-        ...ethers.utils.arrayify(signature).slice(0, 64), 
-        ...ethers.utils.arrayify(hashedMessage), 
-        ...ethers.utils.arrayify("0x" + nullifier.toString("hex")), 
-        ...mt.pathElements.map(el => el.toBuffer()),
-        "0x" + index.toString(),
-        mt.root.toString(),
-        claimer1.address,
-        claimer1.address,
-      ]
-      const userAbi = new Map<number, string>();
-
-      for (let i = 0; i < arr.length; i++) {
-        // @ts-ignore
-        userAbi.set(i + 1, ethers.utils.hexZeroPad(arr[i], 32))
-      }
-      return {userAbi, nullifier};
+      const pubKey = await recoverPublicKey({hash: messageToHash, signature});
+      console.log(pubKey.slice(2))
+      console.log(pubKey.slice(2).length)
+      console.log(fromHex(pubKey.slice(2) as `0x{bytes}`, "bytes"))
+      return {
+          "pub_key": pubKey.slice(2)
+          // signature: signature.slice(0, 130),
+          // hashed_message: messageToHash,
+          // nullifier : `0x${nullifier}`,
+          // merkle_path : merkleTree.proof(index).pathElements.map((x : any) => x.toString()),
+          // index: `0x${index.toString()}`,
+          // merkle_root : merkleTree.root().toString(),
+          // claimer_priv: claimer1.account!.address,
+          // claimer_pub: claimer1.account!.address,
+      };
     };
 
-    const noir = new NoirNode();
+    // const noir = new NoirNode();
 
-    test('Collects tokens from an eligible user', async () => {
-      const {userAbi, nullifier} = await getUserAbi(user1);
+    it('Collects tokens from an eligible user', async () => {
+      const inputs = await getClaimInputs({ user: user1 });
 
-      // console.log(JSON.stringify(Array.from(userAbi.values())))
+      // console.log(inputs)
+      // const proof = await noir.execute(inputs);
+      // console.log(proof)
 
-      console.log(userAbi)
-      await noir.init();
-      const witness = await noir.generateWitness(userAbi);
-
-      const proof = await noir.generateProof(witness);
-
-      const verification = await noir.verifyProof(proof);
-      console.log(verification)
+      // const verification = await noir.verifyProof(proof);
+      // console.log(verification)
 
       // // 2240
       // const publicInputs = ethers.utils.hexlify(proof).slice(2).slice(0, 2112);

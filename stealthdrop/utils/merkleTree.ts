@@ -1,11 +1,8 @@
 // @ts-ignore -- no types
 import {
   Barretenberg,
-  Crs,
-  RawBuffer,
-} from '@aztec/bb.js/dest/browser/index.js';
-// @ts-ignore -- no types
-import { Fr } from '@aztec/bb.js/dest/browser/types';
+  Fr
+} from '@aztec/bb.js';
 
 // thanks @vezenovm for this beautiful merkle tree implementation
 export interface IMerkleTree {
