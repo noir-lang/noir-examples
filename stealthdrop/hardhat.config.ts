@@ -1,4 +1,4 @@
-import '@nomicfoundation/hardhat-toolbox';
+import '@nomicfoundation/hardhat-toolbox-viem';
 import '@nomicfoundation/hardhat-chai-matchers';
 import "@nomicfoundation/hardhat-viem";
 
@@ -9,7 +9,7 @@ dotenv.config();
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.18',
+    version: '0.8.20',
     settings: {
       optimizer: { enabled: true, runs: 5000 },
     },
@@ -35,8 +35,11 @@ const config: HardhatUserConfig = {
     },
   },
   paths: {
-    sources: './circuits/contract',
+    sources: './contracts',
   },
+  mocha: {
+    timeout: 4000000
+  }
 };
 
 export default config;

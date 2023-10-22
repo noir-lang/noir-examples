@@ -1,18 +1,17 @@
 // @ts-ignore -- no types
-import {
-  Barretenberg,
-  Fr
-} from '@aztec/bb.js';
+import { Barretenberg } from '@aztec/bb.js';
+// @ts-ignore -- no types
+import { Fr } from '@aztec/bb.js';
 
 // thanks @vezenovm for this beautiful merkle tree implementation
 export interface IMerkleTree {
   root: () => Fr;
-  proof: (index: number) => {
+  proof: (index: number) => Promise<{
     root: Fr;
     pathElements: Fr[];
     pathIndices: number[];
     leaf: Fr;
-  };
+  }>;
   insert: (leaf: Fr) => void;
 }
 
@@ -34,8 +33,7 @@ export class MerkleTree implements IMerkleTree {
   }
 
   async initialize(defaultLeaves: Fr[]) {
-    this.bb = await Barretenberg.new(4);
-
+    this.bb = await Barretenberg.new();
     // build zeros depends on tree levels
     let currentZero = this.zeroValue;
     this.zeros.push(currentZero);
@@ -44,10 +42,19 @@ export class MerkleTree implements IMerkleTree {
       currentZero = await this.pedersenHash(currentZero, currentZero);
       this.zeros.push(currentZero);
     }
+
+    for await (let leaf of defaultLeaves) {
+      await this.insert(leaf);
+    }
   }
 
-  pedersenHash(left: Fr, right: Fr): Promise<Fr> {
-    let hashRes = this.bb.pedersenPlookupCommit([left, right])
+  async getBB() {
+    return this.bb;
+  }
+
+  async pedersenHash(left: Fr, right: Fr): Promise<Fr> {
+    await this.bb.pedersenInit();
+    let hashRes = await this.bb.pedersenPlookupCommit([left, right]);
     return hashRes;
   }
 
@@ -68,7 +75,7 @@ export class MerkleTree implements IMerkleTree {
     return this.storage.get(MerkleTree.indexToKey(this.levels, 0)) || this.zeros[this.levels];
   }
 
-  proof(indexOfLeaf: number) {
+  async proof(indexOfLeaf: number) {
     let pathElements: Fr[] = [];
     let pathIndices: number[] = [];
 
@@ -76,14 +83,14 @@ export class MerkleTree implements IMerkleTree {
     if (!leaf) throw new Error('leaf not found');
 
     // store sibling into pathElements and target's indices into pathIndices
-    const handleIndex = (level: number, currentIndex: number, siblingIndex: number) => {
+    const handleIndex = async (level: number, currentIndex: number, siblingIndex: number) => {
       const siblingValue =
         this.storage.get(MerkleTree.indexToKey(level, siblingIndex)) || this.zeros[level];
       pathElements.push(siblingValue);
       pathIndices.push(currentIndex % 2);
     };
 
-    this.traverse(indexOfLeaf, handleIndex);
+    await this.traverse(indexOfLeaf, handleIndex);
 
     return {
       root: this.root(),
@@ -93,13 +100,13 @@ export class MerkleTree implements IMerkleTree {
     };
   }
 
-  insert(leaf: Fr) {
+  async insert(leaf: Fr) {
     const index = this.totalLeaves;
-    this.update(index, leaf, true);
+    await this.update(index, leaf, true);
     this.totalLeaves++;
   }
 
-  update(index: number, newLeaf: Fr, isInsert: boolean = false) {
+  async update(index: number, newLeaf: Fr, isInsert: boolean = false) {
     if (!isInsert && index >= this.totalLeaves) {
       throw Error('Use insert method for new elements.');
     } else if (isInsert && index < this.totalLeaves) {
@@ -130,7 +137,7 @@ export class MerkleTree implements IMerkleTree {
       currentElement = await this.pedersenHash(left, right);
     };
 
-    this.traverse(index, handleIndex);
+    await this.traverse(index, handleIndex);
 
     // push root to the end
     keyValueToStore.push({
@@ -144,9 +151,9 @@ export class MerkleTree implements IMerkleTree {
   }
 
   // traverse from leaf to root with handler for target node and sibling node
-  private traverse(
+  private async traverse(
     indexOfLeaf: number,
-    handler: (level: number, currentIndex: number, siblingIndex: number) => void,
+    handler: (level: number, currentIndex: number, siblingIndex: number) => Promise<void>,
   ) {
     let currentIndex = indexOfLeaf;
     for (let i = 0; i < this.levels; i++) {
@@ -157,7 +164,7 @@ export class MerkleTree implements IMerkleTree {
         siblingIndex = currentIndex - 1;
       }
 
-      handler(i, currentIndex, siblingIndex);
+      await handler(i, currentIndex, siblingIndex);
       currentIndex = Math.floor(currentIndex / 2);
     }
   }

@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
+  transpilePackages: [
+    "@noir-lang/noirDepManager"
+  ],
   // permits loading of the worker file (barretenberg.js):
   experimental: {
     esmExternals: 'loose',
@@ -13,7 +17,7 @@ const nextConfig = {
         config.optimization.minimizer = [];
       }
     }
-
+    
     return config;
   },
   // allows for local running of multithreads:

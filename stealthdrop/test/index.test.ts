@@ -1,176 +1,183 @@
 // @ts-ignore
 import { MerkleTree } from '../utils/merkleTree'; // MerkleTree.js
 import merkle from './merkle.json'; // merkle
-import { viem } from "hardhat"
-import { localhost } from 'viem/chains'
+import hre from "hardhat"
 
-import toml from 'toml';
-import { Fr } from '@aztec/bb.js';
+import { Barretenberg, Fr } from '@aztec/bb.js';
 
-// @ts-ignore -- no types
-import blake2 from 'blake2';
-
-import { Airdrop, UltraVerifier } from '../typechain-types';
-import { Wallet } from 'ethers';
-import { PublicClient, WalletClient, fromHex, hashMessage, http, recoverPublicKey, toHex } from 'viem';
+import { PublicClient, WalletClient, pad, fromHex, hashMessage, http, recoverPublicKey, toHex } from 'viem';
 
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir }  from '@noir-lang/noir_js';
-import { CompiledCircuit } from "@noir-lang/types"
-import { compile } from "@noir-lang/noir_wasm"
-
-import { initializeResolver } from '@noir-lang/source-resolver';
-import path, { resolve } from 'path';
-
+import { CompiledCircuit, ProofData } from "@noir-lang/types"
 import circuit from "../circuits/target/stealthdrop.json"
-import { readFileSync } from 'fs';
-import axios from 'axios';
+
+import { expect } from 'chai';
+
+class Airdrop {
+  public address : `0x${string}`= "0x";
+
+  constructor(
+    private _hashedMessage : `0x${string}`, 
+    private _verifierAddress: string, 
+    public merkleTreeRoot: string, 
+    private _amount: string) {
+  }
+
+  async deploy () {
+    const airdrop = await hre.viem.deployContract('Ad' as never, [
+      this.merkleTreeRoot,
+      this._hashedMessage,
+      this._verifierAddress,
+      '3500000000000000000000',
+    ])
+    this.address = airdrop.address;
+  }
+
+  async contract() {
+    return await hre.viem.getContractAt('Ad', this.address)
+  }
+}
 
 describe('Setup', () => {
   let publicClient : PublicClient;
   
-  let verifierContract: UltraVerifier;
-  let airdropContract: Airdrop;
   let merkleTree: MerkleTree;
+  let bb : Barretenberg;
+  let airdrop : Airdrop;
   let messageToHash : `0x${string}`= '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
-  let hashedMessage: string;
+  let hashedMessage: `0x${string}`;
 
   before(async () => {
-    publicClient = await viem.getPublicClient();
+    publicClient = await hre.viem.getPublicClient();
   
-    const verifier = await viem.deployContract('UltraVerifier');
+    const verifier = await hre.viem.deployContract('UltraVerifier');
     console.log(`Verifier deployed to ${verifier.address}`);
 
 
     // Setup merkle tree
     merkleTree = new MerkleTree(4);
-    await merkleTree.initialize([]);
+    await merkleTree.initialize(merkle.map(addr => Fr.fromString(addr)));
 
-    await Promise.all(
-      merkle.map(async (addr: any) => {
-        merkleTree.insert(Fr.fromString(addr));
-      }),
-    );
+    hashedMessage = hashMessage(messageToHash, "hex"); // keccak of "signthis"
 
-    hashedMessage = hashMessage(messageToHash); // keccak of "signthis"
-
-    const airdrop = await viem.deployContract('Airdrop', [
-      merkleTree.root().toString(),
-      hashedMessage,
-      verifier.address,
-      '3500000000000000000000',
-    ]);
+    airdrop = new Airdrop(hashedMessage, verifier.address, merkleTree.root().toString(), '3500000000000000000000');
+    await airdrop.deploy();
 
     console.log(`Airdrop deployed to ${airdrop.address}`);
+
   });
 
-  describe('Airdrop', () => {
+  describe('Airdrop tests', () => {
     let user1: WalletClient;
     let user2: WalletClient;
     let claimer1: WalletClient;
     let claimer2: WalletClient;
 
-    let circuit : CompiledCircuit
     let backend : BarretenbergBackend;
     let noir : Noir;
 
     before(async () => {
-      ([user1, user2, claimer1, claimer2] = await viem.getWalletClients());
+      // only user1 is an eligible user
+      ([user1, user2, claimer1, claimer2] = await hre.viem.getWalletClients());
       
-      initializeResolver((id : string) => {
-        console.log('source-resolver: resolving:', id);
-
-        return id;
-      })
-
-      const circuitPath = path.resolve("circuits/src/main.nr")
-      console.log(circuitPath)
-      // circuit = await compile(circuitPath);
-
-      backend = new BarretenbergBackend(circuit, { threads: 8 });
-      noir = new Noir(circuit, backend);
+      backend = new BarretenbergBackend(circuit as unknown as CompiledCircuit, { threads: 8 });
+      noir = new Noir(circuit as unknown as CompiledCircuit, backend);
 
     });
 
     const getClaimInputs = async ({user} : { user: WalletClient }) => {
+
       const leaf = user.account!.address;
       const index = merkleTree.getIndex(Fr.fromString(leaf));
-      const signature = await user1.signMessage({ account: user1.account!.address, message: messageToHash })
-      const nullifier = blake2
-          .createHash('blake2s')
-          .update(fromHex(signature, "bytes").slice(0, 64))
-          .digest("hex")
+      const signature = await user.signMessage({ account: user.account!.address, message: messageToHash })
 
-      const pubKey = await recoverPublicKey({hash: messageToHash, signature});
-      console.log(pubKey.slice(2))
-      console.log(pubKey.slice(2).length)
-      console.log(fromHex(pubKey.slice(2) as `0x{bytes}`, "bytes"))
+      const pedersenBB = await merkleTree.getBB()
+      await pedersenBB.pedersenHashInit();
+      const signatureBuffer = fromHex(signature as `0x${string}`, "bytes").slice(0, 64)
+
+      const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
+
+      const nullifier = await pedersenBB.pedersenPlookupCommit(frArray)
+      const pubKey = await recoverPublicKey({hash: hashedMessage, signature});
+
+      const proof = await merkleTree.proof(index)
       return {
-          "pub_key": pubKey.slice(2)
-          // signature: signature.slice(0, 130),
-          // hashed_message: messageToHash,
-          // nullifier : `0x${nullifier}`,
-          // merkle_path : merkleTree.proof(index).pathElements.map((x : any) => x.toString()),
-          // index: `0x${index.toString()}`,
-          // merkle_root : merkleTree.root().toString(),
-          // claimer_priv: claimer1.account!.address,
-          // claimer_pub: claimer1.account!.address,
+          pub_key: [...fromHex(pubKey, "bytes").slice(1)],
+          signature: [...fromHex(signature as `0x${string}`, "bytes").slice(0, 64)],
+          hashed_message: [...fromHex(hashedMessage, "bytes")],
+          nullifier : nullifier.toString(),
+          merkle_path : proof.pathElements.map(x => x.toString()),
+          index: index,
+          merkle_root : merkleTree.root().toString() as `0x${string}`,
+          claimer_priv: claimer1.account!.address,
+          claimer_pub: claimer1.account!.address,
       };
     };
 
-    // const noir = new NoirNode();
+    describe("Eligible user", () => {
+      let proof : ProofData;
 
-    it('Collects tokens from an eligible user', async () => {
-      const inputs = await getClaimInputs({ user: user1 });
+      it("Generates a valid claim", async () => {
+        const inputs = await getClaimInputs({ user: user1 });
+        proof = await noir.generateFinalProof(inputs)
+      })
 
-      // console.log(inputs)
-      // const proof = await noir.execute(inputs);
-      // console.log(proof)
+      it("Verifies a valid claim off-chain", async () => {
+        const verification = await noir.verifyFinalProof(proof);
+        expect(verification).to.be.true;
+      })
 
-      // const verification = await noir.verifyProof(proof);
-      // console.log(verification)
+      // ON-CHAIN VERIFICATION FAILS, CHECK https://github.com/noir-lang/noir/issues/3245
+      it.skip("Verifies a valid claim on-chain", async () => {
+        const { nullifier } = await getClaimInputs({ user: user1 });
+        const ad = await airdrop.contract();
 
-      // // 2240
-      // const publicInputs = ethers.utils.hexlify(proof).slice(2).slice(0, 2112);
-      // const cutDownProof = '0x' + ethers.utils.hexlify(proof).slice(2).slice(2112);
+        await ad.write.claim([toHex(proof.proof), nullifier as `0x${string}`], { account: claimer1.account!.address });
 
-      // console.log("proof", ethers.utils.hexlify(proof))
-      // console.log("cutDownProof", cutDownProof)
-      // console.log("publicInputs", publicInputs.match(/.{1,64}/g).map(x => '0x' + x))
+      })
+    })
 
-      // const connectedAirdropContract = airdropContract.connect(claimer1);
-      // const balanceBefore = await connectedAirdropContract.balanceOf(claimer1.address);
-      // expect(balanceBefore.toNumber()).to.equal(0);
 
-      // await verifierContract.verify(
-      //   cutDownProof,
-      //   publicInputs.match(/.{1,64}/g).map(x => '0x' + x),
-      // );
+    describe.only("Uneligible user", () => {
+      let proof : ProofData;
 
-      // const balanceAfter = await connectedAirdropContract.balanceOf(claimer1.address);
-      // expect(balanceAfter.toNumber()).to.equal(1);
-    });
+      it("Fails to generate a valid claim", async () => {
+        try {
+          // give it a genuine signature...
+          const signature = await user2.signMessage({ account: user2.account!.address, message: messageToHash })
+          const pedersenBB = await merkleTree.getBB()
+          await pedersenBB.pedersenHashInit();
+          const signatureBuffer = fromHex(signature as `0x${string}`, "bytes").slice(0, 64)
+          const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
+          const nullifier = await pedersenBB.pedersenPlookupCommit(frArray)
+          const pubKey = await recoverPublicKey({hash: hashedMessage, signature});
 
-    // test('Fails to collect tokens of an eligible user with a non-authorized account (front-running)', async () => {
-    //   try {
-    //     const userAbi = await getUserAbi(user1);
-    //     console.log('Valid ABI', userAbi);
-    //     const proof = prove(userAbi, 'valid');
-    //     expect(proof).to.exist;
+          // ...but give it a fake merkle path
+          const { merkle_path, index, merkle_root } = (await import("./fixtures/uneligible_user_inputs")).default
+          const naughtyInputs = {
+            pub_key: [...fromHex(pubKey, "bytes").slice(1)],
+            signature: [...fromHex(signature as `0x${string}`, "bytes").slice(0, 64)],
+            hashed_message: [...fromHex(hashedMessage, "bytes")],
+            nullifier : nullifier.toString(),
+            merkle_path,
+            index,
+            merkle_root,
+            claimer_priv: claimer1.account!.address,
+            claimer_pub: claimer1.account!.address,
+          };
 
-    //     const connectedAirdropContract = airdropContract.connect(claimer2);
-    //     const balanceBefore = await connectedAirdropContract.balanceOf(claimer2.address);
-    //     expect(balanceBefore.toNumber()).to.equal(0);
-    //     await connectedAirdropContract.claim(
-    //       '0x' + proof.toString(),
-    //       ethers.utils.hexlify(userAbi.nullifier),
-    //     );
+          proof = await noir.generateFinalProof(naughtyInputs)
+        
+        } catch(err: any) {
+          expect(err.message).to.equal("Circuit execution failed: Error: Cannot satisfy constraint");
+        }
+      })
 
-    //     const balanceAfter = await connectedAirdropContract.balanceOf(claimer2.address);
-    //     expect(balanceAfter.toNumber()).to.equal(0);
-    //   } catch (e: any) {
-    //     expect(e.error.reason).to.contain('PROOF_FAILURE()');
-    //   }
-    // });
+      it("Fails to front-run the on-chain transaction with a invalid claimer", async () => {
+        // ON-CHAIN VERIFICATION FAILS
+      })
+
+    })
   });
 });

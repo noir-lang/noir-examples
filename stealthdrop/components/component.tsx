@@ -1,179 +1,143 @@
 import { useState, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
-import Ethers from '../utils/ethers';
 import React from 'react';
-import { NoirBrowser } from '../utils/noir/noirBrowser';
 
-import { ThreeDots } from 'react-loader-spinner';
-import { Fr } from '@aztec/bb.js/dest/browser/types/fields';
-import { ecrecover, fromRpcSig, toType } from "@ethereumjs/util"
+import { Fr } from '@aztec/bb.js';
 import { MerkleTree } from '../utils/merkleTree';
+import { fromHex, hashMessage, recoverPublicKey } from 'viem';
 import merkle from '../test/merkle.json'; // merkle
 
+import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
+import { Noir }  from '@noir-lang/noir_js';
+import { CompiledCircuit, ProofData } from "@noir-lang/types"
+import { useAccount, useConnect, useWalletClient } from 'wagmi'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+
+import circuit from "../circuits/target/stealthdrop.json"
 
 function Component() {
-  const [input, setInput] = useState({ x: 0, y: 0});
-  const [pending, setPending] = useState(false);
-  const [proof, setProof] = useState(Uint8Array.from([]));
-  const [verification, setVerification] = useState(false);
-  const [noir, setNoir] = useState(new NoirBrowser());
-  const [ethers, setEthers] = useState<Ethers | null>(null);
+  const [proof, setProof] = useState<ProofData>();
+  const [noir, setNoir] = useState<Noir | null>(null);
+  const [backend, setBackend] = useState<BarretenbergBackend | null>(null);
+  const [storedSignature, setStoredSignature] = useState<{account: string, signature: string | undefined}>();
+  const [availableAddresses, setAvailableAddresses] = useState<`0x${string}`[]>()
+  const [merkleTree, setMerkleTree] = useState<MerkleTree>();
 
-  const [signature, setSignature] = useState({signature: "", account: ""});
-  const [accounts, setAccounts] = useState([]);
+  const { data: walletClient, status: walletConnStatus } = useWalletClient()
+  const { isConnected } = useAccount()
+  const { connect, connectors } = useConnect({
+    connector: new InjectedConnector(),
+  })
 
-
-  // Handles input state
-  const handleChange = e => {
-    e.preventDefault();
-    setInput({ ...input, [e.target.name]: e.target.value });
-  };
-
-  const connectAccounts = async () => {
-    ethers!!.requestPermissions();
-  }
+  let messageToHash = '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
 
   const signData = async (acc: string) => {
-    console.log(acc)
-    let messageToHash = '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
-    const newSigner = await ethers!!.changeSigner(acc)
-    const signature = await newSigner.signMessage(messageToHash);
-    
-    setSignature({signature, account: acc});
+    const signature = await walletClient?.signMessage({ account: acc as `0x${string}`, message: messageToHash })
+    setStoredSignature({ signature, account: acc });
   }
 
-  // Calculates proof
   const claim = async (acc: string) => {
-    await ethers!!.changeSigner(acc)
+    const generateClaim = new Promise(async (resolve, reject) => {
+      const hashedMessage = hashMessage(messageToHash, "hex"); // keccak of "signthis"
+      const { account, signature } = storedSignature!
+      const index = merkleTree!.getIndex(Fr.fromString(account));
+      const pedersenBB = await merkleTree!.getBB()
+      const signatureBuffer = fromHex(signature as `0x${string}`, "bytes").slice(0, 64)
+      const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
+      const nullifier = await pedersenBB.pedersenPlookupCommit(frArray)
+      const pubKey = await recoverPublicKey({hash: hashedMessage, signature: signature as `0x${string}`});
+      const merkleProof = await merkleTree!.proof(index)
 
-    console.log(ethers?.signer._address)
+      const inputs = {
+          pub_key: [...fromHex(pubKey, "bytes").slice(1)],
+          signature: [...fromHex(signature as `0x${string}`, "bytes").slice(0, 64)],
+          hashed_message: [...fromHex(hashedMessage, "bytes")],
+          nullifier : nullifier.toString(),
+          merkle_path : merkleProof.pathElements.map(x => x.toString()),
+          index: index,
+          merkle_root : merkleTree!.root().toString() as `0x${string}`,
+          claimer_priv: acc,
+          claimer_pub: acc,
+      };
 
-    setPending(true);
+      const proof = await noir!.generateFinalProof(inputs)
+      setProof(proof)
+      resolve(proof)
+    })
 
-    const merkleTree = new MerkleTree(4);
-
-    await merkleTree.initialize([]);
-
-    await Promise.all(
-      merkle.map(async (addr: any) => {
-        // @ts-ignore
-        const leaf = Fr.fromString(addr);
-        merkleTree.insert(leaf);
-      }),
-    );
-
-    let messageToHash = '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
-    const hashedMessage = ethers!!.utils.hashMessage(messageToHash);
-    const sig = fromRpcSig(signature.signature);
-    const hashedMessageUint8 = ethers!!.utils.arrayify(hashedMessage);
-    const pubKey = ecrecover(hashedMessageUint8, sig.v, sig.r, sig.s);
-
-    const user = ethers!!.signer;
-    const leaf = Fr.fromString(signature.account);
-    const index = merkleTree.getIndex(leaf);
-    const mt = merkleTree.proof(index);
-
-    var blake2 = require('blakejs');
-
-    const nullifier = blake2.blake2s(ethers!!.utils.arrayify(signature.signature).slice(0, 64))
-
-    console.log(      ...ethers!!.utils.arrayify(hashedMessage))
-    console.log(...pubKey)
-    console.log(...nullifier)
-    const arr = [
-      ...pubKey, 
-      ...ethers!!.utils.arrayify(signature.signature).slice(0, 64), 
-      ...ethers!!.utils.arrayify(hashedMessage), 
-      ...nullifier, 
-      ...mt.pathElements.map(el => el.toBuffer()),
-      "0x" + index.toString(),
-      mt.root.toString(),
-      ethers?.signer._address,
-      ethers?.signer._address
-    ]
-
-    const userAbi = new Map<number, string>();
-
-    for (let i = 0; i < arr.length; i++) {
-      // @ts-ignore
-      userAbi.set(i + 1, ethers.utils.hexZeroPad(arr[i], 32))
-    }
-    
-    try {
-      const witness = await noir.generateWitness(userAbi);
-      console.log(witness)
-      const proof = await noir.generateProof(witness);
-      setProof(proof);
-      console.log("proof", proof)
-
-    } catch (err) {
-      console.log(err);
-      toast.error('Error generating proof');
-    }
-
-    setPending(false);
+    toast.promise(generateClaim, {
+      pending: 'Calculating proof...',
+      success: 'Proof calculated!',
+      error: 'Error calculating proof',
+    });
   };
 
   const verifyProof = async () => {
-    // only launch if we do have an acir and a proof to verify
-    try {
-      console.log("verify")
-      const verification = await noir.verifyProof(proof);
-      console.log(verification)
-      setVerification(verification);
-      toast.success('Proof verified!');
+    const verifyOffChain = new Promise(async (resolve, reject) => {
+      const verification = await noir!.verifyFinalProof(proof!);
+      resolve(verification)
+    })
 
-      const publicInputs = proof.slice(0, 32);
-      const slicedProof = proof.slice(32);
 
-      const ver = await ethers!!.contract.verify(slicedProof, [publicInputs]);
-      if (ver) {
-        toast.success('Proof verified on-chain!');
-        setVerification(true);
-      } else {
-        toast.error('Proof failed on-chain verification');
-        setVerification(false);
-      }
-    } catch (err) {
-      console.log(err)
-      toast.error('Error verifying your proof');
-    } finally {
-      noir.destroy();
-    }
+    toast.promise(verifyOffChain, {
+      pending: 'Verifying proof off-chain...',
+      success: 'Proof verified off-chain!',
+      error: 'Error verifying proof',
+    });
   };
 
   // Verifier the proof if there's one in state
   useEffect(() => {
-    console.log(proof)
-    if (proof.length > 0) {
+    if (proof) {
       console.log("verify")
       verifyProof();
     }
   }, [proof]);
 
-  const initNoir = async () => {
-    setPending(true);
+  useEffect(() => {
+    if (!backend || !noir) {
+      const backend = new BarretenbergBackend(circuit as unknown as CompiledCircuit, { threads: 8 })
+      setBackend(backend)
 
-    await noir.init();
-    console.log("init")
-    setNoir(noir);
+      const noir = new Noir(circuit as unknown as CompiledCircuit, backend)
+      setNoir(noir)
+    }
+  }, [proof]);
 
-    setPending(false);
-  };
 
-  const initEthers = async () => {
-    const ethers = new Ethers();
-    setEthers(ethers);
-
-    const accounts = await ethers.getAccounts();
-    setAccounts(accounts);
+  const initAddresses = async () => {
+    const addresses = await walletClient?.getAddresses()
+    setAvailableAddresses(addresses || [])
   }
 
   useEffect(() => {
-    initNoir();
-    initEthers();
-  }, [proof]);
+    if (isConnected) {
+      initAddresses();
+    }
+  }, [walletConnStatus])
+
+
+  const initMerkleTree = async () => {
+    const initMerkleTree = new Promise(async (resolve, reject) => {
+      const merkleTree = new MerkleTree(4);
+      await merkleTree.initialize(merkle.map(addr => Fr.fromString(addr)));
+      setMerkleTree(merkleTree);
+      resolve(merkleTree)
+    })
+
+    await toast.promise(initMerkleTree, {
+      pending: 'Setting up merkle tree...',
+      success: 'Merkle tree ready!',
+      error: 'Error creating merkle tree',
+    });
+  }
+
+  useEffect(() => {
+    if (!merkleTree) {
+      initMerkleTree();
+    }
+  }, [merkleTree])
 
   return (
     <div className="gameContainer">
@@ -185,14 +149,12 @@ function Component() {
         <li>Generate proof</li>
         <li>Send the transaction</li>
       </ol>
-      <button onClick={connectAccounts}>Connect accounts</button>
       <br/>
-      {accounts && accounts.map(acc => <><button onClick={() => signData(acc)}>Sign with connected account: {acc}</button><br/></>)}
+      {availableAddresses && availableAddresses.map(acc => <><button onClick={() => signData(acc)}>Sign with connected account: {acc}</button><br/></>)}
       <br/>
-      {signature.signature && <p>Saved signature: {signature.signature} for account {signature.account}</p>}
+      {storedSignature && storedSignature.account && <p>Saved signature: {storedSignature!.signature} for account {storedSignature!.account}</p>}
 
-      {signature && accounts && accounts.map(acc => <><button onClick={() => claim(acc)}>Claim with connected account: {acc}</button><br/></>)}
-      {pending && <ThreeDots wrapperClass="spinner" color="#000000" height={100} width={100} />}
+      {storedSignature && availableAddresses && availableAddresses.map(acc => <><button onClick={() => claim(acc)}>Claim with connected account: {acc}</button><br/></>)}
     </div>
   );
 }

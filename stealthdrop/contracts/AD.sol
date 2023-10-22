@@ -1,10 +1,10 @@
 pragma solidity ^0.8.0;
 
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import './stealthdrop/plonk_vk.sol';
+import './plonk_vk.sol';
 import 'hardhat/console.sol';
 
-contract Airdrop is ERC20 {
+contract Ad is ERC20 {
     bytes32 public signThis;
     bytes32 public merkleRoot;
     UltraVerifier public verifier;
@@ -41,11 +41,13 @@ contract Airdrop is ERC20 {
     }
 
     function claim(bytes calldata proof, bytes32 nullifier) external {
-        bytes32[] memory _publicInputs = new bytes32[](66);
-        _publicInputs = preparePublicInputs(_publicInputs, signThis, 0);
-        _publicInputs = preparePublicInputs(_publicInputs, nullifier, 32);
-        _publicInputs[64] = merkleRoot;
-        _publicInputs[65] = bytes32(uint256(uint160(msg.sender)));
+        bytes32[] memory _publicInputs = new bytes32[](2);
+        // _publicInputs = preparePublicInputs(_publicInputs, signThis, 0);
+        // _publicInputs = preparePublicInputs(_publicInputs, nullifier, 32);
+        // _publicInputs[64] = merkleRoot;
+        _publicInputs[0] = nullifier;
+        // _publicInputs[33] = merkleRoot;
+        _publicInputs[1] = bytes32(uint256(uint160(msg.sender)));
         verifier.verify(proof, _publicInputs);
 
         // mint tokens
