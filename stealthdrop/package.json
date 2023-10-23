@@ -6,7 +6,9 @@
     "dev": "yarn compile && yarn deploy && next",
     "build": "yarn compile && yarn deploy && next build",
     "test": "yarn compile && hardhat test",
-    "compile": "hardhat compile && cd circuits && nargo compile"
+    "compile": "hardhat compile && cd circuits && nargo compile",
+    "deploy": "hardhat compile && hardhat run --network ${NETWORK} scripts/deploy.ts",
+    "gen": "hardhat run utils/mt/generateAddresses.ts"
   },
   "dependencies": {
     "@aztec/bb.js": "^0.8.14",

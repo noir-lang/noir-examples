@@ -2,6 +2,7 @@
 import { Barretenberg } from '@aztec/bb.js';
 // @ts-ignore -- no types
 import { Fr } from '@aztec/bb.js';
+import { cpus } from 'os';
 
 // thanks @vezenovm for this beautiful merkle tree implementation
 export interface IMerkleTree {
@@ -33,7 +34,7 @@ export class MerkleTree implements IMerkleTree {
   }
 
   async initialize(defaultLeaves: Fr[]) {
-    this.bb = await Barretenberg.new();
+    this.bb = await Barretenberg.new(cpus().length);
     // build zeros depends on tree levels
     let currentZero = this.zeroValue;
     this.zeros.push(currentZero);

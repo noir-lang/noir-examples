@@ -1,6 +1,6 @@
 // @ts-ignore
 import { MerkleTree } from '../utils/merkleTree'; // MerkleTree.js
-import merkle from './merkle.json'; // merkle
+import merkle from '../utils/merkle.json'; // merkle
 import hre from "hardhat"
 
 import { Barretenberg, Fr } from '@aztec/bb.js';
@@ -56,8 +56,8 @@ describe('Setup', () => {
 
 
     // Setup merkle tree
-    merkleTree = new MerkleTree(4);
-    await merkleTree.initialize(merkle.map(addr => Fr.fromString(addr)));
+    merkleTree = new MerkleTree(parseInt(merkle.depth));
+    await merkleTree.initialize(merkle.addresses.map(addr => Fr.fromString(addr)));
 
     hashedMessage = hashMessage(messageToHash, "hex"); // keccak of "signthis"
 
@@ -77,10 +77,11 @@ describe('Setup', () => {
     let backend : BarretenbergBackend;
     let noir : Noir;
 
+    let naughtyInputMerkleTree : any;
+
     before(async () => {
       // only user1 is an eligible user
       ([user1, user2, claimer1, claimer2] = await hre.viem.getWalletClients());
-      
       backend = new BarretenbergBackend(circuit as unknown as CompiledCircuit, { threads: 8 });
       noir = new Noir(circuit as unknown as CompiledCircuit, backend);
 
@@ -121,6 +122,9 @@ describe('Setup', () => {
       it("Generates a valid claim", async () => {
         const inputs = await getClaimInputs({ user: user1 });
         proof = await noir.generateFinalProof(inputs)
+
+        const { merkle_path, index, merkle_root } = inputs;
+        naughtyInputMerkleTree = { merkle_path, index, merkle_root }
       })
 
       it("Verifies a valid claim off-chain", async () => {
@@ -139,7 +143,7 @@ describe('Setup', () => {
     })
 
 
-    describe.only("Uneligible user", () => {
+    describe("Uneligible user", () => {
       let proof : ProofData;
 
       it("Fails to generate a valid claim", async () => {
@@ -154,7 +158,7 @@ describe('Setup', () => {
           const pubKey = await recoverPublicKey({hash: hashedMessage, signature});
 
           // ...but give it a fake merkle path
-          const { merkle_path, index, merkle_root } = (await import("./fixtures/uneligible_user_inputs")).default
+          const { merkle_path, index, merkle_root } = naughtyInputMerkleTree;
           const naughtyInputs = {
             pub_key: [...fromHex(pubKey, "bytes").slice(1)],
             signature: [...fromHex(signature as `0x${string}`, "bytes").slice(0, 64)],

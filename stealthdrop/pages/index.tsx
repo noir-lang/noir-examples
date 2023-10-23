@@ -7,6 +7,7 @@ import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
 import { Connect } from '../components/connect';
 import { Connected } from '../components/connected';
 import { Providers } from './providers';
+import { MerkleTreeProvider } from '../components/merkleTree';
 
 
 
@@ -15,7 +16,9 @@ export default function Page() {
     <Providers>
         <Connect />
         <Connected>
-          <Component />
+          <MerkleTreeProvider>
+            <Component />
+          </MerkleTreeProvider>
         </Connected>
     </Providers>
   );
