@@ -1,199 +1,187 @@
 // @ts-ignore
-import ethers, { Contract } from 'ethers';
-import fs from 'fs';
-import path from 'path';
-import { exec, execSync } from 'child_process';
 import { MerkleTree } from '../utils/merkleTree'; // MerkleTree.js
-import merkle from './merkle.json'; // merkle
-import keccak256 from 'keccak256';
+import merkle from '../utils/merkle.json'; // merkle
+import hre from "hardhat"
 
-// @ts-ignore -- no types
-import blake2 from 'blake2';
+import { Barretenberg, Fr } from '@aztec/bb.js';
 
-import { Fr } from '@aztec/bb.js/dest/types';
+import { PublicClient, WalletClient, pad, fromHex, hashMessage, http, recoverPublicKey, toHex } from 'viem';
 
-import airdrop from '../artifacts/circuits/contract/Airdrop.sol/Airdrop.json';
-import verifier from '../artifacts/circuits/contract/plonk_vk.sol/UltraVerifier.json';
+import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
+import { Noir }  from '@noir-lang/noir_js';
+import { CompiledCircuit, ProofData } from "@noir-lang/types"
+import circuit from "../circuits/target/stealthdrop.json"
 
-import { test, beforeAll, describe, expect } from 'vitest';
-interface AbiHashes {
-  [key: string]: string;
-}
+import { expect } from 'chai';
 
-// to avoid re-proving every time
-// we store a hash of every input and hash of the circuit
-// if they change, we re-prove
-// otherwise we just use the existing proof
-function prove(abi: any, testCase: string) {
-  // get the existent hashes for different proof names
-  const abiHashes: AbiHashes = JSON.parse(
-    fs.readFileSync(path.join(__dirname, '../circuits/proofs/abiHashes.json'), 'utf8'),
-  );
+class Airdrop {
+  public address : `0x${string}`= "0x";
 
-  // write the TOML file string
-  const proverToml = `
-      pub_key = [${abi.pub_key}]\n
-      signature = [${abi.signature}]\n
-      hashed_message = [${abi.hashed_message}]\n
-      nullifier = [${abi.nullifier}]\n
-      merkle_path = [${abi.merkle_path}]\n
-      index = ${abi.index}\n
-      merkle_root = "${abi.merkle_root}"\n
-      claimer_pub = "${abi.claimer}"\n
-      claimer_priv = "${abi.claimer}"
-  `;
-
-  // get the hash of the circuit
-  const circuit = fs.readFileSync(path.join(__dirname, '../circuits/src/main.nr'), 'utf8');
-
-  // hash all of it together
-  const abiHash = keccak256(proverToml.concat(circuit)).toString('hex');
-
-  // we also need to prove if there's no proof already
-  let existentProof: string | boolean;
-  try {
-    existentProof = fs.readFileSync(
-      path.join(__dirname, `../circuits/proofs/${testCase}.proof`),
-      'utf8',
-    );
-  } catch (e) {
-    existentProof = false;
+  constructor(
+    private _hashedMessage : `0x${string}`, 
+    private _verifierAddress: string, 
+    public merkleTreeRoot: string, 
+    private _amount: string) {
   }
 
-  // if they differ, we need to re-prove
-  if (abiHashes[testCase] !== abiHash || !existentProof) {
-    console.log(`Proving "${testCase}"...`);
-    fs.writeFileSync('circuits/Prover.toml', proverToml);
-
-    execSync(`nargo prove ${testCase} --show-output`);
-
-    abiHashes[testCase] = abiHash;
-    const updatedHashes = JSON.stringify(abiHashes, null, 2);
-    fs.writeFileSync(path.join(__dirname, '../circuits/proofs/abiHashes.json'), updatedHashes);
-    console.log(`New proof for "${testCase}" written`);
+  async deploy () {
+    const airdrop = await hre.viem.deployContract('Ad' as never, [
+      this.merkleTreeRoot,
+      this._hashedMessage,
+      this._verifierAddress,
+      '3500000000000000000000',
+    ])
+    this.address = airdrop.address;
   }
 
-  const proof = fs.readFileSync(`circuits/proofs/${testCase}.proof`);
-  return proof;
+  async contract() {
+    return await hre.viem.getContractAt('Ad', this.address)
+  }
 }
 
 describe('Setup', () => {
-  let airdropContract: Contract;
+  let publicClient : PublicClient;
+  
   let merkleTree: MerkleTree;
-  let messageToHash = '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
-  let hashedMessage: string;
-  let provider = ethers.getDefaultProvider('http://127.0.0.1:8545');
-  let deployerWallet = new ethers.Wallet(
-    process.env.DEPLOYER_PRIVATE_KEY as unknown as string,
-    provider,
-  );
+  let bb : Barretenberg;
+  let airdrop : Airdrop;
+  let messageToHash : `0x${string}`= '0xabfd76608112cc843dca3a31931f3974da5f9f5d32833e7817bc7e5c50c7821e';
+  let hashedMessage: `0x${string}`;
 
-  beforeAll(async () => {
-    execSync('npx hardhat compile');
-    const Verifier = new ethers.ContractFactory(verifier.abi, verifier.bytecode, deployerWallet);
-    const verifierContract = await Verifier.deploy();
-    const verifierAddr = await verifierContract.deployed();
+  before(async () => {
+    publicClient = await hre.viem.getPublicClient();
+  
+    const verifier = await hre.viem.deployContract('UltraVerifier');
+    console.log(`Verifier deployed to ${verifier.address}`);
 
-    const Airdrop = new ethers.ContractFactory(airdrop.abi, airdrop.bytecode, deployerWallet);
 
     // Setup merkle tree
-    merkleTree = new MerkleTree(4);
-    await merkleTree.initialize([]);
+    merkleTree = new MerkleTree(parseInt(merkle.depth));
+    await merkleTree.initialize(merkle.addresses.map(addr => Fr.fromString(addr)));
 
-    await Promise.all(
-      merkle.map(async (addr: any) => {
-        // @ts-ignore
-        const leaf = Fr.fromString(addr);
-        merkleTree.insert(leaf);
-      }),
-    );
+    hashedMessage = hashMessage(messageToHash, "hex"); // keccak of "signthis"
 
-    hashedMessage = ethers.utils.hashMessage(messageToHash); // keccak of "signthis"
-    airdropContract = await Airdrop.deploy(
-      merkleTree.root().toString(),
-      hashedMessage,
-      verifierAddr.address,
-      '3500000000000000000000',
-    );
-    await airdropContract.deployed();
-    console.log('Airdrop deployed to:', airdropContract.address);
+    airdrop = new Airdrop(hashedMessage, verifier.address, merkleTree.root().toString(), '3500000000000000000000');
+    await airdrop.deploy();
+
+    console.log(`Airdrop deployed to ${airdrop.address}`);
+
   });
 
-  describe('Airdrop', () => {
-    let user1: ethers.Wallet;
-    let user2: ethers.Wallet;
-    let claimer1: ethers.Wallet;
-    let claimer2: ethers.Wallet;
+  describe('Airdrop tests', () => {
+    let user1: WalletClient;
+    let user2: WalletClient;
+    let claimer1: WalletClient;
+    let claimer2: WalletClient;
 
-    beforeAll(async () => {
-      const provider = ethers.getDefaultProvider('http://127.0.0.1:8545');
-      user1 = new ethers.Wallet(process.env.USER1_PRIVATE_KEY as string, provider);
-      claimer1 = new ethers.Wallet(process.env.CLAIMER1_PRIVATE_KEY as string, provider);
-      claimer2 = new ethers.Wallet(process.env.CLAIMER2_PRIVATE_KEY as string, provider);
+    let backend : BarretenbergBackend;
+    let noir : Noir;
+
+    let naughtyInputMerkleTree : any;
+
+    before(async () => {
+      // only user1 is an eligible user
+      ([user1, user2, claimer1, claimer2] = await hre.viem.getWalletClients());
+      backend = new BarretenbergBackend(circuit as unknown as CompiledCircuit, { threads: 8 });
+      noir = new Noir(circuit as unknown as CompiledCircuit, backend);
+
     });
 
-    const getUserAbi = async (user: ethers.Wallet) => {
-      const leaf = Fr.fromString(user.address);
-      const pubKey = ethers.utils.arrayify(user.publicKey).slice(1);
-      const signature = await user1.signMessage(messageToHash);
-      const index = merkleTree.getIndex(leaf);
-      const mt = merkleTree.proof(index);
-      const nullifier = blake2
-        .createHash('blake2s')
-        .update(ethers.utils.arrayify(signature).slice(0, 64))
-        .digest();
+    const getClaimInputs = async ({user} : { user: WalletClient }) => {
 
-      const userAbi = {
-        pub_key: pubKey,
-        signature: ethers.utils.arrayify(signature).slice(0, 64),
-        hashed_message: ethers.utils.arrayify(hashedMessage),
-        nullifier: Uint8Array.from(nullifier),
-        merkle_path: mt.pathElements.map(el => `"${el.toString()}"`),
-        index: index,
-        merkle_root: mt.root.toString(),
-        claimer: claimer1.address,
+      const leaf = user.account!.address;
+      const index = merkleTree.getIndex(Fr.fromString(leaf));
+      const signature = await user.signMessage({ account: user.account!.address, message: messageToHash })
+
+      const pedersenBB = await merkleTree.getBB()
+      await pedersenBB.pedersenHashInit();
+      const signatureBuffer = fromHex(signature as `0x${string}`, "bytes").slice(0, 64)
+
+      const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
+
+      const nullifier = await pedersenBB.pedersenPlookupCommit(frArray)
+      const pubKey = await recoverPublicKey({hash: hashedMessage, signature});
+
+      const proof = await merkleTree.proof(index)
+      return {
+          pub_key: [...fromHex(pubKey, "bytes").slice(1)],
+          signature: [...fromHex(signature as `0x${string}`, "bytes").slice(0, 64)],
+          hashed_message: [...fromHex(hashedMessage, "bytes")],
+          nullifier : nullifier.toString(),
+          merkle_path : proof.pathElements.map(x => x.toString()),
+          index: index,
+          merkle_root : merkleTree.root().toString() as `0x${string}`,
+          claimer_priv: claimer1.account!.address,
+          claimer_pub: claimer1.account!.address,
       };
-      return userAbi;
     };
 
-    test('Collects tokens from an eligible user', async () => {
-      const userAbi = await getUserAbi(user1);
-      console.log('Valid ABI', userAbi);
-      const proof = prove(userAbi, 'valid');
-      expect(proof).to.exist;
+    describe("Eligible user", () => {
+      let proof : ProofData;
 
-      const connectedAirdropContract = airdropContract.connect(claimer1);
-      const balanceBefore = await connectedAirdropContract.balanceOf(claimer1.address);
-      expect(balanceBefore.toNumber()).to.equal(0);
-      await connectedAirdropContract.claim(
-        '0x' + proof.toString(),
-        ethers.utils.hexlify(userAbi.nullifier),
-      );
+      it("Generates a valid claim", async () => {
+        const inputs = await getClaimInputs({ user: user1 });
+        proof = await noir.generateFinalProof(inputs)
 
-      const balanceAfter = await connectedAirdropContract.balanceOf(claimer1.address);
-      expect(balanceAfter.toNumber()).to.equal(1);
-    });
+        const { merkle_path, index, merkle_root } = inputs;
+        naughtyInputMerkleTree = { merkle_path, index, merkle_root }
+      })
 
-    test('Fails to collect tokens of an eligible user with a non-authorized account (front-running)', async () => {
-      try {
-        const userAbi = await getUserAbi(user1);
-        console.log('Valid ABI', userAbi);
-        const proof = prove(userAbi, 'valid');
-        expect(proof).to.exist;
+      it("Verifies a valid claim off-chain", async () => {
+        const verification = await noir.verifyFinalProof(proof);
+        expect(verification).to.be.true;
+      })
 
-        const connectedAirdropContract = airdropContract.connect(claimer2);
-        const balanceBefore = await connectedAirdropContract.balanceOf(claimer2.address);
-        expect(balanceBefore.toNumber()).to.equal(0);
-        await connectedAirdropContract.claim(
-          '0x' + proof.toString(),
-          ethers.utils.hexlify(userAbi.nullifier),
-        );
+      // ON-CHAIN VERIFICATION FAILS, CHECK https://github.com/noir-lang/noir/issues/3245
+      it.skip("Verifies a valid claim on-chain", async () => {
+        const { nullifier } = await getClaimInputs({ user: user1 });
+        const ad = await airdrop.contract();
 
-        const balanceAfter = await connectedAirdropContract.balanceOf(claimer2.address);
-        expect(balanceAfter.toNumber()).to.equal(0);
-      } catch (e: any) {
-        expect(e.error.reason).to.contain('PROOF_FAILURE()');
-      }
-    });
+        await ad.write.claim([toHex(proof.proof), nullifier as `0x${string}`], { account: claimer1.account!.address });
+
+      })
+    })
+
+
+    describe("Uneligible user", () => {
+      let proof : ProofData;
+
+      it("Fails to generate a valid claim", async () => {
+        try {
+          // give it a genuine signature...
+          const signature = await user2.signMessage({ account: user2.account!.address, message: messageToHash })
+          const pedersenBB = await merkleTree.getBB()
+          await pedersenBB.pedersenHashInit();
+          const signatureBuffer = fromHex(signature as `0x${string}`, "bytes").slice(0, 64)
+          const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
+          const nullifier = await pedersenBB.pedersenPlookupCommit(frArray)
+          const pubKey = await recoverPublicKey({hash: hashedMessage, signature});
+
+          // ...but give it a fake merkle path
+          const { merkle_path, index, merkle_root } = naughtyInputMerkleTree;
+          const naughtyInputs = {
+            pub_key: [...fromHex(pubKey, "bytes").slice(1)],
+            signature: [...fromHex(signature as `0x${string}`, "bytes").slice(0, 64)],
+            hashed_message: [...fromHex(hashedMessage, "bytes")],
+            nullifier : nullifier.toString(),
+            merkle_path,
+            index,
+            merkle_root,
+            claimer_priv: claimer1.account!.address,
+            claimer_pub: claimer1.account!.address,
+          };
+
+          proof = await noir.generateFinalProof(naughtyInputs)
+        
+        } catch(err: any) {
+          expect(err.message).to.equal("Circuit execution failed: Error: Cannot satisfy constraint");
+        }
+      })
+
+      it("Fails to front-run the on-chain transaction with a invalid claimer", async () => {
+        // ON-CHAIN VERIFICATION FAILS
+      })
+
+    })
   });
 });
