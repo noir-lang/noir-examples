@@ -6,6 +6,7 @@ Each project is an example you can use for whatever you want. Feel free to mix t
 
 - Private Voting: [`./foundry-voting`](./foundry-voting)
 - Stealthdrop: [`./stealthdrop`](./stealthdrop)
+- Recursion: [`./recursion`](./recursion/)
 
 ## Starter
 
