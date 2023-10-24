@@ -2,67 +2,109 @@ import { useState, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
 import React from 'react';
-import { Noir, generateWitness } from '@noir-lang/noir_js';
+import { Noir } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
-import mainCircuit from '../target/main.json';
-import recursiveCircuit from '../target/recursion.json';
+import { BackendInstances, Circuits, Noirs, ProofArtifacts } from '../types';
+import { useAccount, useConnect, useContractWrite, useWaitForTransaction } from 'wagmi'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import abi from "../utils/verifierAbi.json"
+import axios from "axios";
 
-import { BackendInstances, ProofArtifacts } from '../types';
-import { ethers } from 'ethers';
+import { initializeResolver } from '@noir-lang/source-resolver';
+import newCompiler, { compile } from '@noir-lang/noir_wasm';
+import Ethers from "../utils/ethers"
 
+function splitProof(aggregatedProof: Uint8Array) {
+    const splitIndex = aggregatedProof.length - 2144;
 
+    const publicInputsConcatenated = aggregatedProof.slice(0, splitIndex);
+
+    const publicInputSize = 32;
+    const publicInputs: Uint8Array[] = [];
+
+    for (let i = 0; i < publicInputsConcatenated.length; i += publicInputSize) {
+      const publicInput = publicInputsConcatenated.slice(i, i + publicInputSize);
+      publicInputs.push(publicInput);
+    }
+
+    const proof = aggregatedProof.slice(splitIndex);
+    return { proof, publicInputs };
+}
+
+async function getCircuit(name: string) {
+  await newCompiler();
+
+  const {data: noirSource} = await axios.get("/api/readCircuitFile?filename=" + name)
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  initializeResolver((id: string) => {
+    const source = noirSource
+    return source;
+  });
+
+  const compiled = compile("main");
+  return compiled
+}
 
 function Component() {
-  const [input, setInput] = useState<{[key: string]: number}>({"x": 0, "y": 0});
+  const [circuits, setCircuits] = useState<Circuits>()
+  const [backends, setBackends] = useState<BackendInstances>()
+  const [noirs, setNoirs] = useState<Noirs>()
 
+  const [input, setInput] = useState<{[key: string]: string}>({"x": "1", "y": "2"});
 
-  const [mainProof, setMainProof] = useState<Uint8Array | null>(null);
-  const [recursiveBackend, setRecursiveBackend] = useState<BarretenbergBackend | null>(null)
-  const [proofArtifacts, setProofArtifacts] = useState<ProofArtifacts | null>(null)
-  const [recursiveProof, setRecursiveProof] = useState<Uint8Array | null>(null);
+  const [mainProofArtifacts, setMainProofArtifacts] = useState<ProofArtifacts>()
+  const [recursiveProofArtifacts, setRecursiveProofArtifacts] = useState<ProofArtifacts>();
+
+  const { address, connector, isConnected } = useAccount()
+  const { connect, connectors } = useConnect({
+    connector: new InjectedConnector(),
+  })
+
+  const contractCallConfig = {
+    address: "0x0165878A594ca255338adfa4d48449f69242Eb8F" as`0x${string}`,
+    abi
+  }
+
+  const { write, data, error, isLoading, isError } = useContractWrite({
+    ...contractCallConfig,
+    functionName: "verify",
+  })
+
+    const {
+    data: receipt,
+    isLoading: isPending,
+    isSuccess,
+  } = useWaitForTransaction({ hash: data?.hash })
+
 
   // Handles input state
   const handleChange = e => {
     e.preventDefault();
-    setInput({...input, [e.target.name]: e.target.value as number});
+    setInput({...input, [e.target.name]: e.target.value});
   };
 
   const calculateMainProof = async () => {
     const proofGeneration = new Promise(async (resolve, reject) => {
-      const backends : BackendInstances = {
-        main: new BarretenbergBackend(mainCircuit, 8),
-        recursive: new BarretenbergBackend(recursiveCircuit, 8)
+      const inputs = {
+        x: "2",
+        y: "3"
       }
-
-      setRecursiveBackend(backends.recursive)
-        
-      // Main
-      const main = new Noir(mainCircuit, backends.main);
-      await main.init();
-
-      const numPublicInputs = 1;
-      console.log('generating inner proof');
-      console.log(input)
-      const mainWitness = await generateWitness(mainCircuit, input);
-      const innerProof = await backends.main.generateIntermediateProof(mainWitness);
-      setMainProof(innerProof)
-      console.log('inner proof generated: ', innerProof);
+      const { witness, returnValue } = await noirs!.main.execute(inputs);
+      const { publicInputs, proof } = await backends!.main.generateIntermediateProof(witness);
 
       // Verify the same proof, not inside of a circuit
-      console.log('verifying inner proof (out of circuit)');
-      const verified = await backends.main.verifyIntermediateProof(innerProof);
-      console.log('inner proof verified as', verified);
+      const verified = await backends!.main.verifyIntermediateProof({proof, publicInputs});
 
       // Now we will take that inner proof and verify it in an outer proof.
-      console.log('Preparing input for outer proof');
-      const { proofAsFields, vkAsFields, vkHash } = await backends.main.generateIntermediateProofArtifacts(
-        innerProof,
-        numPublicInputs,
+      const { proofAsFields, vkAsFields, vkHash } = await backends!.main.generateIntermediateProofArtifacts(
+        {publicInputs, proof},
+        1, // 1 public input
       );
-      setProofArtifacts({ proofAsFields, vkAsFields, vkHash })
 
-      await backends.main.destroy();
-      resolve(innerProof)
+      setMainProofArtifacts({ returnValue: returnValue as unknown as Uint8Array, proof, publicInputs, proofAsFields, vkAsFields, vkHash })
+
+      resolve(true)
     });
 
     toast.promise(proofGeneration, {
@@ -70,38 +112,33 @@ function Component() {
       success: 'Proof generated',
       error: 'Error generating proof',
     });
+
   };
 
   const calculateRecursiveProof = async () => {
     const proofGeneration = new Promise(async (resolve, reject) => {
-      // Recursion
-      const recursive = new Noir(recursiveCircuit, recursiveBackend!);
-      await recursive.init()
 
-      console.log(proofArtifacts)
-
-      const { proofAsFields, vkAsFields, vkHash } = proofArtifacts!
-      console.log('Proof as Fields', proofAsFields);
-      console.log('Vk as Fields', vkAsFields);
-      console.log('Vk Hash', vkHash);
-      const aggregationObject = Array(16).fill(
+      const aggregationObject : string[] = Array(16).fill(
         '0x0000000000000000000000000000000000000000000000000000000000000000',
       );
       const recInput = {
-        verification_key: vkAsFields.map(e => e.toString()),
-        proof: proofAsFields,
-        public_inputs: [input!["y"]],
-        key_hash: vkHash,
+        verification_key: mainProofArtifacts!.vkAsFields.map(e => e.toString()),
+        proof: mainProofArtifacts!.proofAsFields,
+        public_inputs: ["0x" + input!["y"]],
+        key_hash: mainProofArtifacts!.vkHash,
         input_aggregation_object: aggregationObject,
       }
 
-      console.log("rec input", recInput)
-      console.log('generating outer proof');
-      const recWitness = await generateWitness(recursiveCircuit, recInput);
+      const { witness, returnValue } = await noirs!.recursive.execute(recInput);
 
-      const proof = await recursiveBackend!.generateFinalProof(recWitness);
-      console.log('Outer proof generated: ', proof);
-      setRecursiveProof(proof);
+
+      const newBackend = new BarretenbergBackend(circuits!.recursive, { threads: 8 })
+      
+      const { publicInputs, proof } = await newBackend.generateFinalProof(witness);
+
+      setBackends({main: backends!.main, recursive: newBackend})
+
+      setRecursiveProofArtifacts({ returnValue: returnValue as unknown as Uint8Array, proof, publicInputs, proofAsFields: [], vkAsFields: [], vkHash: "" })
 
       resolve(proof);
     });
@@ -114,14 +151,19 @@ function Component() {
   }
 
   const verifyProof = async () => {
-    if (recursiveProof) {
+    if (recursiveProofArtifacts) {
       const proofVerification = new Promise(async (resolve, reject) => {
-        console.log("verifying final proof")
-        const verification = await recursiveBackend!.verifyFinalProof(recursiveProof);
-        console.log('Proof verified as', verification);
-        recursiveBackend!.destroy();
+        const { proof, publicInputs } = recursiveProofArtifacts;
+        
+        const verification = await backends!.recursive.verifyFinalProof({ proof, publicInputs });
 
-        resolve(verification);
+        await noirs!.recursive.destroy();
+
+        const ethers = new Ethers();
+
+        const onChainVer = await ethers.contract.verify(proof, publicInputs);
+
+        resolve(onChainVer);
       });
 
       toast.promise(proofVerification, {
@@ -129,22 +171,57 @@ function Component() {
         success: 'Recursive proof verified',
         error: 'Error verifying recursive proof',
       });
+
+      // ON-CHAIN VERIFICATION IS BUGGED, track https://github.com/noir-lang/noir/issues/3166
+      // write?.({
+      //   args: [bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi))]
+      // })
     }
   };
 
     // Verifier the proof if there's one in state
   useEffect(() => {
-    if (mainProof && proofArtifacts) {
+    if (mainProofArtifacts) {
       calculateRecursiveProof();
     }
-  }, [mainProof, proofArtifacts]);
+  }, [mainProofArtifacts]);
 
   // Verifier the proof if there's one in state
   useEffect(() => {
-    if (recursiveProof) {
+    if (recursiveProofArtifacts) {
       verifyProof();
     }
-  }, [recursiveProof]);
+  }, [recursiveProofArtifacts]);
+
+  const init = async () => {
+    const circuits = {
+      main: await getCircuit("main"),
+      recursive: await getCircuit("recursion")
+    }
+    setCircuits(circuits)
+
+    const backends = {
+      main: new BarretenbergBackend(circuits.main, { threads: 8 }),
+      recursive: new BarretenbergBackend(circuits.recursive, { threads: 8 })
+    }
+
+    setBackends(backends)
+
+    const noirs = {
+      main: new Noir(circuits.main, backends.main),
+      recursive: new Noir(circuits.recursive, backends.recursive)
+    };
+    await noirs.main.init()
+    await noirs.recursive.init()
+
+    setNoirs(noirs)
+  }
+
+  useEffect(() => {
+      if (!backends || !circuits || !noirs) {
+        init()
+      }
+  }, [])
 
   return (
     <div className="gameContainer">
@@ -154,7 +231,7 @@ function Component() {
       <h2>Try it!</h2>
       <input name="x" type={'text'} onChange={handleChange} value={input?.x} />
       <input name="y" type={'text'} onChange={handleChange} value={input?.y} />
-      <button onClick={calculateMainProof}>Calculate proof</button>
+      {circuits && backends && noirs && <button onClick={calculateMainProof}>Calculate proof</button>}
     </div>
   );
 }
