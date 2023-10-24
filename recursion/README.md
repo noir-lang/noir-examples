@@ -10,29 +10,11 @@ Why is this useful? In this example, it doesn't do much. But you could verify tw
 
 ## Getting Started
 
-1. [Install nargo](https://noir-lang.org/getting_started/nargo_installation#option-1-noirup) version 0.11.0 with `noirup -v 0.11.0`
-
-2. [Run nargo](https://noir-lang.org/dev/nargo/commands)
-   1. `nargo compile --workspace` will compile all the circuits in a `target` folder
-   2. optionally you can run `nargo prove --workspace` and `nargo verify --workspace` to see it working on the CLI
-
-3. Install dependencies with
-
-```bash
-yarn
-```
-
-3. Run
-
-```bash
-yarn dev
-```
+1. [Install nargo](https://noir-lang.org/getting_started/nargo_installation#option-1-noirup) version 0.17.0 with `noirup -v 0.17.0`
+2. Install dependencies by running `yarn`
+3. Compile the project with `yarn compile`
+4. Run `yarn dev`
 
 ## Testing
 
-There is a basic [example test file](./test/index.ts) that shows the usage of Noir in a typescript `node.js` environment.
-You can run the tests with:
-
-```sh
-yarn test
-```
+To run the [test file](./test/index.ts), try `yarn test`

@@ -5,18 +5,13 @@ import React from 'react';
 import { Noir } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { BackendInstances, Circuits, Noirs, ProofArtifacts } from '../types';
-import { useAccount, useConnect, usePrepareContractWrite, useContractWrite, useWaitForTransaction } from 'wagmi'
+import { useAccount, useConnect, useContractWrite, useWaitForTransaction } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
-import deployment from "../utils/addresses.json"
 import abi from "../utils/verifierAbi.json"
-import { bytesToHex, hexToBytes, pad, toHex } from 'viem'
-import { InputMap } from '@noir-lang/noirc_abi';
 import axios from "axios";
 
 import { initializeResolver } from '@noir-lang/source-resolver';
-import newCompiler, { compile, init_log_level as compilerLogLevel } from '@noir-lang/noir_wasm';
-import { CompiledCircuit, ProofData } from '@noir-lang/types';
-import { Proof } from 'viem/_types/types/proof';
+import newCompiler, { compile } from '@noir-lang/noir_wasm';
 import Ethers from "../utils/ethers"
 
 function splitProof(aggregatedProof: Uint8Array) {
@@ -47,14 +42,8 @@ async function getCircuit(name: string) {
     return source;
   });
 
-  try {
-    // We're ignoring this in the resolver but pass in something sensible.
-    const compiled = compile("main");
-    console.log(compiled)
-    return compiled
-  } catch(er) {
-    console.log(er)
-  }
+  const compiled = compile("main");
+  return compiled
 }
 
 function Component() {
@@ -97,10 +86,6 @@ function Component() {
 
   const calculateMainProof = async () => {
     const proofGeneration = new Promise(async (resolve, reject) => {
-      console.log("backend here:", backends!.main)
-
-      console.log('generating inner proof');
-      console.log(input as InputMap)
       const inputs = {
         x: "2",
         y: "3"
@@ -108,16 +93,10 @@ function Component() {
       const { witness, returnValue } = await noirs!.main.execute(inputs);
       const { publicInputs, proof } = await backends!.main.generateIntermediateProof(witness);
 
-      console.log('inner proof generated: ', {proof: bytesToHex(proof), publicInputs});
-
       // Verify the same proof, not inside of a circuit
-      console.log('verifying inner proof (out of circuit)');
       const verified = await backends!.main.verifyIntermediateProof({proof, publicInputs});
 
-      console.log('inner proof verified as', verified);
-
       // Now we will take that inner proof and verify it in an outer proof.
-      console.log('Preparing input for outer proof');
       const { proofAsFields, vkAsFields, vkHash } = await backends!.main.generateIntermediateProofArtifacts(
         {publicInputs, proof},
         1, // 1 public input
@@ -138,7 +117,6 @@ function Component() {
 
   const calculateRecursiveProof = async () => {
     const proofGeneration = new Promise(async (resolve, reject) => {
-      console.log(mainProofArtifacts)
 
       const aggregationObject : string[] = Array(16).fill(
         '0x0000000000000000000000000000000000000000000000000000000000000000',
@@ -151,13 +129,8 @@ function Component() {
         input_aggregation_object: aggregationObject,
       }
 
-      console.log("recursive: inputs for backend verify", recInput)
-      // console.log('generating outer proof');
       const { witness, returnValue } = await noirs!.recursive.execute(recInput);
 
-
-      console.log("witness", witness)
-      console.log("return", returnValue)
 
       const newBackend = new BarretenbergBackend(circuits!.recursive, { threads: 8 })
       
@@ -165,12 +138,6 @@ function Component() {
 
       setBackends({main: backends!.main, recursive: newBackend})
 
-      // console.log('Outer proof generated: ', aggregatedProof);
-      // console.log("string", bytesToHex(aggregatedProof))
-      // console.log('Outer proof size: ', aggregatedProof.length);
-      // const publicInputs = piArray.map((input: Uint8Array) => bytesToHex(input))
-
-      console.log("recursive proof:", proof, publicInputs)
       setRecursiveProofArtifacts({ returnValue: returnValue as unknown as Uint8Array, proof, publicInputs, proofAsFields: [], vkAsFields: [], vkHash: "" })
 
       resolve(proof);
@@ -186,24 +153,15 @@ function Component() {
   const verifyProof = async () => {
     if (recursiveProofArtifacts) {
       const proofVerification = new Promise(async (resolve, reject) => {
-        console.log("verifying final proof")
-        console.log("backend here:", backends!.recursive)
-
         const { proof, publicInputs } = recursiveProofArtifacts;
         
         const verification = await backends!.recursive.verifyFinalProof({ proof, publicInputs });
 
-        console.log('Proof verified as', verification);
         await noirs!.recursive.destroy();
-
-        console.log("proof + public inputs")
-        console.log(bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi)))
-
 
         const ethers = new Ethers();
 
         const onChainVer = await ethers.contract.verify(proof, publicInputs);
-        console.log(onChainVer)
 
         resolve(onChainVer);
       });
@@ -214,6 +172,7 @@ function Component() {
         error: 'Error verifying recursive proof',
       });
 
+      // ON-CHAIN VERIFICATION IS BUGGED, track https://github.com/noir-lang/noir/issues/3166
       // write?.({
       //   args: [bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi))]
       // })

@@ -19,19 +19,8 @@ const config: HardhatUserConfig = {
       url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.MUMBAI_ALCHEMY_KEY}`,
       accounts: [process.env.MUMBAI_DEPLOYER_PRIVATE_KEY as string],
     },
-    sepolia: {
-      url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_KEY}`,
-      accounts: [process.env.SEPOLIA_DEPLOYER_PRIVATE_KEY as string],
-    },
     localhost: {
       url: 'http://127.0.0.1:8545',
-    },
-    hardhat: {
-      mining: {
-        auto: true,
-        interval: 1000,
-      },
-      blockGasLimit: 1000000000,
     },
   },
   paths: {

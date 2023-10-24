@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "test": "hardhat compile && hardhat test",
-    "deploy:localhost": "hardhat compile && hardhat run --network localhost scripts/deploy.ts"
+    "deploy:localhost": "hardhat compile && hardhat run --network localhost scripts/deploy.ts",
+    "compile": "yarn compile:main && yarn compile:recursive",
+    "compile:main": "cd circuits/main && nargo compile",
+    "compile:recursive": "cd circuits/recursion && nargo compile && nargo codegen-verifier"
   },
   "dependencies": {
     "@noir-lang/backend_barretenberg": "^0.7.10-37315f8.nightly",

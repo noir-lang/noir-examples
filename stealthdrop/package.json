@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A template repository to get started with writing zero knowledge programs with Noir.",
   "scripts": {
-    "dev": "yarn compile && yarn deploy && next",
+    "dev": "yarn deploy && next",
     "build": "yarn compile && yarn deploy && next build",
-    "test": "yarn compile && hardhat test",
+    "test": "hardhat test",
     "compile": "hardhat compile && cd circuits && nargo compile",
     "deploy": "hardhat compile && hardhat run --network ${NETWORK} scripts/deploy.ts",
     "gen": "hardhat run utils/mt/generateAddresses.ts"
