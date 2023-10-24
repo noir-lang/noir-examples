@@ -17,4 +17,4 @@ There's a config to deploy on the Mumbai testnet as well. Just fill the details 
 
 ## Testing
 
-To run the [test file](./test/index.ts), try `yarn test`
+To run the [test file](./test/index.test.ts), try `yarn test`
