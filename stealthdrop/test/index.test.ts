@@ -10,7 +10,7 @@ import { PublicClient, WalletClient, pad, fromHex, hashMessage, http, recoverPub
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir }  from '@noir-lang/noir_js';
 import { CompiledCircuit, ProofData } from "@noir-lang/types"
-import circuit from "../circuits/target/stealthdrop.json"
+import circuit from "../circuits/main/target/stealthdrop.json"
 
 import { expect } from 'chai';
 
@@ -57,7 +57,7 @@ describe('Setup', () => {
 
     // Setup merkle tree
     merkleTree = new MerkleTree(parseInt(merkle.depth));
-    await merkleTree.initialize(merkle.addresses.map(addr => Fr.fromString(addr)));
+    await merkleTree.initialize(merkle.addresses.map(addr => addr));
 
     hashedMessage = hashMessage(messageToHash, "hex"); // keccak of "signthis"
 
@@ -90,16 +90,15 @@ describe('Setup', () => {
     const getClaimInputs = async ({user} : { user: WalletClient }) => {
 
       const leaf = user.account!.address;
-      const index = merkleTree.getIndex(Fr.fromString(leaf));
+      const index = merkleTree.getIndex(leaf);
       const signature = await user.signMessage({ account: user.account!.address, message: messageToHash })
 
-      const pedersenBB = await merkleTree.getBB()
-      await pedersenBB.pedersenHashInit();
+      const pedersen = await merkleTree.getPedersen()
       const signatureBuffer = fromHex(signature as `0x${string}`, "bytes").slice(0, 64)
 
       const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
 
-      const nullifier = await pedersenBB.pedersenPlookupCommit(frArray)
+      const nullifier = await pedersen(frArray)
       const pubKey = await recoverPublicKey({hash: hashedMessage, signature});
 
       const proof = await merkleTree.proof(index)
@@ -150,11 +149,10 @@ describe('Setup', () => {
         try {
           // give it a genuine signature...
           const signature = await user2.signMessage({ account: user2.account!.address, message: messageToHash })
-          const pedersenBB = await merkleTree.getBB()
-          await pedersenBB.pedersenHashInit();
+          const pedersen = await merkleTree.getPedersen()
           const signatureBuffer = fromHex(signature as `0x${string}`, "bytes").slice(0, 64)
           const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
-          const nullifier = await pedersenBB.pedersenPlookupCommit(frArray)
+          const nullifier = await pedersen(frArray)
           const pubKey = await recoverPublicKey({hash: hashedMessage, signature});
 
           // ...but give it a fake merkle path
