@@ -1,45 +1,47 @@
 // @ts-ignore -- no types
 import { Barretenberg } from '@aztec/bb.js';
 // @ts-ignore -- no types
-import { Fr } from '@aztec/bb.js';
+import { Noir } from '@noir-lang/noir_js';
 import { cpus } from 'os';
+import pedersen from "../circuits/utils/pedersen/target/pedersen.json"
+import { CompiledCircuit } from '@noir-lang/types';
+import { Field, InputValue } from '@noir-lang/noirc_abi';
 
 // thanks @vezenovm for this beautiful merkle tree implementation
 export interface IMerkleTree {
-  root: () => Fr;
+  root: () => InputValue;
   proof: (index: number) => Promise<{
-    root: Fr;
-    pathElements: Fr[];
+    root: InputValue;
+    pathElements: InputValue[];
     pathIndices: number[];
-    leaf: Fr;
+    leaf: InputValue;
   }>;
-  insert: (leaf: Fr) => void;
+  insert: (leaf: InputValue) => void;
 }
 
 export class MerkleTree implements IMerkleTree {
-  readonly zeroValue = Fr.fromString(
-    '18d85f3de6dcd78b6ffbf5d8374433a5528d8e3bf2100df0b7bb43a4c59ebd63',
-  );
+  readonly zeroValue : InputValue = '0x18d85f3de6dcd78b6ffbf5d8374433a5528d8e3bf2100df0b7bb43a4c59ebd63';
   levels: number;
-  storage: Map<string, Fr>;
-  zeros: Fr[];
+  storage: Map<string, InputValue>;
+  zeros: InputValue[];
   totalLeaves: number;
-  bb: Barretenberg = {} as Barretenberg;
+  pedersen: (inputs: any) => Promise<{ witness: Uint8Array; returnValue: InputValue }>;
 
   constructor(levels: number) {
     this.levels = levels;
     this.storage = new Map();
     this.zeros = [];
     this.totalLeaves = 0;
+    this.pedersen = (inputs) => new Noir(pedersen as unknown as CompiledCircuit).execute(inputs)
   }
 
-  async initialize(defaultLeaves: Fr[]) {
-    this.bb = await Barretenberg.new(cpus().length);
+  async initialize(defaultLeaves: InputValue[]) {
     // build zeros depends on tree levels
     let currentZero = this.zeroValue;
     this.zeros.push(currentZero);
 
     for (let i = 0; i < this.levels; i++) {
+      console.log("inserting zeros", i)
       currentZero = await this.pedersenHash(currentZero, currentZero);
       this.zeros.push(currentZero);
     }
@@ -49,21 +51,20 @@ export class MerkleTree implements IMerkleTree {
     }
   }
 
-  async getBB() {
-    return this.bb;
+  async getPedersen() {
+    return this.pedersen;
   }
 
-  async pedersenHash(left: Fr, right: Fr): Promise<Fr> {
-    await this.bb.pedersenInit();
-    let hashRes = await this.bb.pedersenPlookupCommit([left, right]);
-    return hashRes;
+  async pedersenHash(left: InputValue, right: InputValue): Promise<InputValue> {
+    let { returnValue } = await this.pedersen({ left, right });
+    return returnValue;
   }
 
   static indexToKey(level: number, index: number): string {
     return `${level}-${index}`;
   }
 
-  getIndex(leaf: Fr): number {
+  getIndex(leaf: InputValue): number {
     for (const [key, value] of this.storage) {
       if (value.toString() === leaf.toString()) {
         return Number(key.split('-')[1]);
@@ -72,12 +73,12 @@ export class MerkleTree implements IMerkleTree {
     return -1;
   }
 
-  root(): Fr {
+  root(): InputValue {
     return this.storage.get(MerkleTree.indexToKey(this.levels, 0)) || this.zeros[this.levels];
   }
 
   async proof(indexOfLeaf: number) {
-    let pathElements: Fr[] = [];
+    let pathElements: InputValue[] = [];
     let pathIndices: number[] = [];
 
     const leaf = this.storage.get(MerkleTree.indexToKey(0, indexOfLeaf));
@@ -101,28 +102,28 @@ export class MerkleTree implements IMerkleTree {
     };
   }
 
-  async insert(leaf: Fr) {
+  async insert(leaf: InputValue) {
     const index = this.totalLeaves;
     await this.update(index, leaf, true);
     this.totalLeaves++;
   }
 
-  async update(index: number, newLeaf: Fr, isInsert: boolean = false) {
+  async update(index: number, newLeaf: InputValue, isInsert: boolean = false) {
     if (!isInsert && index >= this.totalLeaves) {
       throw Error('Use insert method for new elements.');
     } else if (isInsert && index < this.totalLeaves) {
       throw Error('Use update method for existing elements.');
     }
 
-    let keyValueToStore: { key: string; value: Fr }[] = [];
-    let currentElement: Fr = newLeaf;
+    let keyValueToStore: { key: string; value: InputValue }[] = [];
+    let currentElement: InputValue = newLeaf;
 
     const handleIndex = async (level: number, currentIndex: number, siblingIndex: number) => {
       const siblingElement =
         this.storage.get(MerkleTree.indexToKey(level, siblingIndex)) || this.zeros[level];
 
-      let left: Fr;
-      let right: Fr;
+      let left: InputValue;
+      let right: InputValue;
       if (currentIndex % 2 === 0) {
         left = currentElement;
         right = siblingElement;
