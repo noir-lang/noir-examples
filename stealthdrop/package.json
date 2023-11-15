@@ -11,10 +11,10 @@
     "gen": "hardhat run utils/mt/generateAddresses.ts"
   },
   "dependencies": {
-    "@aztec/bb.js": "^0.8.14",
-    "@noir-lang/backend_barretenberg": "^0.7.10-37315f8.nightly",
-    "@noir-lang/noir_js": "nightly",
-    "@noir-lang/types": "nightly",
+    "@aztec/bb.js": "0.11.0",
+    "@noir-lang/backend_barretenberg": "0.18.0",
+    "@noir-lang/noir_js": "0.18.0",
+    "@noir-lang/types": "0.18.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
     "@nomicfoundation/hardhat-toolbox-viem": "1.0.0",
     "@nomicfoundation/hardhat-viem": "1.0.0",
