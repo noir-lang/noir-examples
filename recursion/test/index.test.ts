@@ -1,17 +1,20 @@
 // @ts-ignore
 import { expect } from 'chai';
 import { Noir } from '@noir-lang/noir_js';
-import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
+import { BarretenbergBackend, flattenPublicInputs } from '@noir-lang/backend_barretenberg';
 import { BackendInstances, Circuits, Noirs } from '../types';
 import { ethers } from 'hardhat';
 import type * as ethersType from "ethers";
-import { compile } from '@noir-lang/noir_wasm';
+import { CompiledProgram, DebugArtifact, compile } from '@noir-lang/noir_wasm';
 import path from 'path';
 import { ProofData } from '@noir-lang/types';
 
 const getCircuit = async (name: string) => {
-  const compiled = await compile(path.resolve("circuits", name, "src", `${name}.nr`));
-  return compiled
+  const compiled = (await compile(path.resolve("circuits", name, "src", `${name}.nr`))) as {
+    program: CompiledProgram;
+    debug: DebugArtifact;
+};
+  return compiled.program;
 }
 
 const getArtifactsPath = (name: string) => {
@@ -71,7 +74,7 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
 
       it("Should verify on-chain", async () => {
         const { proof, publicInputs } = mainProof;
-        const verified = await verifierContract.verify(proof, publicInputs);
+        const verified = await verifierContract.verify(proof, flattenPublicInputs(publicInputs));
         expect(verified).to.be.true;
       })
     })
@@ -161,7 +164,7 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
       });
 
       it("Should verify on-chain", async () => {
-        const verified = await verifierContract.verify(recursiveProof.proof, recursiveProof.publicInputs);
+        const verified = await verifierContract.verify(recursiveProof.proof, flattenPublicInputs(recursiveProof.publicInputs));
         expect(verified).to.be.true;
       })
     })
