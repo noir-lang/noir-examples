@@ -1,39 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 
 import { toast } from 'react-toastify';
 import React from 'react';
 import { Noir } from '@noir-lang/noir_js';
-import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
-import { BackendInstances, Circuits, Noirs, ProofArtifacts } from '../types';
-import { useAccount, useConnect, useContractWrite, useWaitForTransaction } from 'wagmi'
+import { BarretenbergBackend, flattenPublicInputs } from '@noir-lang/backend_barretenberg';
+import { BackendInstances, Circuits, Noirs, ProofArtifacts } from '../types.js';
+import { useAccount, useConnect, useContractRead } from 'wagmi'
 import { InjectedConnector } from 'wagmi/connectors/injected'
 import abi from "../utils/verifierAbi.json"
 import axios from "axios";
 
+// @ts-ignore
 import { initializeResolver } from '@noir-lang/source-resolver';
-import newCompiler, { compile } from '@noir-lang/noir_wasm';
-import Ethers from "../utils/ethers"
+import init, { compile } from '@noir-lang/noir_wasm';
+import { bytesToHex } from 'viem';
+import addresses from '../utils/addresses.json';
 
-function splitProof(aggregatedProof: Uint8Array) {
-    const splitIndex = aggregatedProof.length - 2144;
 
-    const publicInputsConcatenated = aggregatedProof.slice(0, splitIndex);
-
-    const publicInputSize = 32;
-    const publicInputs: Uint8Array[] = [];
-
-    for (let i = 0; i < publicInputsConcatenated.length; i += publicInputSize) {
-      const publicInput = publicInputsConcatenated.slice(i, i + publicInputSize);
-      publicInputs.push(publicInput);
-    }
-
-    const proof = aggregatedProof.slice(splitIndex);
-    return { proof, publicInputs };
-}
 
 async function getCircuit(name: string) {
-  await newCompiler();
-
+  await init();
   const {data: noirSource} = await axios.get("/api/readCircuitFile?filename=" + name)
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -55,6 +41,7 @@ function Component() {
 
   const [mainProofArtifacts, setMainProofArtifacts] = useState<ProofArtifacts>()
   const [recursiveProofArtifacts, setRecursiveProofArtifacts] = useState<ProofArtifacts>();
+  const [recursiveVerifyParams, setRecursiveVerifyParams] = useState<{ proof: `0x${string}`, publicInputs: `0x${string}`[]}>();
 
   const { address, connector, isConnected } = useAccount()
   const { connect, connectors } = useConnect({
@@ -62,24 +49,34 @@ function Component() {
   })
 
   const contractCallConfig = {
-    address: "0x0165878A594ca255338adfa4d48449f69242Eb8F" as`0x${string}`,
+    address: addresses.verifier as`0x${string}`,
     abi
   }
 
-  const { write, data, error, isLoading, isError } = useContractWrite({
+  const {  data, error, isLoading, isError } = useContractRead({
     ...contractCallConfig,
     functionName: "verify",
+    args: [recursiveVerifyParams?.proof, recursiveVerifyParams?.publicInputs],
+    enabled: recursiveVerifyParams !== undefined
   })
 
-    const {
-    data: receipt,
-    isLoading: isPending,
-    isSuccess,
-  } = useWaitForTransaction({ hash: data?.hash })
+  useEffect(() => {
+    if (isLoading || isError || data ) {
+      let txToast = toast("Verifying on-chain", { toastId: "verify" })
+
+      if (data) {
+        toast.update(txToast, {type: toast.TYPE.SUCCESS, render: "Proof verified on-chain!"})
+      }
+      
+      if (error) {
+        toast.update(txToast, {type: toast.TYPE.ERROR, render: "Error verifying proof on-chain"})
+      }
+    }
+  }, [data, isLoading, isError, error])
 
 
   // Handles input state
-  const handleChange = e => {
+  const handleChange = (e : ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setInput({...input, [e.target.name]: e.target.value});
   };
@@ -93,15 +90,13 @@ function Component() {
       const { witness, returnValue } = await noirs!.main.execute(inputs);
       const { publicInputs, proof } = await backends!.main.generateIntermediateProof(witness);
 
-      // Verify the same proof, not inside of a circuit
-      const verified = await backends!.main.verifyIntermediateProof({proof, publicInputs});
-
       // Now we will take that inner proof and verify it in an outer proof.
       const { proofAsFields, vkAsFields, vkHash } = await backends!.main.generateIntermediateProofArtifacts(
         {publicInputs, proof},
         1, // 1 public input
       );
 
+      console.log([proof, publicInputs, proofAsFields, vkAsFields, vkHash])
       setMainProofArtifacts({ returnValue: returnValue as unknown as Uint8Array, proof, publicInputs, proofAsFields, vkAsFields, vkHash })
 
       resolve(true)
@@ -117,7 +112,6 @@ function Component() {
 
   const calculateRecursiveProof = async () => {
     const proofGeneration = new Promise(async (resolve, reject) => {
-
       const aggregationObject : string[] = Array(16).fill(
         '0x0000000000000000000000000000000000000000000000000000000000000000',
       );
@@ -128,18 +122,11 @@ function Component() {
         key_hash: mainProofArtifacts!.vkHash,
         input_aggregation_object: aggregationObject,
       }
-
       const { witness, returnValue } = await noirs!.recursive.execute(recInput);
-
-
-      const newBackend = new BarretenbergBackend(circuits!.recursive, { threads: 8 })
-      
-      const { publicInputs, proof } = await newBackend.generateFinalProof(witness);
-
-      setBackends({main: backends!.main, recursive: newBackend})
+      const { publicInputs, proof } = await backends!.recursive.generateFinalProof(witness);
+      console.log([proof, publicInputs])
 
       setRecursiveProofArtifacts({ returnValue: returnValue as unknown as Uint8Array, proof, publicInputs, proofAsFields: [], vkAsFields: [], vkHash: "" })
-
       resolve(proof);
     });
 
@@ -152,30 +139,17 @@ function Component() {
 
   const verifyProof = async () => {
     if (recursiveProofArtifacts) {
-      const proofVerification = new Promise(async (resolve, reject) => {
-        const { proof, publicInputs } = recursiveProofArtifacts;
-        
-        const verification = await backends!.recursive.verifyFinalProof({ proof, publicInputs });
+      const { proof, publicInputs } = recursiveProofArtifacts;
 
-        await noirs!.recursive.destroy();
-
-        const ethers = new Ethers();
-
-        const onChainVer = await ethers.contract.verify(proof, publicInputs);
-
-        resolve(onChainVer);
-      });
-
-      toast.promise(proofVerification, {
+      await toast.promise(backends!.recursive.verifyFinalProof({ proof, publicInputs }), {
         pending: 'Verifying recursive proof',
         success: 'Recursive proof verified',
         error: 'Error verifying recursive proof',
       });
 
-      // ON-CHAIN VERIFICATION IS BUGGED, track https://github.com/noir-lang/noir/issues/3166
-      // write?.({
-      //   args: [bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi))]
-      // })
+      console.log([proof, flattenPublicInputs(publicInputs)])
+
+      setRecursiveVerifyParams({proof: bytesToHex(proof), publicInputs: flattenPublicInputs(publicInputs) as `0x${string}`[]})
     }
   };
 
@@ -195,14 +169,14 @@ function Component() {
 
   const init = async () => {
     const circuits = {
-      main: await getCircuit("main"),
-      recursive: await getCircuit("recursion")
+      main: (await getCircuit("main")).program,
+      recursive: (await getCircuit("recursion")).program
     }
     setCircuits(circuits)
 
     const backends = {
-      main: new BarretenbergBackend(circuits.main, { threads: 8 }),
-      recursive: new BarretenbergBackend(circuits.recursive, { threads: 8 })
+      main: new BarretenbergBackend(circuits.main, { threads: navigator.hardwareConcurrency }),
+      recursive: new BarretenbergBackend(circuits.recursive, { threads: navigator.hardwareConcurrency })
     }
 
     setBackends(backends)

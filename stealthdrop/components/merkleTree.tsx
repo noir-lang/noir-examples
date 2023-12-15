@@ -14,7 +14,7 @@ export function MerkleTreeProvider({ children }) {
         const initializeTree = async () => {
             const initialLeaves = merkle.addresses.map(addr => Fr.fromString(addr));
             await toast.promise(tree.initialize(initialLeaves), {
-                pending: 'Starting...',
+                pending: `Initializing merkle tree with ${initialLeaves.length} leaves... `,
             });
 
             setMerkleTree(tree);

@@ -1,3 +1,4 @@
+import { join } from 'path'
 import { configureChains, createConfig } from 'wagmi'
 import { localhost } from 'wagmi/chains'
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
@@ -20,3 +21,8 @@ export const config = createConfig({
   publicClient,
   webSocketPublicClient,
 })
+
+
+export const getArtifactsPath = (name: string) => {
+  return join("circuits", name, "contract", name, "plonk_vk.sol:UltraVerifier")
+}

@@ -11,7 +11,7 @@ fn main(
   merkle_path: [Field; DEPTH],
   index: Field,
   merkle_root: pub Field,
-  claimer_priv: Field,
+  claimer_priv: Field
   claimer_pub: pub Field
 ) {
     let key = ecrecover::secp256k1::PubKey::from_unified(pub_key);
