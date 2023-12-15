@@ -1,22 +1,22 @@
 import { writeFileSync } from 'fs';
-const hardhat = require("hardhat") // damn commonjs
+import hre from 'hardhat';
+import { getArtifactsPath } from '../utils/wagmi-viem.js';
+const { viem } = hre;
 
 async function main() {
-  // Deploy the verifier contract
-  const Verifier = await hardhat.ethers.getContractFactory('UltraVerifier');
-  const verifier = await Verifier.deploy();
+  const publicClient = await viem.getPublicClient();
 
-  // Get the address of the deployed verifier contract
-  const verifierAddr = await verifier.deployed();
+  // Deploy the verifier contract
+  const verifier = await viem.deployContract(getArtifactsPath("recursion"));
 
   // Create a config object
   const config = {
-    chainId: hardhat.ethers.provider.network.chainId,
-    verifier: verifierAddr.address
+    chainId: publicClient.chain.id,
+    verifier: verifier.address,
   };
 
   // Print the config
-  console.log('Deployed with', config);
+  console.log('Deployed at', config);
   writeFileSync('utils/addresses.json', JSON.stringify(config), { flag: 'w' });
   process.exit();
 }

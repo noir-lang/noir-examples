@@ -1,22 +1,20 @@
 // @ts-ignore
 import { expect } from 'chai';
 import { Noir } from '@noir-lang/noir_js';
-import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
-import { BackendInstances, Circuits, Noirs } from '../types';
-import { ethers } from 'hardhat';
-import type * as ethersType from "ethers";
+import { BarretenbergBackend, flattenPublicInputs } from '@noir-lang/backend_barretenberg';
+import { BackendInstances, Circuits, Noirs } from '../types.js';
+import hre from 'hardhat';
 import { compile } from '@noir-lang/noir_wasm';
 import path from 'path';
 import { ProofData } from '@noir-lang/types';
+import {  bytesToHex } from 'viem';
+import { getArtifactsPath } from '../utils/wagmi-viem.js';
 
 const getCircuit = async (name: string) => {
-  const compiled = await compile(path.resolve("circuits", name, "src", `${name}.nr`));
-  return compiled
+  const { program } = compile(path.resolve("circuits", name, "src", `${name}.nr`));
+  return program
 }
 
-const getArtifactsPath = (name: string) => {
-  return path.join("circuits", name, "contract", name, "plonk_vk.sol:UltraVerifier")
-}
 
 describe('It compiles noir program code, receiving circuit bytes and abi object.', () => {
   let circuits : Circuits;
@@ -31,8 +29,8 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
       recursive: await getCircuit("recursion")
     }
     backends = {
-      main: new BarretenbergBackend(circuits.main, {threads: 8}),
-      recursive: new BarretenbergBackend(circuits.recursive, {threads: 8})
+      main: new BarretenbergBackend(circuits.main, { threads: 8 }),
+      recursive: new BarretenbergBackend(circuits.recursive, { threads: 8 })
     }
     noirs = {
       main: new Noir(circuits.main, backends.main),
@@ -57,21 +55,16 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
     })
 
     describe("Proof verification", async() => {
-      let verifierContract : ethersType.Contract;
-
-      before(async () => {
-        const verifierContractFactory = await ethers.getContractFactory(getArtifactsPath("main"));
-        verifierContract = await verifierContractFactory.deploy();
-      });
-      
+     
       it('Should verify off-chain', async () => {
         const verified = await noirs.main.verifyFinalProof(mainProof);
         expect(verified).to.be.true;
       });
 
       it("Should verify on-chain", async () => {
+        const verifierContract = await hre.viem.deployContract(getArtifactsPath("main"), []);
         const { proof, publicInputs } = mainProof;
-        const verified = await verifierContract.verify(proof, publicInputs);
+        const verified = await verifierContract.read.verify([bytesToHex(proof), flattenPublicInputs(publicInputs)]);
         expect(verified).to.be.true;
       })
     })
@@ -146,22 +139,14 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
     });
 
     describe("Proof verification", async() => {
-      let verifierContract : ethersType.Contract;
-
-      before(async () => {
-        const verifierContractFactory = await ethers.getContractFactory(getArtifactsPath("recursion"));
-        verifierContract = await verifierContractFactory.deploy();
-
-        const verifierAddr = await verifierContract.deployed();
-      });
-      
       it('Should verify off-chain', async () => {
         const verified = await noirs.recursive.verifyFinalProof(recursiveProof);
         expect(verified).to.be.true;
       });
 
       it("Should verify on-chain", async () => {
-        const verified = await verifierContract.verify(recursiveProof.proof, recursiveProof.publicInputs);
+        const verifierContract = await hre.viem.deployContract(getArtifactsPath("recursion"), []);
+        const verified = await verifierContract.read.verify([bytesToHex(recursiveProof.proof), flattenPublicInputs(recursiveProof.publicInputs)]);
         expect(verified).to.be.true;
       })
     })

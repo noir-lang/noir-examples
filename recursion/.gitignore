@@ -52,3 +52,5 @@ artifacts
 typechain-types
 cache
 .target
+
+circuits/**/target

@@ -6,7 +6,7 @@ This is a much faster version of Stealthdrop, built with Noir.
 
 ## Getting Started
 
-1. [Install nargo](https://noir-lang.org/getting_started/nargo_installation#option-1-noirup) version 0.17.0 with `noirup -v 0.17.0`
+1. [Install nargo](https://noir-lang.org/getting_started/nargo_installation#option-1-noirup) version 0.18.0 with `noirup -v 0.18.0`
 2. Rename `env.examples` to `.env`, you can set up a number of things there but it contains sensible defaults
 3. Install dependencies by running `yarn`
 4. Compile the project with `yarn compile`
