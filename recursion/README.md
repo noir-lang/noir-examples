@@ -10,10 +10,8 @@ Why is this useful? In this example, it doesn't do much. But you could verify tw
 
 ## Getting Started
 
-1. [Install nargo](https://noir-lang.org/getting_started/nargo_installation#option-1-noirup) version 0.17.0 with `noirup -v 0.17.0`
-2. Install dependencies by running `yarn`
-3. Compile the project with `yarn compile`
-4. Run `yarn dev`
+1. Install dependencies by running `yarn`
+2. Run `yarn dev`
 
 ## Testing
 
