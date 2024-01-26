@@ -6,7 +6,8 @@ export default async function handler(req, res) {
 
   try {
     const projectRoot = process.cwd();
-    const filePath = path.join(projectRoot, 'circuits', filename, "src", `${filename}.nr`);
+    const filePath = path.join(projectRoot, 'circuits', filename);
+    console.log(filePath);
     const data = await fs.readFile(filePath, 'utf-8');
     res.status(200).send(data);
   } catch (error) {

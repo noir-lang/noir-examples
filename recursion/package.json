@@ -13,11 +13,10 @@
     "compile:recursive": "cd circuits/recursion && nargo compile && nargo codegen-verifier"
   },
   "dependencies": {
-    "@noir-lang/backend_barretenberg": "^0.7.10-37315f8.nightly",
-    "@noir-lang/noir_js": "^0.16.0-37315f8.nightly",
-    "@noir-lang/noir_wasm": "^0.16.0-37315f8.nightly",
-    "@noir-lang/source-resolver": "^0.16.0-37315f8.nightly",
-    "@noir-lang/types": "^0.16.0-37315f8.nightly",
+    "@noir-lang/backend_barretenberg": "0.23.0",
+    "@noir-lang/noir_js": "0.23.0",
+    "@noir-lang/noir_wasm": "0.23.0",
+    "@noir-lang/types": "0.23.0",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
     "@nomicfoundation/hardhat-ethers": "^3.0.0",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
