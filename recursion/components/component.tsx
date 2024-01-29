@@ -74,9 +74,6 @@ function Component() {
 
   const [input, setInput] = useState<{ [key: string]: string }>({ x: '1', y: '2' });
 
-  const [mainProofArtifacts, setMainProofArtifacts] = useState<ProofArtifacts>();
-  const [recursiveProofArtifacts, setRecursiveProofArtifacts] = useState<ProofArtifacts>();
-
   const { address, connector, isConnected } = useAccount();
   const { connect, connectors } = useConnect({
     connector: new InjectedConnector(),
@@ -105,7 +102,7 @@ function Component() {
   };
 
   const calculateMainProof = async () => {
-    const proofGeneration = new Promise(async (resolve, reject) => {
+    const proofGeneration: Promise<ProofArtifacts> = new Promise(async (resolve, reject) => {
       const inputs = {
         x: '2',
         y: '3',
@@ -123,16 +120,14 @@ function Component() {
           1, // 1 public input
         );
 
-      setMainProofArtifacts({
-        returnValue: returnValue as unknown as Uint8Array,
+      resolve({
+        returnValue,
         proof,
         publicInputs,
         proofAsFields,
         vkAsFields,
         vkHash,
       });
-
-      resolve(true);
     });
 
     toast.promise(proofGeneration, {
@@ -140,10 +135,10 @@ function Component() {
       success: 'Proof generated',
       error: 'Error generating proof',
     });
-  };
 
-  const calculateRecursiveProof = async () => {
-    const proofGeneration = new Promise(async (resolve, reject) => {
+    const mainProofArtifacts = await proofGeneration;
+
+    const proofGeneration2: Promise<ProofArtifacts> = new Promise(async (resolve, reject) => {
       const aggregationObject: string[] = Array(16).fill(
         '0x0000000000000000000000000000000000000000000000000000000000000000',
       );
@@ -163,7 +158,7 @@ function Component() {
 
       setBackends({ main: backends!.main, recursive: newBackend });
 
-      setRecursiveProofArtifacts({
+      resolve({
         returnValue: returnValue as unknown as Uint8Array,
         proof,
         publicInputs,
@@ -171,59 +166,36 @@ function Component() {
         vkAsFields: [],
         vkHash: '',
       });
-
-      resolve(proof);
     });
 
-    toast.promise(proofGeneration, {
+    toast.promise(proofGeneration2, {
       pending: 'Generating recursive proof',
       success: 'Recursive proof generated',
       error: 'Error generating recursive proof',
     });
+
+    const recursiveProofArtifacts = await proofGeneration2;
+
+    const proofVerification = new Promise(async (resolve, reject) => {
+      const { proof, publicInputs } = recursiveProofArtifacts;
+
+      const verification = await backends!.recursive.verifyFinalProof({ proof, publicInputs });
+
+      await noirs!.recursive.destroy();
+
+      // const ethers = new Ethers();
+
+      // const onChainVer = await ethers.contract.verify(proof, publicInputs);
+
+      resolve(verification);
+    });
+
+    toast.promise(proofVerification, {
+      pending: 'Verifying recursive proof',
+      success: 'Recursive proof verified',
+      error: 'Error verifying recursive proof',
+    });
   };
-
-  const verifyProof = async () => {
-    if (recursiveProofArtifacts) {
-      const proofVerification = new Promise(async (resolve, reject) => {
-        const { proof, publicInputs } = recursiveProofArtifacts;
-
-        const verification = await backends!.recursive.verifyFinalProof({ proof, publicInputs });
-
-        await noirs!.recursive.destroy();
-
-        const ethers = new Ethers();
-
-        const onChainVer = await ethers.contract.verify(proof, publicInputs);
-
-        resolve(onChainVer);
-      });
-
-      toast.promise(proofVerification, {
-        pending: 'Verifying recursive proof',
-        success: 'Recursive proof verified',
-        error: 'Error verifying recursive proof',
-      });
-
-      // ON-CHAIN VERIFICATION IS BUGGED, track https://github.com/noir-lang/noir/issues/3166
-      // write?.({
-      //   args: [bytesToHex(proof), publicInputs.map((pi : Uint8Array) => bytesToHex(pi))]
-      // })
-    }
-  };
-
-  // Verifier the proof if there's one in state
-  useEffect(() => {
-    if (mainProofArtifacts) {
-      calculateRecursiveProof();
-    }
-  }, [mainProofArtifacts]);
-
-  // Verifier the proof if there's one in state
-  useEffect(() => {
-    if (recursiveProofArtifacts) {
-      verifyProof();
-    }
-  }, [recursiveProofArtifacts]);
 
   const init = async () => {
     const circuits = {
