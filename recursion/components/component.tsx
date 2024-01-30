@@ -102,11 +102,12 @@ function Component() {
   };
 
   const calculateMainProof = async () => {
+    const inputs = {
+      x: '2',
+      y: '3',
+    };
+
     const proofGeneration: Promise<ProofArtifacts> = new Promise(async (resolve, reject) => {
-      const inputs = {
-        x: '2',
-        y: '3',
-      };
       const { witness, returnValue } = await noirs!.main.execute(inputs);
       const { publicInputs, proof } = await backends!.main.generateIntermediateProof(witness);
 
@@ -145,7 +146,7 @@ function Component() {
       const recInput = {
         verification_key: mainProofArtifacts!.vkAsFields.map(e => e.toString()),
         proof: mainProofArtifacts!.proofAsFields,
-        public_inputs: ['0x' + input!['y']],
+        public_inputs: ['0x' + inputs['y']],
         key_hash: mainProofArtifacts!.vkHash,
         input_aggregation_object: aggregationObject,
       };
