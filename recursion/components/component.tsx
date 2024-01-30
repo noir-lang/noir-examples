@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { toast } from 'react-toastify';
 import React from 'react';
-import { Noir } from '@noir-lang/noir_js';
+import { Noir, ProofData } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { BackendInstances, Circuits, Noirs, ProofArtifacts } from '../types';
 import { useAccount, useConnect, useContractWrite, useWaitForTransaction } from 'wagmi';
@@ -139,7 +139,7 @@ function Component() {
 
     const mainProofArtifacts = await proofGeneration;
 
-    const proofGeneration2: Promise<ProofArtifacts> = new Promise(async (resolve, reject) => {
+    const proofGeneration2: Promise<ProofData> = new Promise(async (resolve, reject) => {
       const aggregationObject: string[] = Array(16).fill(
         '0x0000000000000000000000000000000000000000000000000000000000000000',
       );
@@ -151,22 +151,10 @@ function Component() {
         input_aggregation_object: aggregationObject,
       };
 
-      const { witness, returnValue } = await noirs!.recursive.execute(recInput);
+      const { witness } = await noirs!.recursive.execute(recInput);
+      const proofData = await backends!.recursive.generateFinalProof(witness);
 
-      const newBackend = new BarretenbergBackend(circuits!.recursive, { threads: 8 });
-
-      const { publicInputs, proof } = await newBackend.generateFinalProof(witness);
-
-      setBackends({ main: backends!.main, recursive: newBackend });
-
-      resolve({
-        returnValue: returnValue as unknown as Uint8Array,
-        proof,
-        publicInputs,
-        proofAsFields: [],
-        vkAsFields: [],
-        vkHash: '',
-      });
+      resolve(proofData);
     });
 
     toast.promise(proofGeneration2, {
