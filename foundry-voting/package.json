@@ -8,16 +8,12 @@
     "test": "test"
   },
   "scripts": {
-    "test": "forge test",
-    "integration-test": "vitest",
-    "populate-prover-toml": "ts-node --esm --experimental-specifier-resolution=node ./utils/populate.ts"
+    "test": "forge test"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@aztec/bb.js": "0.3.6",
     "@iarna/toml": "^2.2.5",
-    "@noir-lang/acvm_js": "git+https://github.com/noir-lang/acvm-simulator-wasm.git",
     "fflate": "^0.8.0",
     "toml": "^3.0.0"
   },
