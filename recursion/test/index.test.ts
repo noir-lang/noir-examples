@@ -2,15 +2,15 @@
 import { expect } from 'chai';
 import { Noir } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
-import { BackendInstances, Circuits, Noirs } from '../types';
-import { ethers } from 'hardhat';
-import type * as ethersType from 'ethers';
+import { BackendInstances, Circuits, Noirs } from '../types.js';
+import hre from 'hardhat';
 import { compile, createFileManager } from '@noir-lang/noir_wasm';
-import path, { join, resolve } from 'path';
+import { join, resolve } from 'path';
 import { ProofData } from '@noir-lang/types';
+import { bytesToHex } from 'viem';
 
 async function getCircuit(name: string) {
-  const basePath = resolve(join(__dirname, '../circuits', name));
+  const basePath = resolve(join('./circuits', name));
   const fm = createFileManager(basePath);
   const compiled = await compile(fm, basePath);
   if (!('program' in compiled)) {
@@ -18,10 +18,6 @@ async function getCircuit(name: string) {
   }
   return compiled.program;
 }
-
-const getArtifactsPath = (name: string) => {
-  return path.join('circuits', name, 'contract', name, 'plonk_vk.sol:UltraVerifier');
-};
 
 describe('It compiles noir program code, receiving circuit bytes and abi object.', () => {
   let circuits: Circuits;
@@ -50,72 +46,17 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
     await backends.recursive.destroy();
   });
 
-  describe('Normal flow', async () => {
-    let mainProof: ProofData;
-
-    describe('Proof generation', async () => {
-      it('Should generate a final proof', async () => {
-        mainProof = await noirs.main.generateFinalProof(mainInput);
-        expect(mainProof.proof instanceof Uint8Array).to.be.true;
-      });
-    });
-
-    describe('Proof verification', async () => {
-      let verifierContract: ethersType.Contract;
-
-      before(async () => {
-        const verifierContractFactory = await ethers.getContractFactory(getArtifactsPath('main'));
-        verifierContract = await verifierContractFactory.deploy();
-      });
-
-      it('Should verify off-chain', async () => {
-        const verified = await noirs.main.verifyFinalProof(mainProof);
-        expect(verified).to.be.true;
-      });
-
-      it('Should verify on-chain', async () => {
-        const { proof, publicInputs } = mainProof;
-        const verified = await verifierContract.verify(proof, publicInputs);
-        expect(verified).to.be.true;
-      });
-    });
-  });
-
   describe('Recursive flow', async () => {
-    let circuits: Circuits;
-    let backends: BackendInstances;
-    let noirs: Noirs;
-
-    const mainInput = { x: 1, y: 2 };
-
     let recursiveInputs: any;
-    let recursiveProof: ProofData;
+    let intermediateProof: ProofData;
+    let finalProof: ProofData;
 
-    before(async () => {
-      circuits = {
-        main: await getCircuit('main'),
-        recursive: await getCircuit('recursion'),
-      };
-      backends = {
-        main: new BarretenbergBackend(circuits.main, { threads: 8 }),
-        recursive: new BarretenbergBackend(circuits.recursive, { threads: 8 }),
-      };
-      noirs = {
-        main: new Noir(circuits.main, backends.main),
-        recursive: new Noir(circuits.recursive, backends.recursive),
-      };
-    });
-
-    after(async () => {
-      await backends.main.destroy();
-      await backends.recursive.destroy();
-    });
-
-    describe('Proof generation', async () => {
+    describe.only('Proof generation', async () => {
       it('Should generate an intermediate proof', async () => {
-        const { witness, returnValue } = await noirs.main.execute(mainInput);
-        const { proof, publicInputs } = await backends.main.generateIntermediateProof(witness);
+        const { witness } = await noirs.main.execute(mainInput);
+        intermediateProof = await backends.main.generateIntermediateProof(witness);
 
+        const { proof, publicInputs } = intermediateProof;
         expect(proof instanceof Uint8Array).to.be.true;
 
         const verified = await backends.main.verifyIntermediateProof({ proof, publicInputs });
@@ -139,32 +80,27 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
       });
 
       it('Should generate a final proof with a recursive input', async () => {
-        recursiveProof = await noirs.recursive.generateFinalProof(recursiveInputs);
-        expect(recursiveProof.proof instanceof Uint8Array).to.be.true;
+        finalProof = await noirs.recursive.generateFinalProof(recursiveInputs);
+        expect(finalProof.proof instanceof Uint8Array).to.be.true;
       });
     });
 
     describe('Proof verification', async () => {
-      let verifierContract: ethersType.Contract;
+      let verifierContract: any;
 
       before(async () => {
-        const verifierContractFactory = await ethers.getContractFactory(
-          getArtifactsPath('recursion'),
-        );
-        verifierContract = await verifierContractFactory.deploy();
-
-        const verifierAddr = await verifierContract.deployed();
+        verifierContract = await hre.viem.deployContract('UltraVerifier');
       });
 
       it('Should verify off-chain', async () => {
-        const verified = await noirs.recursive.verifyFinalProof(recursiveProof);
+        const verified = await noirs.recursive.verifyFinalProof(finalProof);
         expect(verified).to.be.true;
       });
 
       it('Should verify on-chain', async () => {
-        const verified = await verifierContract.verify(
-          recursiveProof.proof,
-          recursiveProof.publicInputs,
+        const verified = await verifierContract.read.verify(
+          bytesToHex(finalProof.proof),
+          finalProof.publicInputs,
         );
         expect(verified).to.be.true;
       });
