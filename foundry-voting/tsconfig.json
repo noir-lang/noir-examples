@@ -12,17 +12,7 @@
     "resolveJsonModule": true,
     "noImplicitAny": true,
     "plugins": [],
-    "lib": [
-      "dom",
-      "EsNext"
-    ]
-    },
-    "include": [
-      "./test/**/*"
-    ],
-      "exclude": [
-    "node_modules",
-    "**/node_modules/**"
-  ]
-  
+    "lib": ["dom", "EsNext"]
+  },
+  "exclude": ["node_modules", "**/node_modules/**"]
 }
