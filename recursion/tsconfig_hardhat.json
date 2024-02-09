@@ -1,0 +1,20 @@
+{
+  "extend": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "esModuleInterop": true
+  },
+  "ts-node": {
+    "experimentalResolver": true,
+    "files": true
+  },
+  "files": [
+    "hardhat.config.cts"
+  ],
+  "include": [
+    "scripts/**/*.ts",
+    "test/**/*.ts"
+  ]
+}

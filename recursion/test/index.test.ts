@@ -4,6 +4,7 @@ import { Noir } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { BackendInstances, Circuits, Noirs } from '../types.js';
 import hre from 'hardhat';
+const { viem } = hre;
 import { compile, createFileManager } from '@noir-lang/noir_wasm';
 import { join, resolve } from 'path';
 import { ProofData } from '@noir-lang/types';
@@ -89,7 +90,7 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
       let verifierContract: any;
 
       before(async () => {
-        verifierContract = await hre.viem.deployContract('UltraVerifier');
+        verifierContract = await viem.deployContract('UltraVerifier');
       });
 
       it('Should verify off-chain', async () => {

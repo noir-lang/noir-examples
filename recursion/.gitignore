@@ -51,4 +51,4 @@ artifacts
 .target
 typechain-types
 cache
-.target
+target

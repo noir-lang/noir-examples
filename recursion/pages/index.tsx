@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useOffChainVerification } from '../hooks/useOffChainVerification.jsx';
-import { useOnChainVerification } from '../hooks/useOnChainVerification.jsx';
-import { useMainProofGeneration } from '../hooks/useMainProofGeneration.jsx';
-import { useRecursiveProofGeneration } from '../hooks/useRecursiveProofGeneration.jsx';
+import { useOffChainVerification } from '../hooks/useOffChainVerification';
+import { useOnChainVerification } from '../hooks/useOnChainVerification';
+import { useMainProofGeneration } from '../hooks/useMainProofGeneration';
+import { useRecursiveProofGeneration } from '../hooks/useRecursiveProofGeneration';
 
 export default function Page() {
   const [input, setInput] = useState<{ x: string; y: string } | undefined>();

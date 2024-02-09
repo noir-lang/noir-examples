@@ -1,9 +1,9 @@
 'use client';
 
 import { toast } from 'react-toastify';
-import { ProofArtifacts } from '../types.js';
+import { ProofArtifacts } from '../types';
 import { useEffect, useState } from 'react';
-import { getCircuit } from '../utils/compile.js';
+import { getCircuit } from '../utils/compile';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { Noir, ProofData } from '@noir-lang/noir_js';
 
