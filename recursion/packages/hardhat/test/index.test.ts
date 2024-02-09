@@ -1,5 +1,5 @@
-// @ts-ignore
-import { expect } from 'chai';
+import chai from 'chai';
+const { expect } = chai;
 import { Noir } from '@noir-lang/noir_js';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';
 import { BackendInstances, Circuits, Noirs } from '../types.js';
@@ -11,7 +11,7 @@ import { ProofData } from '@noir-lang/types';
 import { bytesToHex } from 'viem';
 
 async function getCircuit(name: string) {
-  const basePath = resolve(join('./circuits', name));
+  const basePath = resolve(join('../noir', name));
   const fm = createFileManager(basePath);
   const compiled = await compile(fm, basePath);
   if (!('program' in compiled)) {

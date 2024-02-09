@@ -16,7 +16,7 @@ async function main() {
 
   // Print the config
   console.log('Deployed at', config);
-  writeFileSync('utils/addresses.json', JSON.stringify(config), { flag: 'w' });
+  writeFileSync('../addresses.json', JSON.stringify(config), { flag: 'w' });
   process.exit();
 }
 

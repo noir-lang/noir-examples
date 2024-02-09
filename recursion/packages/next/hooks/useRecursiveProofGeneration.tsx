@@ -1,7 +1,7 @@
 'use client';
 
 import { toast } from 'react-toastify';
-import { ProofArtifacts } from '../types';
+import { ProofArtifacts } from '../../hardhat/types';
 import { useEffect, useState } from 'react';
 import { getCircuit } from '../utils/compile';
 import { BarretenbergBackend } from '@noir-lang/backend_barretenberg';

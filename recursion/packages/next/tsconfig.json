@@ -20,5 +20,5 @@
     "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
-  "exclude": ["node_modules", "scripts", "test"]
+  "exclude": ["node_modules", "packages/hardhat/scripts", "packages/hardhat/test"]
 }

@@ -42,7 +42,10 @@ const config: HardhatUserConfig = {
     timeout: 200000,
   },
   paths: {
-    sources: './circuits/recursion/contract/recursion',
+    sources: './noir/recursion/contract/recursion',
+    artifacts: './hardhat/artifacts',
+    cache: './hardhat/cache',
+    tests: './hardhat/test',
   },
 };
 

@@ -46,13 +46,13 @@ export function useOnChainVerification(proofData?: ProofData) {
     console.log(data);
     if (data) {
       toast.update(onChainToast, {
-        type: toast.TYPE.SUCCESS,
+        type: 'success',
         render: 'Proof verified on-chain!',
         isLoading: false,
       });
     } else if (error) {
       toast.update(onChainToast, {
-        type: toast.TYPE.ERROR,
+        type: 'error',
         render: 'Error verifying proof on-chain!',
         isLoading: false,
       });

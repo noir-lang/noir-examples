@@ -3,7 +3,7 @@ import { localhost, polygonMumbai, sepolia } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 import abi from './verifierAbi.json';
-import addresses from './addresses.json';
+import addresses from '../../addresses.json';
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [localhost, polygonMumbai, sepolia],
