@@ -4,7 +4,7 @@
 
 This example project shows how to create a simple zk voting circuit in Noir with a corresponding Solidity contract to track eligible voters, proposals and votes.
 
-This example was last tested with Noir version 0.10.3. You can install it with [noirup](https://noir-lang.org/getting_started/nargo_installation#option-1-noirup) using
+This example was last tested with Noir version 0.10.3. You can install it with [noirup](https://noir-lang.org/docs/getting_started/installation/#installing-noirup) using
 
 ```bash
 noirup -v 0.10.3
