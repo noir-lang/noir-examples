@@ -13,7 +13,7 @@ You could also avoid verifying stuff on-chain for turn-based games, for example.
 ## Getting Started
 
 1. Install dependencies by running `yarn`
-2. For on-chain verification, open another terminal and run `npx hardhat node`
+2. For on-chain verification, open another terminal, and run `cd packages/hardhat && npx hardhat node`
 3. Run `yarn dev`
 
 ## Testing
