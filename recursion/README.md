@@ -18,4 +18,4 @@ You could also avoid verifying stuff on-chain for turn-based games, for example.
 
 ## Testing
 
-To run the [test file](./test/index.ts), try `yarn test`
+To run the [test file](./packages/hardhat/test/index.test.ts), try `yarn test`
