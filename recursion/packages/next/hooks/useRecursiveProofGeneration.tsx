@@ -12,7 +12,7 @@ export function useRecursiveProofGeneration(
   inputs?: { [key: string]: string },
 ) {
   const [proofData, setProofData] = useState<ProofData | undefined>();
-  const [recursiveBackend, setRecursiveBackend] = useState<BarretenbergBackend | undefined>();
+  const [recursiveNoir, setRecursiveNoir] = useState<Noir | undefined>();
 
   const proofGeneration = async () => {
     if (!artifacts || !inputs) return;
@@ -29,10 +29,9 @@ export function useRecursiveProofGeneration(
       key_hash: vkHash,
     };
 
-    const { witness } = await noir.execute(recInput);
-    const proofData = await backend.generateFinalProof(witness);
+    const proofData = await noir.generateProof(recInput);
 
-    setRecursiveBackend(backend);
+    setRecursiveNoir(noir);
     setProofData(proofData);
   };
 
@@ -45,5 +44,5 @@ export function useRecursiveProofGeneration(
     });
   }, [artifacts, inputs]);
 
-  return { recursiveBackend, proofData };
+  return { recursiveNoir, proofData };
 }

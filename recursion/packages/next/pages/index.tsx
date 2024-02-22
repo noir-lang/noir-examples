@@ -9,9 +9,9 @@ import { useRecursiveProofGeneration } from '../hooks/useRecursiveProofGeneratio
 export default function Page() {
   const [input, setInput] = useState<{ x: string; y: string } | undefined>();
   const mainProofArtifacts = useMainProofGeneration(input);
-  const { recursiveBackend, proofData } = useRecursiveProofGeneration(mainProofArtifacts, input);
+  const { recursiveNoir, proofData } = useRecursiveProofGeneration(mainProofArtifacts, input);
 
-  useOffChainVerification(recursiveBackend, proofData);
+  useOffChainVerification(recursiveNoir, proofData);
   useOnChainVerification(proofData);
 
   const submit = (e: React.FormEvent<HTMLFormElement>) => {

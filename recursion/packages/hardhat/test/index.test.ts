@@ -14,6 +14,7 @@ async function getCircuit(name: string) {
   const basePath = resolve(join('../noir', name));
   const fm = createFileManager(basePath);
   const compiled = await compile(fm, basePath);
+  console.log(compiled);
   if (!('program' in compiled)) {
     throw new Error('Compilation failed');
   }
@@ -52,20 +53,19 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
     let intermediateProof: ProofData;
     let finalProof: ProofData;
 
-    describe.only('Proof generation', async () => {
+    describe('Proof generation', async () => {
       it('Should generate an intermediate proof', async () => {
-        const { witness } = await noirs.main.execute(mainInput);
-        intermediateProof = await backends.main.generateIntermediateProof(witness);
+        intermediateProof = await noirs.main.generateProof(mainInput);
 
         const { proof, publicInputs } = intermediateProof;
         expect(proof instanceof Uint8Array).to.be.true;
 
-        const verified = await backends.main.verifyIntermediateProof({ proof, publicInputs });
+        const verified = await noirs.main.verifyProof({ proof, publicInputs });
         expect(verified).to.be.true;
 
         const numPublicInputs = 1;
         const { proofAsFields, vkAsFields, vkHash } =
-          await backends.main.generateIntermediateProofArtifacts(
+          await backends.main.generateRecursiveProofArtifacts(
             { publicInputs, proof },
             numPublicInputs,
           );
@@ -81,7 +81,7 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
       });
 
       it('Should generate a final proof with a recursive input', async () => {
-        finalProof = await noirs.recursive.generateFinalProof(recursiveInputs);
+        finalProof = await noirs.recursive.generateProof(recursiveInputs);
         expect(finalProof.proof instanceof Uint8Array).to.be.true;
       });
     });
@@ -94,7 +94,7 @@ describe('It compiles noir program code, receiving circuit bytes and abi object.
       });
 
       it('Should verify off-chain', async () => {
-        const verified = await noirs.recursive.verifyFinalProof(finalProof);
+        const verified = await noirs.recursive.verifyProof(finalProof);
         expect(verified).to.be.true;
       });
 

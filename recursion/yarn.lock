@@ -26,9 +26,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aztec/bb.js@npm:0.19.0":
-  version: 0.19.0
-  resolution: "@aztec/bb.js@npm:0.19.0"
+"@aztec/bb.js@npm:0.23.0":
+  version: 0.23.0
+  resolution: "@aztec/bb.js@npm:0.23.0"
   dependencies:
     comlink: "npm:^4.4.1"
     commander: "npm:^10.0.1"
@@ -36,7 +36,7 @@ __metadata:
     tslib: "npm:^2.4.0"
   bin:
     bb.js: dest/node/main.js
-  checksum: 10c0/7f0df00d5fcc9c7a027c8fa4d02aa9ad36cfeb69dcee91770f207816fa00c1f9744113cbdc0921c43b48793ae56f1269b8300a081aa336b5971b0337af459bcf
+  checksum: 10c0/0765f9615ff99d486da7745c023d807505bdc99c11256200a55bcdf54f56c98435578e237b4f3acccbf3be53208b1a466ec8f84219c9dcb3f3d0985280331247
   languageName: node
   linkType: hard
 
@@ -940,57 +940,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noir-lang/acvm_js@npm:0.39.0":
-  version: 0.39.0
-  resolution: "@noir-lang/acvm_js@npm:0.39.0"
-  checksum: 10c0/0780b8abe6ab6d0c83b095877adfe9080f0cd4bedb97f709f146b26a53d5b8be2bce065c8f710b59e0a6e23506ade6cdf73aaf58868da5863d75bca5c40783ba
+"@noir-lang/acvm_js@npm:0.40.0":
+  version: 0.40.0
+  resolution: "@noir-lang/acvm_js@npm:0.40.0"
+  checksum: 10c0/fc2e9534890c7195118d40dcc8c567da65ab651af1bad690b7fa2f70b5beb811166e0987e9d461f5174205ddf111763166dc016da8a145a240027394c620f1b5
   languageName: node
   linkType: hard
 
-"@noir-lang/backend_barretenberg@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "@noir-lang/backend_barretenberg@npm:0.23.0"
+"@noir-lang/backend_barretenberg@npm:^0.24.0":
+  version: 0.24.0
+  resolution: "@noir-lang/backend_barretenberg@npm:0.24.0"
   dependencies:
-    "@aztec/bb.js": "npm:0.19.0"
-    "@noir-lang/types": "npm:0.23.0"
+    "@aztec/bb.js": "npm:0.23.0"
+    "@noir-lang/types": "npm:0.24.0"
     fflate: "npm:^0.8.0"
-  checksum: 10c0/52170513bae7e09df4bc88d6c020cddab47b91ab3c56c4dcb2183d2b091bcb95c557606e338daf22ee415fe61b8b218cdf6ec7971a5548804d11f83cd7795086
+  checksum: 10c0/c547f1bf08e7fe5d81690a358ac484cdbdc188f7f509cc7f6bbbf848273f8dd3a3fb139790cf9460a19b10d48abf24d058499943bfe8c1fa39fbd247b786d3e5
   languageName: node
   linkType: hard
 
-"@noir-lang/noir_js@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "@noir-lang/noir_js@npm:0.23.0"
+"@noir-lang/noir_js@npm:^0.24.0":
+  version: 0.24.0
+  resolution: "@noir-lang/noir_js@npm:0.24.0"
   dependencies:
-    "@noir-lang/acvm_js": "npm:0.39.0"
-    "@noir-lang/noirc_abi": "npm:0.23.0"
-    "@noir-lang/types": "npm:0.23.0"
-  checksum: 10c0/1ccb04cf5990cc6b32c230a08e016def41bb8c002263eea226272c719d63aee06b012772d69fe5658f3fd26985f906ab30d53adf4804632d9c7b63c25b108eaf
+    "@noir-lang/acvm_js": "npm:0.40.0"
+    "@noir-lang/noirc_abi": "npm:0.24.0"
+    "@noir-lang/types": "npm:0.24.0"
+  checksum: 10c0/185d3bd525ae6e1f6d8b355511b66284977589c2799a2cf613e0d2f8381855d081255d3b42d16b80413091cdfbdec1482061d5b7d6d995531c5037dcde939d1e
   languageName: node
   linkType: hard
 
-"@noir-lang/noir_wasm@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "@noir-lang/noir_wasm@npm:0.23.0"
+"@noir-lang/noir_wasm@npm:^0.24.0":
+  version: 0.24.0
+  resolution: "@noir-lang/noir_wasm@npm:0.24.0"
   dependencies:
+    "@noir-lang/types": "npm:0.24.0"
     pako: "npm:^2.1.0"
-  checksum: 10c0/c960ebd9eb859efab48f1e15b002d1d5edd278cafe71d61261cf0cfee2a5cd792953f9e8ffd2fe142c1be32a72ed4bb4b17a4561392d6a0359f4936eef1287f5
+  checksum: 10c0/764d4a6fefd9cf00f7ee810622bf75d9212da46b5276d481961b7bb68d42614edebd9b07eef5d8fa620210e9fc7fef7d5f3973f1a6c68553d9a2abd8df28aa30
   languageName: node
   linkType: hard
 
-"@noir-lang/noirc_abi@npm:0.23.0":
-  version: 0.23.0
-  resolution: "@noir-lang/noirc_abi@npm:0.23.0"
-  checksum: 10c0/a37a9b96e8690d766bee3f850f6a9913c2a070d99147e3672c9979c4740226b5e17fc033b520b53b79f997ca1d95aa5598f91ac8c303a5f1242c238ccbbc1587
-  languageName: node
-  linkType: hard
-
-"@noir-lang/types@npm:0.23.0, @noir-lang/types@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "@noir-lang/types@npm:0.23.0"
+"@noir-lang/noirc_abi@npm:0.24.0":
+  version: 0.24.0
+  resolution: "@noir-lang/noirc_abi@npm:0.24.0"
   dependencies:
-    "@noir-lang/noirc_abi": "npm:0.23.0"
-  checksum: 10c0/f349a2c6649988f21aecf104a31cff476af0d69b3f7352d72ac2eb36cbe14aa12a524273cce2066fa0ac7f68e62c69870b860a80c73df4d662d7d94bf321f882
+    "@noir-lang/types": "npm:0.24.0"
+  checksum: 10c0/e6fc770a4923ee2b1e772facafe574c3eefae75d29310ac1a2054e0c2cb1eadbc8f642dbed67f66c891ef045c3ca5319e584675467540bce707e4a82dbb9f15a
+  languageName: node
+  linkType: hard
+
+"@noir-lang/types@npm:0.24.0, @noir-lang/types@npm:^0.24.0":
+  version: 0.24.0
+  resolution: "@noir-lang/types@npm:0.24.0"
+  checksum: 10c0/b9ffac8fd95ea9eae26dfc106ca943e4f0304ad19d27eab28a191d5d44f6ca01c49cc08e3e54f9742593de17a6fbea6d08533d3900812c741546a0ada0a9ab18
   languageName: node
   linkType: hard
 
@@ -6595,7 +6596,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "next@workspace:packages/next"
   dependencies:
-    "@noir-lang/types": "npm:^0.23.0"
+    "@noir-lang/types": "npm:^0.24.0"
     "@types/react": "npm:^18.2.55"
     next: "npm:^14.1.0"
     react: "npm:^18.2.0"
@@ -7387,9 +7388,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "recursion@workspace:."
   dependencies:
-    "@noir-lang/backend_barretenberg": "npm:^0.23.0"
-    "@noir-lang/noir_js": "npm:^0.23.0"
-    "@noir-lang/noir_wasm": "npm:^0.23.0"
+    "@noir-lang/backend_barretenberg": "npm:^0.24.0"
+    "@noir-lang/noir_js": "npm:^0.24.0"
+    "@noir-lang/noir_wasm": "npm:^0.24.0"
   languageName: unknown
   linkType: soft
 

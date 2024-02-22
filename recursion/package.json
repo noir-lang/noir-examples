@@ -16,8 +16,8 @@
         "build": "yarn workspace next run build"
     },
     "dependencies": {
-        "@noir-lang/backend_barretenberg": "^0.23.0",
-        "@noir-lang/noir_js": "^0.23.0",
-        "@noir-lang/noir_wasm": "^0.23.0"
+        "@noir-lang/backend_barretenberg": "^0.24.0",
+        "@noir-lang/noir_js": "^0.24.0",
+        "@noir-lang/noir_wasm": "^0.24.0"
     }
 }
