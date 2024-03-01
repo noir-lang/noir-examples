@@ -10,7 +10,7 @@ export function useOffChainVerification(backend?: BarretenbergBackend, proofData
     if (!proofData || !backend) return;
     const { proof, publicInputs } = proofData;
 
-    toast.promise(backend.verifyFinalProof({ proof, publicInputs }), {
+    toast.promise(backend.verifyProof({ proof, publicInputs }), {
       pending: 'Verifying recursive proof off-chain',
       success: 'Recursive proof verified off-chain',
       error: 'Error verifying recursive proof off-chain',

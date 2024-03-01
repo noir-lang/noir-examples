@@ -30,7 +30,7 @@ export function useRecursiveProofGeneration(
     };
 
     const { witness } = await noir.execute(recInput);
-    const proofData = await backend.generateFinalProof(witness);
+    const proofData = await backend.generateProof(witness);
 
     setRecursiveBackend(backend);
     setProofData(proofData);

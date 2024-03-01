@@ -20,7 +20,7 @@ export function useMainProofGeneration(inputs?: { x: string; y: string }) {
     const { witness } = await noir.execute(inputs);
 
     const { publicInputs, proof } = await toast.promise(
-      backend.generateIntermediateProof(witness),
+      backend.generateProof(witness),
       {
         pending: 'Generating proof',
         success: 'Proof generated',
@@ -28,13 +28,13 @@ export function useMainProofGeneration(inputs?: { x: string; y: string }) {
       },
     );
 
-    toast.promise(backend.verifyIntermediateProof({ proof, publicInputs }), {
+    toast.promise(backend.verifyProof({ proof, publicInputs }), {
       pending: 'Verifying intermediate proof',
       success: 'Intermediate proof verified',
       error: 'Error verifying intermediate proof',
     });
 
-    const mainProofArtifacts = await backend.generateIntermediateProofArtifacts(
+    const mainProofArtifacts = await backend.generateRecursiveProofArtifacts(
       { publicInputs, proof },
       1, // 1 public input
     );
