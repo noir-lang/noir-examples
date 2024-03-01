@@ -1,5 +1,7 @@
 'use client';
 
+import styles from './Page.module.css';
+
 import React, { useState } from 'react';
 import { useOffChainVerification } from '../hooks/useOffChainVerification';
 import { useOnChainVerification } from '../hooks/useOnChainVerification';
@@ -26,17 +28,30 @@ export default function Page() {
   };
 
   return (
-    <form className="gameContainer" onSubmit={submit}>
-      <h1>Recursive!</h1>
-      <p>This circuit proves that x and y are different (main proof)</p>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Recursive!</h1>
+      <p>This circuit proves that x and y are different (main proof).</p>
       <p>
         Then it feeds that proof into another circuit, which then proves it verifies (recursive
-        proof)
+        proof).
       </p>
-      <h2>Try it!</h2>
-      <input name="x" type={'text'} />
-      <input name="y" type={'text'} />
-      <button type="submit">Calculate proof</button>
-    </form>
+      <form className={styles.proofForm} onSubmit={submit}>
+        <div className={styles.inputGroup}>
+          <label htmlFor="x-input" className={styles.inputLabel}>
+            Value of x:
+          </label>
+          <input id="x-input" name="x" type="text" className={styles.inputField} />
+        </div>
+        <div className={styles.inputGroup}>
+          <label htmlFor="y-input" className={styles.inputLabel}>
+            Value of y:
+          </label>
+          <input id="y-input" name="y" type="text" className={styles.inputField} />
+        </div>
+        <button type="submit" className={styles.submitButton}>
+          Calculate proof
+        </button>
+      </form>
+    </div>
   );
 }
