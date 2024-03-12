@@ -11,7 +11,9 @@ export function useMainProofGeneration(inputs?: { x: string; y: string }) {
   const [mainProofArtifacts, setMainProofArtifacts] = useState<ProofArtifacts>();
 
   const proofGeneration = async () => {
-    if (!inputs) return;
+    if (!inputs) {
+      return;
+    }
 
     const circuit = await getCircuit('main');
     const backend = new BarretenbergBackend(circuit, { threads: navigator.hardwareConcurrency });
@@ -19,14 +21,11 @@ export function useMainProofGeneration(inputs?: { x: string; y: string }) {
 
     const { witness } = await noir.execute(inputs);
 
-    const { publicInputs, proof } = await toast.promise(
-      backend.generateProof(witness),
-      {
-        pending: 'Generating proof',
-        success: 'Proof generated',
-        error: 'Error generating proof',
-      },
-    );
+    const { publicInputs, proof } = await toast.promise(backend.generateProof(witness), {
+      pending: 'Generating proof',
+      success: 'Proof generated',
+      error: 'Error generating proof',
+    });
 
     toast.promise(backend.verifyProof({ proof, publicInputs }), {
       pending: 'Verifying intermediate proof',
