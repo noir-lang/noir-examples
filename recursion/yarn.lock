@@ -988,17 +988,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noir-lang/types@npm:0.25.0":
+"@noir-lang/types@npm:0.25.0, @noir-lang/types@npm:^0.25.0":
   version: 0.25.0
   resolution: "@noir-lang/types@npm:0.25.0"
   checksum: 10c0/066d7dd3bb06a000fb1d2dac74db2b4e052516a5a5a4bc1f9c9a3beb8442045e323db60b90ec342b3acd71e19948a9701a0b082eead7ab51e6e1aa6e4986f1e1
-  languageName: node
-  linkType: hard
-
-"@noir-lang/types@npm:^0.24.0":
-  version: 0.24.0
-  resolution: "@noir-lang/types@npm:0.24.0"
-  checksum: 10c0/b9ffac8fd95ea9eae26dfc106ca943e4f0304ad19d27eab28a191d5d44f6ca01c49cc08e3e54f9742593de17a6fbea6d08533d3900812c741546a0ada0a9ab18
   languageName: node
   linkType: hard
 
@@ -6603,7 +6596,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "next@workspace:packages/next"
   dependencies:
-    "@noir-lang/types": "npm:^0.24.0"
+    "@noir-lang/types": "npm:^0.25.0"
     "@types/react": "npm:^18.2.55"
     next: "npm:^14.1.0"
     react: "npm:^18.2.0"
