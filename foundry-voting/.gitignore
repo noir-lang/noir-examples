@@ -15,3 +15,6 @@ docs/
 
 node_modules
 crs
+
+circuits/contract
+circuits/proofs

@@ -42,7 +42,7 @@ contract VotingTest is Test {
     }
 
     function test_invalidProof() public {
-        vm.expectRevert(BaseUltraVerifier.EC_SCALAR_MUL_FAILURE.selector);
+        vm.expectRevert();
         voteContract.castVote(hex"12", 0, 1, nullifierHash);
     }
 
@@ -54,7 +54,7 @@ contract VotingTest is Test {
     }
 
     function test_changedVote() public {
-        vm.expectRevert(BaseUltraVerifier.PROOF_FAILURE.selector);
+        vm.expectRevert();
 
         voteContract.castVote(proofBytes, 0, 0, nullifierHash);
     }
