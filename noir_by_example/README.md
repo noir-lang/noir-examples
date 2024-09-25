@@ -29,9 +29,12 @@ Simply run:
 - `nargo test`
 - `cargo test`
 
-Specific functions can be selected for testing by adding a substring of a test function name: `nargo test macro`
+To see output from `println`:
+- `nargo test --show-output`
+- `cargo test -- --nocapture`
 
-To see println output
+To test specific functions, a substring of its name can be added to the end.
+Eg, `nargo test macro`, to run tests who's name contains the string `macro`.
 
 # Adding to this repository - GOOD FIRST ISSUES
 
@@ -41,12 +44,11 @@ For instance for macro function example:
 - Noir example in [(Quasi) Quote](https://noir-lang.org/docs/dev/noir/concepts/comptime#lowering)
 - Rust example in [macros](https://doc.rust-lang.org/rust-by-example/macros.html)
 
-Example functions can be added to [main.nr](./src/main.nr) with a 1:1 corresponding [main.rs](./src/main.rs) equivalent.
+Example functions can be added to [main.nr](./noir/src/main.nr) with a 1:1 corresponding [main.rs](./rust/src/main.rs) equivalent.
 
 # How this directory was created
 
-- Create the directory and go into it: `mkdir noir_by_example && cd noir_by_example`
-- For simplicity we will initialize both a rust and noir binary projects in the same directory:
-  - Rust: `cargo init`
-  - Noir: `nargo init`
-- Then make additions to the main files of each and test
+- Create the directory and go into it: `mkdir noir_by_example && cd noir_by_example` (For Noir, the name must not contain hyphens)
+  - Noir: `nargo new noir`
+  - Rust: `cargo new rust`
+- Then make additions to the main files of each and test.
