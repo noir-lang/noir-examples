@@ -9,8 +9,11 @@ comptime fn say_hello() -> Quoted {
 }
 
 fn main() {
+    println("\nSIMPLE_MACRO START");
     // This call will unquote into `println!("Hello!")`
-    say_hello!()
+    let res = say_hello!();
+    println("SIMPLE_MACRO END\n");
+    res
 }
 
 #[test]

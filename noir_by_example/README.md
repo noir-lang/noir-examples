@@ -16,7 +16,7 @@ The surrounding build artifacts (and additional proving/verifying artifacts for 
 
 # Usage
 
-First, from within the `noir_by_example` directory, go into the desired topic.
+The following commands can be run at the top level `noir_by_example`, or withing the specific topic directory.
 Eg: `cd simple_macros`
 
 ## Compiling
@@ -27,7 +27,7 @@ Eg: `cd simple_macros`
 ## Running main
 
 - `nargo execute`
-- `cargo run`
+- `cargo run` # topic-level only
 
 ## Running tests
 

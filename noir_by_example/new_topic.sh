@@ -24,7 +24,7 @@ if [ $? -eq 0 ]; then
     cd "$dir_name"
 
     echo "Creating Noir project..."
-    nargo new noir-blah
+    nargo new noir
     if [ $? -ne 0 ]; then
         echo "Error: Failed to create new Noir project."
         exit 1

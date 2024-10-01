@@ -23,8 +23,10 @@ fn variable_loop(len: u32) {
 
 // Parameters read from Prover.toml file
 fn main(loop_length: u32) {
+    println("\nLOOPS START");
     fixed_loop();
     variable_loop(loop_length);
+    println("LOOPS END\n");
 }
 
 #[test]

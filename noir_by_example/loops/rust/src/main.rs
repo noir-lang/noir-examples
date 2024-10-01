@@ -18,7 +18,8 @@ fn variable_loop(len: u32) {
 }
 
 fn main() {
-    let DEFAULT = 5;
+    println!("\nLOOPS START");
+    const DEFAULT: u32 = 5;
     // Read first command line argument
     let args: Vec<String> = env::args().collect();
     let loop_length = if args.len() > 1 {
@@ -29,6 +30,7 @@ fn main() {
 
     fixed_loop();
     variable_loop(loop_length); // variable
+    println!("\nLOOPS END");
 }
 
 #[test]

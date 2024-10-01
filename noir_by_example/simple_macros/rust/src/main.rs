@@ -9,8 +9,11 @@ macro_rules! say_hello {
 }
 
 fn main() {
+    println!("\nSIMPLE_MACRO START");
     // This call will expand into `println!("Hello!")`
-    say_hello!()
+    let res = say_hello!();
+    println!("SIMPLE_MACRO END\n");
+    res
 }
 
 #[test]

@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "simple_macros/rust",
+    "loops/rust"
+]
+resolver = "1"
