@@ -1,7 +1,0 @@
-[package]
-name = "noir_by_example"
-type = "bin"
-authors = [""]
-compiler_version = ">=0.33.0"
-
-[dependencies]

@@ -16,14 +16,20 @@ The surrounding build artifacts (and additional proving/verifying artifacts for 
 
 # Usage
 
+First, from within the `noir_by_example` directory, go into the desired topic.
+Eg: `cd simple_macros`
+
+## Compiling
+
+- `nargo compile`
+- `cargo build`
+
 ## Running main
 
 - `nargo execute`
 - `cargo run`
 
 ## Running tests
-
-Tests are used so as to stay focused on the language, putting aside the greater differences around program artifacts and their use.
 
 Simply run:
 - `nargo test`
@@ -36,6 +42,7 @@ To see output from `println`:
 To test specific functions, a substring of its name can be added to the end.
 Eg, `nargo test macro`, to run tests who's name contains the string `macro`.
 
+
 # Adding to this repository - GOOD FIRST ISSUES
 
 The Noir documentation has many good pages explaining the syntax with examples, similarly with Rust.
@@ -46,9 +53,9 @@ For instance for macro function example:
 
 Example functions can be added to [main.nr](./noir/src/main.nr) with a 1:1 corresponding [main.rs](./rust/src/main.rs) equivalent.
 
-# How this directory was created
+# Adding to this repository
 
-- Create the directory and go into it: `mkdir noir_by_example && cd noir_by_example` (For Noir, the name must not contain hyphens)
-  - Noir: `nargo new noir`
-  - Rust: `cargo new rust`
-- Then make additions to the main files of each and test.
+To add a new section:
+- Go to the directory: `cd noir_by_example`
+- Use the script: `./new_topic.sh topic_name`
+- Then equivalent functionality to the `noir` and `rust` projects.
