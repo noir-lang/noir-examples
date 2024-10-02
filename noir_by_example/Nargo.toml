@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "simple_macros/noir",
+    "loops/noir"
+]
