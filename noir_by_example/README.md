@@ -19,7 +19,7 @@ The surrounding build artifacts (and additional proving/verifying artifacts for 
 
 ## Usage
 
-The following commands can be run at the top level `noir_by_example`, or withing the specific topic directory.
+The following commands can be run at the top level `noir_by_example`, or within the specific topic directory.
 Eg: `cd simple_macros`
 
 ### Compiling
