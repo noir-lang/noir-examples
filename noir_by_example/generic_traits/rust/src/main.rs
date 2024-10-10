@@ -48,7 +48,7 @@ impl <T:ValueFunctions> Seller for T {
 }
 
 // Define the purchase context with its generic roles
-struct PurchaseContext<'b, 's, B: Buyer, S: Seller> {
+struct PurchaseContext<'b, 's, B, S> {
     // Roles
     buyer: &'b mut B,
     seller: &'s mut S,
