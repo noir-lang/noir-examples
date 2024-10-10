@@ -29,8 +29,9 @@ trait Buyer {
 }
 
 // impl <T:ValueFunctions> Buyer for T {   // This works in rust
-// impl <T> Seller for T {   // Valid Noir, but can't specify ValueFunctions trait, so can't access corresponding fns
-impl <T> Buyer for ValueAccount { // context needs to be aware of data object (not just trait)
+// impl <T> Buyer for T where T:ValueFunctions { // Valid noir, specifies value functions,
+//    but gives compilation error on line that calls Buyer function make_payment
+impl Buyer for ValueAccount { // context needs to be aware of data object (not just trait)
     fn make_payment(&mut self, val: u32) {
         self.sub(val);
     }
@@ -41,7 +42,7 @@ trait Seller {
     fn receive_payment(&mut self, val: u32);
 }
 
-impl <T> Seller for ValueAccount {
+impl Seller for ValueAccount {
     fn receive_payment(&mut self, val: u32) {
         self.add(val);
     }
@@ -56,7 +57,7 @@ struct PurchaseContext<B, S> {
 
 impl <B, S> PurchaseContext<B, S> where B: Buyer, S: Seller {
     fn do_purchase(&mut self, amount: u32) {
-        self.buyer.make_payment(amount);
+        self.buyer.make_payment(amount); //   Compilation error "No matching impl found for `B: ValueFunctions`" when Buyer uses generic T
         // self.buyer.receive_payment(amount); // correct compiler error, buyer role cannot receive_payment
         self.seller.receive_payment(amount);
     }
