@@ -65,17 +65,24 @@ impl <B, S> PurchaseContext<'_, '_, B, S> where B: Buyer, S: Seller {
 
 // ### INTERACTION ###
 
-fn main() {
+fn main(start: u32, cost: u32) {
+    assert!(start >= cost, "Not enough start balance");
     // create data object, can use all primitive functions
-    let mut acc1: ValueAccount = ValueAccount { balance: 10 };
-    let mut acc2: ValueAccount = ValueAccount { balance: 10 };
+    let mut acc1: ValueAccount = ValueAccount { balance: start };
+    let mut acc2: ValueAccount = ValueAccount { balance: start };
 
     // create context for data object as
     let mut purchase_context: PurchaseContext<ValueAccount, ValueAccount> =
         PurchaseContext::<ValueAccount, ValueAccount> {
             buyer: &mut acc1, seller: &mut acc2
         };
-    purchase_context.do_purchase(5); // 7
-    println!("acc1 balance: {}", acc1.balance);
-    println!("acc2 balance: {}", acc2.balance);
+    purchase_context.do_purchase(cost);
+    assert!(acc1.balance == start - cost, "Didn't spend");
+    assert!(acc2.balance == start + cost, "Didn't receive");
+}
+
+
+#[test]
+fn test_generic_traits() {
+    main(10, 5);
 }
