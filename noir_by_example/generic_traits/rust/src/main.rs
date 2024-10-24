@@ -65,7 +65,7 @@ impl <B, S> PurchaseContext<'_, '_, B, S> where B: Buyer, S: Seller {
 
 // ### INTERACTION ###
 
-fn main(start: u32, cost: u32) {
+fn purchase_interaction(start: u32, cost: u32) {
     assert!(start >= cost, "Not enough start balance");
     // create data object, can use all primitive functions
     let mut acc1: ValueAccount = ValueAccount { balance: start };
@@ -81,8 +81,30 @@ fn main(start: u32, cost: u32) {
     assert!(acc2.balance == start + cost, "Didn't receive");
 }
 
+// ## Parse args
+
+fn parse_args(args: Vec<String>) -> (u32, u32) {
+    // Check if the correct number of arguments is provided
+    if args.len() != 3 {
+        eprintln!("Usage: {} <start> <cost>", args[0]);
+        std::process::exit(1);
+    }
+
+    let start: u32 = args[1].parse().expect("Please provide a valid number for start");
+    let cost: u32 = args[2].parse().expect("Please provide a valid number for cost");
+
+    (start, cost)
+}
+
+use std::env;
+
+fn main() {
+    // Collect command-line arguments into a vector
+    let (start, cost) = parse_args(env::args().collect());
+    purchase_interaction(start, cost);
+}
 
 #[test]
 fn test_generic_traits() {
-    main(10, 5);
+    purchase_interaction(10, 5);
 }
