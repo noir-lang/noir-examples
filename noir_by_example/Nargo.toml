@@ -1,5 +1,6 @@
 [workspace]
 members = [
     "simple_macros/noir",
-    "loops/noir"
+    "loops/noir",
+    "generic_traits/noir"
 ]
