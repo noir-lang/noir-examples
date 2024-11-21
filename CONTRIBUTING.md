@@ -24,7 +24,7 @@ proofs in an EVM context with the Solidity examples.
 started with the project (installation instructions, tips, gotchas, etc.). Be as descriptive as possible.
 See the other projects for examples.
 4. Automated testing. Ideally there are some tests as part of the project that can be used to check
-the functionality. See the [voting pproject](foundry-voting) for an example--there are foundry tests
+the functionality. See the [voting project](foundry-voting) for an example--there are foundry tests
 defined in the project and automated testing defined in the [Github workflows](.github/workflows/foundry-voting.yml) that will run the tests
 on open PRs. This helps us ensure the reliability of the examples.
 
