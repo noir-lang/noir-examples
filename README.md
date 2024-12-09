@@ -14,7 +14,7 @@ You can view simpler, boilerplate projects that are good templates for starting 
 
 ## Support
 
-Need help? Join the [Noir Discord](https://discord.gg/JtqzkdeQ6G) or reach out on [X (formerly Twitter)](https://x.com/NoirLang).
+Need help? Join the [Noir Discord](https://discord.gg/JtqzkdeQ6G) or reach out on [X (formerly X)](https://x.com/NoirLang).
 
 ## Contributing
 
