@@ -6,8 +6,8 @@ pub global ENCODE_RUNS: u32 = 3;
 pub global DECODE_RUNS: u32 = 0;
 
 // Choose size, and use corresponding Prover.toml during execution
-comptime global TEST_INPUT = test_inputs::TEST_INPUT_SHORT;
-comptime global TEST_BASE64_ENCODED = test_inputs::TEST_BASE64_ENCODED_SHORT;
+comptime global TEST_INPUT: str<12> = test_inputs::TEST_INPUT_SHORT;
+comptime global TEST_BASE64_ENCODED: str<16> = test_inputs::TEST_BASE64_ENCODED_SHORT;
 
 comptime global U: u32 = comptime { TEST_INPUT.as_bytes().len() };
 comptime global B: u32 = comptime {
