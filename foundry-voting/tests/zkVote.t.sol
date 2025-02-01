@@ -22,11 +22,7 @@ contract VotingTest is Test {
     }
 
     function setUp() public {
-        // vm.allowCheatcodes("tests/data");
         string memory inputs = readInputs();
-
-        // merkleRoot = bytes32(0x215597bacd9c7e977dfc170f320074155de974be494579d2586e5b268fa3b629);
-        // nullifierHash = bytes32(0x079d88735cdd786b64a950b1cd887ae89308e3b4176ef4adb308267888fe1f91);
 
         merkleRoot = bytes32(vm.parseJson(inputs, ".merkleRoot"));
         nullifierHash = bytes32(vm.parseJson(inputs, ".nullifierHash"));
