@@ -4,7 +4,7 @@ This makes use of [this](https://github.com/noir-lang/noir_base64.git) base64 li
 
 The lib covers several encode/decode tests, whereas this program has some extra code to facilitate benchmarking the gate counts of a proving backend. Comparisons can be made against other proving backends if desired.
 
-Ordinarily base64 is used encode/decode binary data sent across the web (in html/css files), rather than the text strings shown here. So could be used to verify that a website sent a particular image by comparing to a local binary, with applications that could equate to digital watermarks.
+Ordinarily base64 is used encode/decode binary data sent across the web (in html/css files), rather than the text strings shown here. This library is currently used to prove signed base64 data that has been received via email or in the browser, to then be verified to permit other actions.
 
 ## Test setups for gate counts
 
