@@ -8,7 +8,7 @@ Ordinarily base64 is used encode/decode binary data sent across the web (in html
 
 ## Test setups for gate counts
 
-Assuming you have `nargo` and a compatible proving backend (eg nargo v0.36.0 and barretenberg bb v0.58.0):
+Assuming you have `nargo` and a compatible proving backend (eg Barretenberg `bb`):
 
 - Choose the desired number of encode/decode runs by setting the corresponding `global` variables in src/main.nr
 - Choose the input strings via the `comptime global` variables (the lengths are managed automatically at compile time)
