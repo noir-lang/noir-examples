@@ -1,35 +1,36 @@
 {
   "name": "stealthdrop",
   "version": "1.0.0",
+  "type": "module",
   "description": "A template repository to get started with writing zero knowledge programs with Noir.",
   "scripts": {
     "dev": "yarn deploy && next",
     "build": "yarn compile && yarn deploy && next build",
-    "test": "hardhat test",
+    "test": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only' hardhat test",
     "compile": "hardhat compile && cd circuits && nargo compile",
     "deploy": "hardhat compile && hardhat run --network ${NETWORK} scripts/deploy.ts",
-    "gen": "hardhat run utils/mt/generateAddresses.ts"
+    "gen": "bun run utils/mt/generateAddresses.ts"
   },
   "dependencies": {
-    "@aztec/bb.js": "0.11.0",
-    "@noir-lang/backend_barretenberg": "0.18.0",
-    "@noir-lang/noir_js": "0.18.0",
-    "@noir-lang/types": "0.18.0",
-    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
-    "@nomicfoundation/hardhat-toolbox-viem": "1.0.0",
-    "@nomicfoundation/hardhat-viem": "1.0.0",
+    "@aztec/bb.js": "0.67.0",
+    "@noir-lang/noir_js": "1.0.0-beta.1",
+    "@nomicfoundation/hardhat-network-helpers": "1.0.12",
+    "@nomicfoundation/hardhat-toolbox-viem": "3.0.0",
+    "@nomicfoundation/hardhat-viem": "2.0.6",
     "@openzeppelin/contracts": "^5.0.0",
+    "@zk-kit/lean-imt": "^2.2.2",
     "dotenv": "^16.0.3",
     "hardhat": "^2.18.1",
     "hardhat-gas-reporter": "^1.0.8",
+    "hardhat-plugin-noir": "0.3.0-next.0",
     "next": "latest",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-toastify": "^9.1.1",
     "solidity-coverage": "^0.8.1",
     "ts-node": "^10.9.1",
-    "viem": "1.16.6",
-    "wagmi": "^1.4.5"
+    "viem": "2.22.21",
+    "wagmi": "2.14.9"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
@@ -40,7 +41,11 @@
     "@types/react": "^18.0.26",
     "chai": "^4.3.10",
     "ethers": "^5.4.7",
+    "prettier": "3.4.2",
     "typescript": "^5.0.0"
+  },
+  "resolutions": {
+    "@aztec/bb.js": "0.67.0"
   },
   "packageManager": "yarn@3.6.4"
 }
