@@ -1,32 +1,37 @@
-use dep::std;
-use dep::ecrecover;
+use ecrecover;
+use std::hash::poseidon2::Poseidon2::hash;
+use trees::merkle::MerkleTree;
 
-global DEPTH = 12;
+global DEPTH: u32 = 12;
+
+fn hasher(leaves: [Field; 2]) -> Field {
+    hash(leaves, 2)
+}
 
 fn main(
-  pub_key: [u8; 64],
-  signature: [u8; 64],
-  hashed_message: pub [u8; 32],
-  nullifier: pub Field,
-  merkle_path: [Field; DEPTH],
-  index: Field,
-  merkle_root: pub Field,
-  claimer_priv: Field,
-  claimer_pub: pub Field
+    pub_key: [u8; 64],
+    signature: [u8; 64],
+    hashed_message: pub [u8; 32],
+    nullifier: pub Field,
+    merkle_path: [Field; DEPTH],
+    index: Field,
+    merkle_root: pub Field,
+    claimer_priv: Field,
+    claimer_pub: pub Field,
 ) {
+    let mut mt = MerkleTree::from(merkle_root, hasher);
+
     let key = ecrecover::secp256k1::PubKey::from_unified(pub_key);
     let address = ecrecover::ecrecover(key.pub_x, key.pub_y, signature, hashed_message);
 
-    let signature_as_fields = signature.map(|x : u8| x as Field);
-    let calculatedNullifier = std::hash::pedersen(signature_as_fields);
-    assert(calculatedNullifier[0] == nullifier);
+    let signature_as_fields = signature.map(|x: u8| x as Field);
+    let calculatedNullifier = hash(signature_as_fields, 64);
+    assert(calculatedNullifier == nullifier);
 
-    let new_root = std::merkle::compute_merkle_root(address, index, merkle_path);
-    assert(new_root == merkle_root);
-  
+    mt.membership(address, index, merkle_path);
+
     assert(claimer_priv == claimer_pub);
 }
-
 
 // #[test]
 // fn test_main() {
@@ -52,7 +57,6 @@ fn main(
 //         97, 254, 154, 79,  91, 223, 149,  18,
 //         3, 210, 111, 56, 246, 219,  19, 104
 //     ];
-
 
 //     let nullifier = 0x0e860d099661305414f1218fd4ba4ea3f71ef33123a6263cae21bf132ff8dac1;
 //     let merkle_path = [

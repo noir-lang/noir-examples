@@ -1,19 +1,11 @@
-import { configureChains, createConfig } from 'wagmi'
-import { localhost } from 'wagmi/chains'
-import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
-
-import { publicProvider } from 'wagmi/providers/public'
-
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [localhost],
-  [publicProvider()],
-)
+import { createConfig, http } from 'wagmi';
+import { localhost } from 'wagmi/chains';
+import { metaMask } from 'wagmi/connectors';
 
 export const config = createConfig({
-  autoConnect: true,
-  connectors: [
-    new MetaMaskConnector({ chains }),
-  ],
-  publicClient,
-  webSocketPublicClient,
-})
+  connectors: [metaMask()],
+  transports: {
+    [localhost.id]: http(),
+  },
+  chains: [localhost],
+});
