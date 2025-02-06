@@ -4,11 +4,11 @@
   "type": "module",
   "description": "A template repository to get started with writing zero knowledge programs with Noir.",
   "scripts": {
-    "dev": "yarn deploy && next",
-    "build": "yarn compile && yarn deploy && next build",
+    "dev": "NETWORK=localhost bun run deploy && next",
+    "build": "bun run compile && bun run deploy && next build",
     "test": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only' hardhat test",
     "compile": "hardhat compile && cd circuits && nargo compile",
-    "deploy": "hardhat compile && hardhat run --network ${NETWORK} scripts/deploy.ts",
+    "deploy": "hardhat compile && NODE_NO_WARNINGS=1 NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only' hardhat run --network ${NETWORK} scripts/deploy.ts",
     "gen": "bun run utils/mt/generateAddresses.ts"
   },
   "dependencies": {
@@ -18,6 +18,7 @@
     "@nomicfoundation/hardhat-toolbox-viem": "3.0.0",
     "@nomicfoundation/hardhat-viem": "2.0.6",
     "@openzeppelin/contracts": "^5.0.0",
+    "@tanstack/react-query": "^5.66.0",
     "@zk-kit/lean-imt": "^2.2.2",
     "dotenv": "^16.0.3",
     "hardhat": "^2.18.1",

@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 
-const nextConfig = {
+export default {
   // permits loading of the worker file (barretenberg.js):
   experimental: {
     esmExternals: 'loose',
@@ -14,7 +14,10 @@ const nextConfig = {
         config.optimization.minimizer = [];
       }
     }
-    
+    config.experiments = {
+      asyncWebAssembly: true,
+      topLevelAwait: true,
+    };
     return config;
   },
   // allows for local running of multithreads:
@@ -36,5 +39,3 @@ const nextConfig = {
     ];
   },
 };
-
-module.exports = nextConfig;

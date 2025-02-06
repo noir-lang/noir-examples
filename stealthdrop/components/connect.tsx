@@ -1,35 +1,25 @@
-'use client'
+'use client';
 
-import { BaseError } from 'viem'
-import { useAccount, useConnect, useDisconnect } from 'wagmi'
-import React from "react"
+import { BaseError } from 'viem';
+import { useAccount, useConnect, useConnectors, useDisconnect } from 'wagmi';
+import React from 'react';
 
 export function Connect() {
-  const { connector, isConnected } = useAccount()
-  const { connect, connectors, error, isLoading, pendingConnector } =
-    useConnect()
-  const { disconnect } = useDisconnect()
+  const connectors = useConnectors();
+  const { connect, error } = useConnect();
+
+  const { connector, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
 
   return (
     <div>
       <div>
-        {isConnected && (
-          <button onClick={() => disconnect()}>
-            Disconnect from {connector?.name}
-          </button>
-        )}
-
-        {connectors
-          .filter((x) => x.ready && x.id !== connector?.id)
-          .map((x) => (
-            <button key={x.id} onClick={() => connect({ connector: x })}>
-              {x.name}
-              {isLoading && x.id === pendingConnector?.id && ' (connecting)'}
-            </button>
-          ))}
+        <button key="metamask" onClick={() => connect({ connector: connectors[0] })}>
+          Connect
+        </button>
       </div>
 
       {error && <div>{(error as BaseError).shortMessage}</div>}
     </div>
-  )
+  );
 }

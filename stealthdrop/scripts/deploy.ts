@@ -1,10 +1,11 @@
 import { writeFileSync } from 'fs';
-import { viem } from 'hardhat';
+import hre from 'hardhat';
+const { viem } = hre;
 
 async function main() {
   const publicClient = await viem.getPublicClient();
 
-  const verifier = await viem.deployContract('UltraVerifier');
+  const verifier = await viem.deployContract('HonkVerifier');
   console.log(`Verifier deployed to ${verifier.address}`);
 
   // Create a config object
