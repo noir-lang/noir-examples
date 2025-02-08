@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "forge-std/Test.sol";
+import { Test } from "forge-std/src/Test.sol";
 import "../contracts/zkVote.sol";
-import "../circuits/contract/foundry_voting/plonk_vk.sol";
+import "../circuits/target/contract.sol";
 
 contract VotingTest is Test {
     zkVote public voteContract;
@@ -16,7 +16,7 @@ contract VotingTest is Test {
     bytes32 nullifierHash;
 
     function readInputs() internal view returns (string memory) {
-        string memory inputDir = string.concat(vm.projectRoot(), "/data/input");
+        string memory inputDir = string.concat(vm.projectRoot(), "/tests/data/input");
 
         return vm.readFile(string.concat(inputDir, ".json"));
     }
@@ -30,8 +30,8 @@ contract VotingTest is Test {
         verifier = new UltraVerifier();
         voteContract = new zkVote(merkleRoot, address(verifier));
         voteContract.propose("First proposal", deadline);
-
-        string memory proofFilePath = "./circuits/proofs/foundry_voting.proof";
+        
+        string memory proofFilePath = "./circuits/target/clean-proof";
         string memory proof = vm.readLine(proofFilePath);
 
         proofBytes = vm.parseBytes(proof);
