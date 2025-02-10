@@ -60,8 +60,8 @@ contract AD is ERC20 {
 
         verifier.verify(proof, _publicInputs);
 
-        _transfer(address(this), msg.sender, 1);
-        emit TokensAirdropped(msg.sender, 1);
+        _transfer(address(this), msg.sender, 3500000000000000000);
+        emit TokensAirdropped(msg.sender, 3500000000000000000);
         nullifiers[nullifier] = true;
     }
 

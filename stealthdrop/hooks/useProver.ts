@@ -17,6 +17,7 @@ export function useProver() {
 
     const { witness } = await noir.execute(inputs);
     const proof = await backend.generateProof(witness, { keccak: true });
+    proof.proof = proof.proof.slice(4);
 
     setProof(proof);
   };

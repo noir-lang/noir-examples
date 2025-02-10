@@ -58,25 +58,25 @@ export function useClaim(signature: `0x${string}` | undefined, hashedMessage: `0
 
     console.log('writing');
     console.log([toHex(proof.proof), inputs.nullifier]);
-    // writeContract(
-    //   {
-    //     address: addresses.ad as `0x${string}`,
-    //     abi: abi.abi,
-    //     functionName: 'claim',
-    //     args: [toHex(proof.proof), inputs.nullifier],
-    //   },
-    //   {
-    //     onSuccess: data => {
-    //       console.log('success');
-    //       console.log(data);
-    //       setTxHash(data);
-    //     },
-    //     onError: error => {
-    //       toast.error('Error claiming');
-    //       console.error(error);
-    //     },
-    //   },
-    // );
+    writeContract(
+      {
+        address: addresses.ad as `0x${string}`,
+        abi: abi.abi,
+        functionName: 'claim',
+        args: [toHex(proof.proof), inputs.nullifier],
+      },
+      {
+        onSuccess: data => {
+          console.log('success');
+          console.log(data);
+          setTxHash(data);
+        },
+        onError: error => {
+          toast.error('Error claiming');
+          console.error(error);
+        },
+      },
+    );
   }, [proof, account.address]);
 
   const claim = async () => {
