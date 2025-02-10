@@ -10,7 +10,3 @@ export interface StepProps extends Step {
   onContinue?: () => void;
   isCompleted?: boolean;
 }
-
-export interface WalletConnectionStepProps extends StepProps {
-  isConnected: boolean;
-}

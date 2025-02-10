@@ -12,7 +12,7 @@ export const CheckmarkIcon: React.FC<CheckmarkIconProps> = ({
   bg = 'white',
 }) => {
   return (
-    <div className={`bg-${bg} rounded-full p-1`}>
+    <div className={`${bg === 'white' ? 'bg-white' : ''} rounded-full p-1`}>
       <svg className={className} viewBox="0 0 20 20" fill="none">
         <path
           d="M4 10L8 14L16 6"

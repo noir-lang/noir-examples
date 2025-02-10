@@ -8,28 +8,8 @@ export function useConnectAccount() {
   const connectors = useConnectors();
   const { connect, error } = useConnect();
 
-  const { status } = useAccount();
+  const { status, isConnected, address } = useAccount();
   const { disconnect } = useDisconnect();
 
-  if (status === 'connected') {
-    return (
-      <div>
-        <button key="metamask" onClick={() => disconnect()}>
-          Disconnect
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <div>
-        <button key="metamask" onClick={() => connect({ connector: connectors[0] })}>
-          Connect
-        </button>
-      </div>
-
-      {error && <div>{(error as BaseError).shortMessage}</div>}
-    </div>
-  );
+  return { connect, error, status, disconnect, isConnected, address };
 }

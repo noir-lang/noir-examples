@@ -1,17 +1,20 @@
 import React from 'react';
 import { Button } from '../Button.tsx';
 import { StepContainer } from './StepContainer.tsx';
-import { WalletConnectionStepProps } from '../../types.ts';
+import { StepProps } from '../../types.ts';
+import { useConnectAccount } from '../../hooks/useConnectAccount.tsx';
 
-export const ConnectWalletStep: React.FC<WalletConnectionStepProps> = ({
+export const ConnectWalletStep: React.FC<StepProps> = ({
   number,
   title,
   description,
-  isConnected,
+  onContinue,
   isOpen,
   onToggle,
   isCompleted,
 }) => {
+  const { connect, isConnected } = useConnectAccount();
+
   const renderButtons = () => {
     if (!isConnected) {
       return (
@@ -52,7 +55,7 @@ export const ConnectWalletStep: React.FC<WalletConnectionStepProps> = ({
         </Button>
         <Button
           variant="secondary"
-          disabled={!isConnected}
+          onClick={onContinue}
           className="px-8 py-4 rounded-xl text-lg font-normal bg-[#4A3671] text-white hover:bg-[#553f82] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue

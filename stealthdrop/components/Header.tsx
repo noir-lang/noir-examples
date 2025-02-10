@@ -1,12 +1,15 @@
 import React from 'react';
+import { useConnectAccount } from '../hooks/useConnectAccount.tsx';
 
 interface HeaderProps {
   connectedAddress?: string;
   onDisconnect?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ connectedAddress, onDisconnect }) => {
-  if (!connectedAddress) {
+const Header: React.FC<HeaderProps> = () => {
+  const { isConnected, disconnect, address } = useConnectAccount();
+
+  if (!isConnected) {
     return null;
   }
 
@@ -17,10 +20,10 @@ const Header: React.FC<HeaderProps> = ({ connectedAddress, onDisconnect }) => {
           <div className="flex items-center justify-end gap-8 h-full px-16">
             <div className="text-right">
               <span className="text-base font-medium text-white">Connected to: </span>
-              <span className="text-base font-light text-white">{connectedAddress}</span>
+              <span className="text-base font-light text-white">{address}</span>
             </div>
             <button
-              onClick={onDisconnect}
+              onClick={() => disconnect()}
               className="px-6 py-2.5 rounded-xl text-base font-medium text-white bg-[#4A3671] hover:bg-[#553f82] transition-colors"
             >
               Disconnect

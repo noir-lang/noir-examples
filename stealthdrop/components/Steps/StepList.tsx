@@ -64,6 +64,18 @@ const StepList: React.FC = () => {
             isCompleted: completedSteps[index],
           };
 
+          if (index === 0) {
+            return (
+              <ConnectWalletStep
+                {...commonProps}
+                onContinue={() => {
+                  handleStepComplete(index);
+                  handleStepToggle(index + 1);
+                }}
+              />
+            );
+          }
+
           if (index === 1) {
             return (
               <SignMessageStep
@@ -97,17 +109,6 @@ const StepList: React.FC = () => {
               />
             );
           }
-          return (
-            <ConnectWalletStep
-              key={index}
-              {...step}
-              number={index + 1}
-              isConnected={index === 0}
-              isOpen={openStepIndex === index}
-              onToggle={() => handleStepToggle(index)}
-              isCompleted={completedSteps[index]}
-            />
-          );
         })}
       </div>
     </div>
