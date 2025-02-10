@@ -4,12 +4,22 @@ import { BaseError } from 'viem';
 import { useAccount, useConnect, useConnectors, useDisconnect } from 'wagmi';
 import React from 'react';
 
-export function Connect() {
+export function useConnectAccount() {
   const connectors = useConnectors();
   const { connect, error } = useConnect();
 
-  const { connector, isConnected } = useAccount();
+  const { status } = useAccount();
   const { disconnect } = useDisconnect();
+
+  if (status === 'connected') {
+    return (
+      <div>
+        <button key="metamask" onClick={() => disconnect()}>
+          Disconnect
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div>

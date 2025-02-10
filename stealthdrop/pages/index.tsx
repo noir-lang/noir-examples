@@ -1,23 +1,30 @@
-import React from 'react';
-import Component from '../components/component';
-import { Connect } from '../components/connect';
-import { Connected } from '../components/connected';
-import { WagmiProvider } from 'wagmi';
-import { config } from '../utils/wagmi';
-import { MerkleTreeProvider } from '../components/merkleTree';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-const queryClient = new QueryClient();
+import React, { useState } from 'react';
+import SignButton from '../components/signButton.tsx';
+import { useConnectAccount } from '../hooks/useConnectAccount.tsx';
+import { useAccount, useGasPrice } from 'wagmi';
+import { MerkleTreeProvider } from '../providers/merkleTree.tsx';
+import { ClaimButton } from '../components/claimButton.tsx';
 
 export default function Page() {
+  const [signature, setSignature] = useState<string | null>(null);
+  const connectButton = useConnectAccount();
+  const { isConnected } = useAccount();
+
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <Connect />
-        <MerkleTreeProvider>
-          <Component />
-        </MerkleTreeProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <MerkleTreeProvider>
+      <div className="gameContainer">
+        <h1>Stealthdrop</h1>
+        <ol>
+          <li>Connect both the accounts you want to use</li>
+          <li>Sign with your elligible account</li>
+          <li>Switch to the receiver wallet</li>
+          <li>Generate proof</li>
+          <li>Send the transaction</li>
+        </ol>
+        {connectButton}
+        {isConnected && <SignButton setSignature={setSignature} />}
+        {signature && <ClaimButton signature={signature as `0x${string}`} />}
+      </div>
+    </MerkleTreeProvider>
   );
 }

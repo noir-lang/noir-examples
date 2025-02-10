@@ -1,23 +1,19 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 import { LeanIMT, LeanIMTHashFunction } from '@zk-kit/lean-imt';
-import merkle from '../utils/merkle.json'; // merkle
+import merkle from '../utils/mt/merkle.json' with { type: 'json' };
 import { toast } from 'react-toastify';
 
-export const MerkleTreeContext = createContext<{
-  merkleTree: LeanIMT | null;
-} | null>(null);
+export const MerkleTreeContext = createContext<LeanIMT | null>(null);
 
-export function MerkleTreeProvider({ children }) {
+export function MerkleTreeProvider({ children }: { children: React.ReactNode }) {
   const [merkleTree, setMerkleTree] = useState<LeanIMT | null>(null);
 
   useEffect(() => {
-    const initializeTree = async () => {
-      const { BarretenbergSync, Fr } = await import('@aztec/bb.js');
-      const bb = await BarretenbergSync.new();
+    if (merkleTree) return;
 
-      const hashPair = (a: bigint, b: bigint) =>
-        BigInt(bb.poseidon2Hash([new Fr(a), new Fr(b)]).toString());
-      const tree = new LeanIMT(hashPair);
+    const initializeTree = async () => {
+      const { poseidon } = await import('../utils/bb.ts');
+      const tree = new LeanIMT(poseidon);
 
       const initialLeaves = merkle.addresses.map(addr => BigInt(addr));
       const t = toast.loading('Starting...');
@@ -35,5 +31,5 @@ export function MerkleTreeProvider({ children }) {
 
   if (!merkleTree) return <div>Loading...</div>;
 
-  return <MerkleTreeContext.Provider value={{ merkleTree }}>{children}</MerkleTreeContext.Provider>;
+  return <MerkleTreeContext.Provider value={merkleTree}>{children}</MerkleTreeContext.Provider>;
 }

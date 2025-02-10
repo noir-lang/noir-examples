@@ -1,68 +1,24 @@
 import { LeanIMT } from '@zk-kit/lean-imt';
-import merkle from '../utils/merkle.json' with { type: 'json' }; // merkle
+import merkle from '../utils/mt/merkle.json' with { type: 'json' };
 import hre from 'hardhat';
 const { viem } = hre;
 
-import { UltraHonkBackend, BarretenbergSync, Fr } from '@aztec/bb.js';
+import { UltraHonkBackend, Fr } from '@aztec/bb.js';
+import { poseidon, bbSync } from '../utils/bb.js';
 
-import {
-  PublicClient,
-  WalletClient,
-  pad,
-  fromHex,
-  hashMessage,
-  http,
-  recoverPublicKey,
-  toHex,
-  getAddress,
-  Address,
-} from 'viem';
+import { WalletClient, fromHex, hashMessage, recoverPublicKey, toHex } from 'viem';
 
 import { Noir } from '@noir-lang/noir_js';
-import { CompiledCircuit, ProofData } from '@noir-lang/types';
-import circuit from '../noir/target/stealthdrop.json' with { type: 'json' };
-
+import { ProofData } from '@noir-lang/types';
+import { Airdrop } from '../utils/airdrop.js';
 import { expect } from 'chai';
-import { errorMonitor } from 'events';
-
-class Airdrop {
-  public address: `0x${string}` = '0x';
-
-  constructor(
-    private hashedMessage: `0x${string}`,
-    private verifierAddress: `0x${string}`,
-    public merkleTreeRoot: `0x${string}`,
-    private amount: string,
-  ) {}
-
-  async deploy() {
-    const airdrop = await viem.deployContract('AD', [
-      this.merkleTreeRoot,
-      this.hashedMessage,
-      this.verifierAddress,
-      '3500000000000000000000',
-    ]);
-    this.address = airdrop.address;
-  }
-
-  async contract() {
-    return await viem.getContractAt('AD', this.address);
-  }
-}
-
-const bbSync = await BarretenbergSync.new();
-
-const poseidon = (a: bigint, b: bigint) => {
-  const hash = bbSync.poseidon2Hash([new Fr(a), new Fr(b)]);
-  return BigInt(hash.toString());
-};
+import { MESSAGE_TO_HASH } from '../utils/const.js';
 
 const primedMerkleTree = new LeanIMT(poseidon);
-merkle.addresses.forEach((addr: string) => primedMerkleTree.insert(BigInt(addr)));
+const initialLeaves = merkle.addresses.map(addr => BigInt(addr));
+primedMerkleTree.insertMany(initialLeaves);
 
-let publicClient: PublicClient;
 let airdrop: Airdrop;
-let messageToHash = 'signthis';
 let hashedMessage: `0x${string}`;
 
 let user1: WalletClient;
@@ -75,16 +31,15 @@ let noir: Noir;
 
 before(async () => {
   [user1, user2, claimer1, claimer2] = await hre.viem.getWalletClients();
-  publicClient = await viem.getPublicClient();
 
   const verifier = await viem.deployContract('HonkVerifier');
   console.log(`Verifier deployed to ${verifier.address}`);
 
   // Setup merkle tree
   const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-  merkleTree.insert(BigInt(user1.account!.address)); // only user1 is eligible
+  merkleTree.update(0, BigInt(user1.account!.address)); // only user1 is eligible
 
-  hashedMessage = hashMessage(messageToHash);
+  hashedMessage = hashMessage(MESSAGE_TO_HASH);
 
   airdrop = new Airdrop(
     hashedMessage,
@@ -106,13 +61,21 @@ const getClaimInputs = async ({
   user: WalletClient;
 }) => {
   const leaf = user.account!.address;
-
   const index = merkleTree.indexOf(BigInt(leaf));
+
+  // Check if address is in merkle tree
+  if (index === -1) {
+    console.warn(
+      `⚠️ Warning: Address ${leaf} is not in the merkle tree. This signature will not be valid for claiming.`,
+    );
+    return null;
+  }
 
   const signature = await user.signMessage({
     account: user.account!.address,
-    message: messageToHash,
+    message: MESSAGE_TO_HASH,
   });
+
   const signatureBuffer = fromHex(signature as `0x${string}`, 'bytes').slice(0, 64);
   const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
   const nullifier = bbSync.poseidon2Hash(frArray);
@@ -138,9 +101,14 @@ describe('Eligible user', () => {
 
   it('Generates a valid claim - off-chain', async () => {
     const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-    merkleTree.insert(BigInt(user1.account!.address));
+    merkleTree.update(0, BigInt(user1.account!.address));
 
     const inputs = await getClaimInputs({ merkleTree, user: user1 });
+    if (!inputs) {
+      throw new Error('Failed to generate inputs - address not in merkle tree');
+    }
+
+    console.log(inputs);
     const { witness } = await noir.execute(inputs);
     proof = await backend.generateProof(witness);
 
@@ -150,9 +118,13 @@ describe('Eligible user', () => {
 
   it('Verifies a valid claim - on-chain', async () => {
     const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-    merkleTree.insert(BigInt(user1.account!.address));
+    merkleTree.update(0, BigInt(user1.account!.address));
 
     const inputs = await getClaimInputs({ merkleTree, user: user1 });
+    if (!inputs) {
+      throw new Error('Failed to generate inputs - address not in merkle tree');
+    }
+
     const { witness } = await noir.execute(inputs);
     proof = await backend.generateProof(witness, { keccak: true });
     proof.proof = proof.proof.slice(4);
@@ -174,7 +146,7 @@ describe('Uneligible user', () => {
     // so we get a valid merkle tree for the inputs
     // but will then feed the correct tree (without user2) into the contract
     const naughtyMT = LeanIMT.import(poseidon, primedMerkleTree.export());
-    naughtyMT.insert(BigInt(user2.account!.address));
+    naughtyMT.update(0, BigInt(user2.account!.address));
 
     inputs = await getClaimInputs({ merkleTree: naughtyMT, user: user2 });
   });
@@ -201,9 +173,11 @@ describe('Uneligible user', () => {
   it('Fails to front-run the on-chain transaction with a invalid claimer', async () => {
     try {
       const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-      merkleTree.insert(BigInt(user1.account!.address));
-
-      const inputs = await getClaimInputs({ merkleTree, user: user1 });
+      merkleTree.update(0, BigInt(user2.account!.address));
+      const inputs = await getClaimInputs({ merkleTree, user: user2 });
+      if (!inputs) {
+        throw new Error('Failed to generate inputs - address not in merkle tree');
+      }
       const { witness } = await noir.execute(inputs);
       proof = await backend.generateProof(witness, { keccak: true });
 
@@ -214,6 +188,7 @@ describe('Uneligible user', () => {
         account: claimer2.account!.address,
       });
     } catch (err: any) {
+      console.log(err);
       expect(err.message).to.include('SumcheckFailed');
     }
   });

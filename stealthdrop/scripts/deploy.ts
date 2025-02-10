@@ -1,6 +1,12 @@
 import { writeFileSync } from 'fs';
 import hre from 'hardhat';
 const { viem } = hre;
+import { LeanIMT } from '@zk-kit/lean-imt';
+import { poseidon } from '../utils/bb.js';
+import merkle from '../utils/mt/merkle.json' with { type: 'json' };
+import { hashMessage, toHex } from 'viem';
+import { MESSAGE_TO_HASH } from '../utils/const.js';
+import { Airdrop } from '../utils/airdrop.js';
 
 async function main() {
   const publicClient = await viem.getPublicClient();
@@ -8,10 +14,29 @@ async function main() {
   const verifier = await viem.deployContract('HonkVerifier');
   console.log(`Verifier deployed to ${verifier.address}`);
 
+  // Setup merkle tree
+  const merkleTree = new LeanIMT(poseidon);
+  merkleTree.insertMany(merkle.addresses.map(BigInt));
+
+  const hashedMessage = hashMessage(MESSAGE_TO_HASH);
+
+  console.log('hashedMessage', hashedMessage);
+  console.log('verifier', verifier.address);
+  console.log('merkleRoot', toHex(merkleTree.root, { size: 32 }));
+  console.log('amount', '3500000000000000000000');
+  const airdrop = new Airdrop(
+    hashedMessage,
+    verifier.address,
+    toHex(merkleTree.root, { size: 32 }),
+    '3500000000000000000000',
+  );
+  await airdrop.deploy();
+
   // Create a config object
   const config = {
     chainId: publicClient.chain.id,
     verifier: verifier.address,
+    ad: airdrop.address,
   };
 
   // Print the config

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "ES2022",
     "module": "NodeNext",
     "declaration": true,
     "declarationMap": true,
@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "noEmitOnError": true,
     "skipDefaultLibCheck": true,
+    "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "composite": true,
     "resolveJsonModule": true,
@@ -16,11 +17,14 @@
     "allowJs": true,
     "noEmit": true,
     "incremental": true,
-    "moduleResolution": "NodeNext",
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "moduleResolution": "nodenext"
   },
-  "exclude": ["dist", "node_modules"],
-  "include": ["**/*.ts", "**/*.json", "hardhat.config.cts"],
-  "files": ["hardhat.config.cts"]
+  "ts-node": {
+    "experimentalResolver": true,
+    "files": true
+  },
+  "exclude": ["dist", "node_modules", "artifacts"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.json", "hardhat.config.cts", "scripts/deploy.ts"]
 }

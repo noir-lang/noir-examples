@@ -1,11 +1,11 @@
 import { createConfig, http } from 'wagmi';
-import { localhost } from 'wagmi/chains';
-import { metaMask } from 'wagmi/connectors';
+import { anvil } from 'wagmi/chains';
+import { injected } from 'wagmi/connectors';
 
 export const config = createConfig({
-  connectors: [metaMask()],
+  connectors: [injected()],
   transports: {
-    [localhost.id]: http(),
+    [anvil.id]: http(),
   },
-  chains: [localhost],
+  chains: [anvil],
 });

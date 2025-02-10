@@ -4,6 +4,8 @@ import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 import '../noir/target/stealthdrop.sol';
 import 'hardhat/console.sol';
 
+error DoubleClaim();
+
 contract AD is ERC20 {
     bytes32 public signThis;
     bytes32 public merkleRoot;
@@ -15,7 +17,7 @@ contract AD is ERC20 {
     event TokensAirdropped(address indexed recipient, uint256 amount);
 
     modifier noDoubleClaim(bytes32 nullifier) {
-        require(!nullifiers[nullifier], 'Double claim');
+        require(!nullifiers[nullifier], DoubleClaim());
         _;
     }
 
@@ -50,6 +52,12 @@ contract AD is ERC20 {
         _publicInputs[32] = nullifier;
         _publicInputs[33] = merkleRoot;
         _publicInputs[34] = bytes32(uint256(uint160(msg.sender)));
+        console.logBytes32(_publicInputs[0]);
+        console.logBytes32(_publicInputs[1]);
+        console.logBytes32(_publicInputs[32]);
+        console.logBytes32(_publicInputs[33]);
+        console.logBytes32(_publicInputs[34]);
+
         verifier.verify(proof, _publicInputs);
 
         _transfer(address(this), msg.sender, 1);
