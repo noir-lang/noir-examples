@@ -1,3 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import 'tailwindcss';
+
+@font-face {
+  font-family: 'Galaxie Copernicus';
+  src: url('/GalaxieCopernicus-Book.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
   margin: 0;
 }
@@ -12,4 +26,8 @@ body {
   left: 50%;
   /* bring your own prefixes */
   transform: translate(-50%, -50%);
+}
+
+.font-galaxie {
+  font-family: 'Galaxie Copernicus', serif;
 }
