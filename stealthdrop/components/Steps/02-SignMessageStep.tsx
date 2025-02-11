@@ -1,8 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Button } from '../Button.tsx';
 import { CheckmarkIcon } from '../Icons/CheckmarkIcon.tsx';
 import { StepContainer } from './StepContainer.tsx';
 import { StepProps } from '../../types.ts';
+import {
+  useAccount,
+  useConnect,
+  useConnections,
+  useConnectors,
+  useDisconnect,
+  useSignMessage,
+} from 'wagmi';
+import { useEligibleAddresses } from '../../hooks/useEligibleAddresses.tsx';
+import { useConnectAccount } from '../../hooks/useConnectAccount.tsx';
+import { MESSAGE_TO_HASH } from '../../utils/const.ts';
+import { MerkleTreeContext } from '../../providers/merkleTree.tsx';
 
 export const SignMessageStep: React.FC<StepProps> = ({
   isOpen,
@@ -12,55 +24,45 @@ export const SignMessageStep: React.FC<StepProps> = ({
   number,
   onContinue,
   isCompleted,
+  sign,
+  signature,
 }) => {
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
-  const [isSigned, setIsSigned] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<`0x${string}` | null>(null);
+  const { addresses } = useAccount();
+  const { eligibleAddresses, nonEligibleAddresses, isLoading } = useEligibleAddresses(
+    addresses as `0x${string}`[],
+  );
+  const merkleTree = useContext(MerkleTreeContext);
 
-  const handleAccountSelect = (account: string) => {
-    setSelectedAccount(account);
-  };
+  const { isConnected, connectors, disconnect, connect, connections, disconnectAsync } =
+    useConnectAccount();
 
-  const handleSignMessage = () => {
-    setIsSigned(true);
-  };
-
-  const renderButtons = () => {
-    if (isSigned) {
-      return (
+  if (!eligibleAddresses || eligibleAddresses.length === 0) {
+    return (
+      <StepContainer
+        number={number}
+        title={title}
+        description={description}
+        isOpen={isOpen}
+        onToggle={onToggle}
+        isCompleted={isCompleted || !!signature}
+      >
+        <span className="text-white text-lg">No eligible addresses found</span>
         <div className="flex items-center gap-4">
           <Button
-            variant="success"
-            className="px-8 py-4 rounded-xl text-lg font-normal bg-[#4CAF50] hover:bg-[#45a049] text-white flex items-center gap-2"
+            variant="yellow"
+            selected={false}
+            onClick={async () => {
+              await disconnectAsync();
+              connect({ connector: connectors[0] });
+            }}
           >
-            <CheckmarkIcon />
-            Message signed
-          </Button>
-          <Button
-            variant="secondary"
-            onClick={onContinue}
-            className="px-8 py-4 rounded-xl text-lg font-normal bg-[#4A3671] text-white hover:bg-[#553f82] transition-colors"
-          >
-            Continue
+            Connect more addresses
           </Button>
         </div>
-      );
-    }
-
-    return (
-      <Button
-        variant="primary"
-        disabled={!selectedAccount}
-        onClick={handleSignMessage}
-        className={`px-8 py-4 rounded-xl text-lg font-normal w-[200px] transition-colors ${
-          selectedAccount
-            ? 'bg-[#E4BAFF] hover:bg-[#d9a6ff] text-[#32204F]'
-            : 'bg-[#4A3671] text-white opacity-50 cursor-not-allowed'
-        }`}
-      >
-        Sign message
-      </Button>
+      </StepContainer>
     );
-  };
+  }
 
   return (
     <StepContainer
@@ -69,43 +71,54 @@ export const SignMessageStep: React.FC<StepProps> = ({
       description={description}
       isOpen={isOpen}
       onToggle={onToggle}
-      isCompleted={isCompleted || isSigned}
+      isCompleted={isCompleted || !!signature}
     >
-      <div className="flex flex-col gap-6 mb-10">
-        <div
-          className={`flex items-center gap-4 p-4 rounded-xl border ${
-            selectedAccount === '0x23F97e73825e0f7F39146D347be95A80A31a2F6f'
-              ? 'border-[#E4BAFF] bg-[#E4BAFF]/5'
-              : 'border-white/10'
-          } cursor-pointer hover:border-[#E4BAFF] hover:bg-[#E4BAFF]/5 transition-colors`}
-          onClick={() => handleAccountSelect('0x23F97e73825e0f7F39146D347be95A80A31a2F6f')}
-        >
-          <input
-            type="radio"
-            checked={selectedAccount === '0x23F97e73825e0f7F39146D347be95A80A31a2F6f'}
-            readOnly
-            className="w-5 h-5 accent-[#E4BAFF]"
-          />
-          <span className="text-white">0x23F97e73825e0f7F39146D347be95A80A31a2F6f</span>
+      {eligibleAddresses?.map((a: string) => {
+        const isEligible = merkleTree ? merkleTree.indexOf(BigInt(a)) !== -1 : false;
+        return (
+          <div key={a} className="flex flex-col gap-6 mb-10">
+            <div
+              className={`flex items-center gap-4 p-4 rounded-xl border border-white/10 cursor-pointer hover:border-[#E4BAFF] hover:bg-[#E4BAFF]/5 transition-colors ${
+                !isEligible ? 'opacity-50' : ''
+              }`}
+              onClick={() => isEligible && setSelectedAccount(a as `0x${string}`)}
+            >
+              <input
+                type="radio"
+                checked={selectedAccount === a}
+                readOnly
+                disabled={!isEligible}
+                className="w-5 h-5 accent-[#E4BAFF]"
+              />
+              <span className="text-white">{a}</span>
+              {!isEligible && <span className="text-red-400 ml-2">(Not eligible)</span>}
+            </div>
+          </div>
+        );
+      })}
+      {!!signature && (
+        <div className="flex items-center gap-4">
+          <Button
+            variant="green"
+            onClick={onContinue}
+            className="px-8 py-4 text-lg font-normal text-white"
+          >
+            Continue
+          </Button>
         </div>
-        <div
-          className={`flex items-center gap-4 p-4 rounded-xl border ${
-            selectedAccount === '0x09F11C930C8a993AF6DC714e5e39BFaD09962664'
-              ? 'border-[#E4BAFF] bg-[#E4BAFF]/5'
-              : 'border-white/10'
-          } cursor-pointer hover:border-[#E4BAFF] hover:bg-[#E4BAFF]/5 transition-colors`}
-          onClick={() => handleAccountSelect('0x09F11C930C8a993AF6DC714e5e39BFaD09962664')}
+      )}
+      {!signature && (
+        <Button
+          variant="yellow"
+          selected={!!selectedAccount}
+          disabled={!selectedAccount}
+          onClick={() =>
+            sign?.({ message: MESSAGE_TO_HASH, account: selectedAccount as `0x${string}` })
+          }
         >
-          <input
-            type="radio"
-            checked={selectedAccount === '0x09F11C930C8a993AF6DC714e5e39BFaD09962664'}
-            readOnly
-            className="w-5 h-5 accent-[#E4BAFF]"
-          />
-          <span className="text-white">0x09F11C930C8a993AF6DC714e5e39BFaD09962664</span>
-        </div>
-      </div>
-      {renderButtons()}
+          Sign message
+        </Button>
+      )}
     </StepContainer>
   );
 };

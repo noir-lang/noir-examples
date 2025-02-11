@@ -3,13 +3,14 @@ import { useConnectAccount } from '../hooks/useConnectAccount.tsx';
 
 interface HeaderProps {
   connectedAddress?: string;
-  onDisconnect?: () => void;
+  resetForm?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = () => {
-  const { isConnected, disconnect, address } = useConnectAccount();
+const Header: React.FC<HeaderProps> = ({ resetForm }) => {
+  const { isConnected, disconnect, address, isDisconnected } = useConnectAccount();
 
   if (!isConnected) {
+    resetForm?.();
     return null;
   }
 

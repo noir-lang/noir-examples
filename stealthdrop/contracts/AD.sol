@@ -46,7 +46,7 @@ contract AD is ERC20 {
         return _publicInputs;
     }
 
-    function claim(bytes calldata proof, bytes32 nullifier) external {
+    function claim(bytes calldata proof, bytes32 nullifier) external noDoubleClaim(nullifier) {
         bytes32[] memory _publicInputs = new bytes32[](35);
         _publicInputs = preparePublicInputs(_publicInputs, signThis, 0);
         _publicInputs[32] = nullifier;

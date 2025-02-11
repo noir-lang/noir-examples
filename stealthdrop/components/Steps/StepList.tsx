@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ConnectWalletStep } from './01-ConnectWalletStep.tsx';
 import { SignMessageStep } from './02-SignMessageStep.tsx';
-import { PrivateWalletStep } from './03-PrivateWalletStep.tsx';
-import { ProveOwnershipStep } from './04-ClaimStep.tsx';
-import { Step, StepProps } from '../../types.ts';
+import { ClaimStep } from './03-ClaimStep.tsx';
+import { Step, StepProps, StepListProps } from '../../types.ts';
+import { useSignMessage } from 'wagmi';
 
 const steps: Step[] = [
   {
@@ -15,29 +15,27 @@ const steps: Step[] = [
     description: 'Select the account you want to sign the message with.',
   },
   {
-    title: 'Switch to the private wallet',
-    description: 'Switch to the private wallet you want to claim the airdrop with.',
-  },
-  {
     title: 'Claim',
-    description:
-      'Claim tokens by submitting a transaction containing the ZK proof to the ERC-20 contract on-chain.',
+    description: 'Select a different account to claim the tokens with, and claim',
   },
 ];
 
-const StepList: React.FC = () => {
+const StepList: React.FC<StepListProps> = ({ resetForm, setResetForm }) => {
   const [openStepIndex, setOpenStepIndex] = useState<number | null>(null);
-  const [completedSteps, setCompletedSteps] = useState<boolean[]>([
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
+  const [completedSteps, setCompletedSteps] = useState<boolean[]>([]);
+  const { data: signature, signMessage, reset: resetSignMessage } = useSignMessage();
 
   const handleStepToggle = (index: number) => {
     setOpenStepIndex(openStepIndex === index ? null : index);
   };
+  useEffect(() => {
+    setResetForm(() => {
+      resetSignMessage();
+      handleStepComplete(0);
+      handleStepToggle(0);
+      return;
+    });
+  }, []);
 
   const handleStepComplete = (index: number) => {
     setCompletedSteps(prev => {
@@ -68,6 +66,7 @@ const StepList: React.FC = () => {
             return (
               <ConnectWalletStep
                 {...commonProps}
+                resetForm={resetForm}
                 onContinue={() => {
                   handleStepComplete(index);
                   handleStepToggle(index + 1);
@@ -84,30 +83,14 @@ const StepList: React.FC = () => {
                   handleStepComplete(index);
                   handleStepToggle(index + 1);
                 }}
+                resetForm={resetForm}
+                sign={signMessage}
+                signature={signature}
               />
             );
           }
           if (index === 2) {
-            return (
-              <PrivateWalletStep
-                {...commonProps}
-                onContinue={() => {
-                  handleStepComplete(index);
-                  handleStepToggle(index + 1);
-                }}
-              />
-            );
-          }
-          if (index === 3) {
-            return (
-              <ProveOwnershipStep
-                {...commonProps}
-                onContinue={() => {
-                  handleStepComplete(index);
-                  handleStepToggle(index + 1);
-                }}
-              />
-            );
+            return <ClaimStep {...commonProps} signature={signature} resetForm={resetForm} />;
           }
         })}
       </div>

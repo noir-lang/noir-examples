@@ -1,7 +1,7 @@
 'use client';
 
 import { BaseError } from 'viem';
-import { useAccount, useConnect, useConnectors, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useConnections, useConnectors, useDisconnect } from 'wagmi';
 import React from 'react';
 
 export function useConnectAccount() {
@@ -9,7 +9,19 @@ export function useConnectAccount() {
   const { connect, error } = useConnect();
 
   const { status, isConnected, address } = useAccount();
-  const { disconnect } = useDisconnect();
+  const { disconnect, disconnectAsync, isSuccess: isDisconnected } = useDisconnect();
+  const connections = useConnections();
 
-  return { connect, error, status, disconnect, isConnected, address };
+  return {
+    connect,
+    error,
+    status,
+    disconnect,
+    isConnected,
+    address,
+    connectors,
+    connections,
+    disconnectAsync,
+    isDisconnected,
+  };
 }
