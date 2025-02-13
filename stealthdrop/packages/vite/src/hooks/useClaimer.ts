@@ -5,7 +5,7 @@ import { MerkleTreeContext } from '../providers/merkleTree.tsx';
 import { useWaitForTransactionReceipt } from 'wagmi';
 import { useWriteContract, useAccount } from 'wagmi';
 import addresses from '../../../../utils/addresses.json' with { type: 'json' };
-import abi from '../../../../artifacts/contracts/AD.sol/AD.json' with { type: 'json' };
+import abi from '../../../ethereum/artifacts/ethereum/contracts/AD.sol/AD.json' with { type: 'json' };
 import { type PlumeSignature } from '../../../../types.ts';
 import { publicKeyToAddress } from 'viem/accounts';
 import { MESSAGE_TO_HASH } from '../../../../utils/const.ts';

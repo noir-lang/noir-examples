@@ -2,7 +2,8 @@ import React from 'react';
 import { Button } from '../Button.tsx';
 import { StepContainer } from './StepContainer.tsx';
 import { type StepProps } from '../../../../../types.ts';
-import { useConnectAccount } from '../../hooks/useConnectAccount.tsx';
+import { useAppKitAccount, useDisconnect, useAppKit } from '@reown/appkit/react';
+import { useAppKitWallet } from '@reown/appkit-wallet-button/react';
 
 export const ConnectWalletStep: React.FC<StepProps> = ({
   number,
@@ -15,7 +16,9 @@ export const ConnectWalletStep: React.FC<StepProps> = ({
   sign,
   resetForm,
 }) => {
-  const { isConnected, connectors, disconnect, connect } = useConnectAccount();
+  const { isConnected } = useAppKitAccount();
+  const { disconnect } = useDisconnect();
+  const { open, close } = useAppKit();
 
   return (
     <StepContainer
@@ -34,7 +37,7 @@ export const ConnectWalletStep: React.FC<StepProps> = ({
                   disconnect();
                   resetForm?.();
                 }
-              : () => connect({ connector: connectors[0] })
+              : () => open()
           }
           variant={'yellow'}
           className={`px-4 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-normal ${

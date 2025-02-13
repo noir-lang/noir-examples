@@ -1,5 +1,5 @@
+import { useAppKitAccount, useDisconnect } from '@reown/appkit/react';
 import React from 'react';
-import { useConnectAccount } from '../hooks/useConnectAccount.tsx';
 
 interface HeaderProps {
   connectedAddress?: string;
@@ -7,7 +7,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ resetForm }) => {
-  const { isConnected, disconnect, address, isDisconnected } = useConnectAccount();
+  const { isConnected, address } = useAppKitAccount();
+  const { disconnect } = useDisconnect();
 
   if (!isConnected) {
     resetForm?.();

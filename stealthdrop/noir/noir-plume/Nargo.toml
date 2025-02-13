@@ -1,2 +1,0 @@
-[workspace]
-members = ["crates/plume", "crates/use_v1", "crates/use_v2"]

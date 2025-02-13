@@ -1,15 +1,10 @@
 {
-  "name": "stealthdrop",
+  "name": "@stealthdrop/ethereum",
   "version": "1.0.0",
   "type": "module",
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "NETWORK=localhost bun run deploy && bun run --filter @stealthdrop/webapp dev",
-    "test": "bun run --filter @stealthdrop/ethereum test",
-    "deploy": "bun run --filter @stealthdrop/ethereum deploy",
-    "gen": "bun run utils/mt/generateAddresses.ts"
+    "test": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only' hardhat test",
+    "deploy": "hardhat compile && NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning' hardhat run --network ${NETWORK} scripts/deploy.ts"
   },
   "dependencies": {
     "@aztec/bb.js": "0.67.0",

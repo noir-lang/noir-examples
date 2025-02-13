@@ -2,7 +2,7 @@ import { Noir } from '@noir-lang/noir_js';
 import type { ProofData } from '@aztec/bb.js';
 import { useState } from 'react';
 import type { CompiledCircuit } from '@noir-lang/noir_js';
-import circuit from '../../../../noir/stealthdrop/target/stealthdrop.json' with { type: 'json' };
+import stealthdropCircuit from '../../../noir/target/stealthdrop.json' with { type: 'json' };
 
 export function useProver() {
   const [proof, setProof] = useState<ProofData>();
@@ -15,8 +15,9 @@ export function useProver() {
     setStatus('executing');
     const { UltraHonkBackend } = await import('@aztec/bb.js');
 
-    const backend = new UltraHonkBackend(circuit.bytecode, { threads: 8 });
-    const noir = new Noir(circuit as unknown as CompiledCircuit);
+    // @ts-ignore
+    const backend = new UltraHonkBackend(stealthdropCircuit.bytecode);
+    const noir = new Noir(stealthdropCircuit as unknown as CompiledCircuit);
 
     const initializationTime = performance.now() - start;
     console.log(`Initialization time: ${initializationTime}ms`);

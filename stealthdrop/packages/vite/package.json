@@ -18,6 +18,7 @@
     "@tailwindcss/postcss": "^4.0.6",
     "@tailwindcss/vite": "^4.0.6",
     "@tanstack/react-query": "^5.66.0",
+    "@types/bun": "latest",
     "@types/classnames": "^2.3.0",
     "@zk-kit/lean-imt": "^2.2.2",
     "autoprefixer": "^10.4.20",
@@ -27,6 +28,7 @@
     "hardhat-gas-reporter": "^1.0.8",
     "hardhat-plugin-noir": "0.3.0-next.0",
     "next": "latest",
+    "plume-sig": "https://gitpkg.vercel.app/signorecello/zk-nullifier-sig/javascript/native?main&scripts.postinstall=npm%20run%20build",
     "postcss": "^8.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -37,9 +39,7 @@
     "toml": "^3.0.0",
     "ts-node": "^10.9.1",
     "viem": "2.22.21",
-    "wagmi": "2.14.9",
-    "@types/bun": "latest",
-    "plume-sig": "workspace:*"
+    "wagmi": "2.14.9"
   },
   "devDependencies": {
     "@types/node": "^18.15.5",

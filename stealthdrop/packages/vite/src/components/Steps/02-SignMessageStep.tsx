@@ -5,8 +5,8 @@ import { StepContainer } from './StepContainer.tsx';
 import { type StepProps } from '../../../../../types.ts';
 import { useAccount } from 'wagmi';
 import { useEligibleAddresses } from '../../hooks/useEligibleAddresses.tsx';
-import { useConnectAccount } from '../../hooks/useConnectAccount.tsx';
 import { MerkleTreeContext } from '../../providers/merkleTree.tsx';
+import { useAppKit, useDisconnect } from '@reown/appkit/react';
 
 export const SignMessageStep: React.FC<StepProps> = ({
   isOpen,
@@ -17,7 +17,7 @@ export const SignMessageStep: React.FC<StepProps> = ({
   onContinue,
   isCompleted,
   plumeSign,
-  signature,
+  plume,
 }) => {
   const [selectedAccount, setSelectedAccount] = useState<`0x${string}` | null>(null);
   const { addresses } = useAccount();
@@ -26,8 +26,8 @@ export const SignMessageStep: React.FC<StepProps> = ({
   );
   const merkleTree = useContext(MerkleTreeContext);
 
-  const { isConnected, connectors, disconnect, connect, connections, disconnectAsync } =
-    useConnectAccount();
+  const { open, close } = useAppKit();
+  const { disconnect } = useDisconnect();
 
   if (!eligibleAddresses || eligibleAddresses.length === 0) {
     return (
@@ -37,7 +37,7 @@ export const SignMessageStep: React.FC<StepProps> = ({
         description={description}
         isOpen={isOpen}
         onToggle={onToggle}
-        isCompleted={isCompleted || !!signature}
+        isCompleted={isCompleted || !!plume?.nullifier}
       >
         <span className="text-white text-base sm:text-lg">No eligible addresses found</span>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
@@ -45,8 +45,8 @@ export const SignMessageStep: React.FC<StepProps> = ({
             variant="yellow"
             selected={false}
             onClick={async () => {
-              await disconnectAsync();
-              connect({ connector: connectors[0] });
+              await disconnect();
+              open();
             }}
             className="w-full sm:w-auto text-center"
           >
@@ -64,7 +64,7 @@ export const SignMessageStep: React.FC<StepProps> = ({
       description={description}
       isOpen={isOpen}
       onToggle={onToggle}
-      isCompleted={isCompleted || !!signature}
+      isCompleted={isCompleted || !!plume?.nullifier}
     >
       <div className="space-y-4 sm:space-y-6">
         {eligibleAddresses?.map((a: string) => {
@@ -95,7 +95,7 @@ export const SignMessageStep: React.FC<StepProps> = ({
           );
         })}
       </div>
-      {!!signature && (
+      {!!plume?.nullifier && (
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mt-6">
           <Button
             variant="green"
@@ -106,7 +106,7 @@ export const SignMessageStep: React.FC<StepProps> = ({
           </Button>
         </div>
       )}
-      {!signature && (
+      {!plume?.nullifier && (
         <Button
           variant="yellow"
           selected={!!selectedAccount}

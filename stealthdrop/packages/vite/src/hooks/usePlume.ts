@@ -3,7 +3,6 @@ import { computeAllInputs } from 'plume-sig';
 import { MESSAGE_TO_HASH } from '../../../../utils/const.ts';
 import { type PlumeSignature } from '../../../../types.ts';
 import eligible from '../../../../utils/mt/eligible.json' with { type: 'json' };
-import { publicKeyToAddress } from 'viem/accounts';
 
 export function usePlume() {
   const [plume, setPlume] = useState<PlumeSignature>();

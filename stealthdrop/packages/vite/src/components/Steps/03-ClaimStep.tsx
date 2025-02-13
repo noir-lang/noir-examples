@@ -3,9 +3,10 @@ import { Button } from '../Button.tsx';
 import { CheckmarkIcon } from '../Icons/CheckmarkIcon.tsx';
 import { StepContainer } from './StepContainer.tsx';
 import { type StepProps } from '../../../../../types.ts';
-import { useAccount, useConnect, useConnectors, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useConnectors } from 'wagmi';
 import { useEligibleAddresses } from '../../hooks/useEligibleAddresses.tsx';
 import { useClaim } from '../../hooks/useClaimer.ts';
+import { useAppKit, useDisconnect } from '@reown/appkit/react';
 
 export const ClaimStep: React.FC<StepProps> = ({
   isOpen,
@@ -22,9 +23,8 @@ export const ClaimStep: React.FC<StepProps> = ({
   const { eligibleAddresses, nonEligibleAddresses, isLoading } = useEligibleAddresses(
     addresses as `0x${string}`[],
   );
-  const { disconnectAsync } = useDisconnect();
-  const { connect } = useConnect();
-  const connectors = useConnectors();
+  const { disconnect } = useDisconnect();
+  const { open, close } = useAppKit();
 
   const { claim, proofStatus, writeStatus, txStatus, proof, reset } = useClaim(
     plume,
@@ -40,8 +40,8 @@ export const ClaimStep: React.FC<StepProps> = ({
               variant="yellow"
               selected={false}
               onClick={async () => {
-                await disconnectAsync();
-                connect({ connector: connectors[0] });
+                await disconnect();
+                open();
               }}
               className="w-full sm:w-auto text-center"
             >
