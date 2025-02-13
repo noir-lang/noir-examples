@@ -25,6 +25,6 @@
     "experimentalResolver": true,
     "files": true
   },
-  "exclude": ["dist", "node_modules", "artifacts"],
+  "exclude": ["dist", "node_modules", "artifacts", "noir"],
   "include": ["**/*.ts", "**/*.tsx", "**/*.json", "hardhat.config.cts", "scripts/deploy.ts"]
 }

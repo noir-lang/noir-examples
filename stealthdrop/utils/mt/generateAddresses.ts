@@ -7,7 +7,7 @@ const numCPUs = require('os').cpus().length;
 const depth = process.env.MERKLE_TREE_DEPTH as unknown as number;
 const totalAddresses = Math.pow(2, depth) - 1;
 
-const addresses: string[] = [...eligible];
+const addresses: string[] = [...eligible.map(a => a.address)];
 const remainingAddresses = totalAddresses - addresses.length;
 
 console.log(`Starting with ${addresses.length} eligible addresses`);

@@ -3,6 +3,13 @@ export interface Step {
   description: string;
 }
 
+export type PlumeSignature = {
+  nullifier: { toHex: () => string };
+  c: string;
+  s: string;
+  uncompressedPublicKey?: `0x${string}`;
+};
+
 export interface StepProps extends Step {
   isOpen: boolean;
   onToggle: () => void;
@@ -11,6 +18,8 @@ export interface StepProps extends Step {
   isCompleted?: boolean;
   sign?: ({ message, account }: { message: string; account: `0x${string}` }) => void;
   signature?: `0x${string}` | null;
+  plumeSign?: (address: `0x${string}`) => Promise<void>;
+  plume?: PlumeSignature;
   resetForm?: () => void;
 }
 

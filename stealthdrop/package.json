@@ -2,12 +2,14 @@
   "name": "stealthdrop",
   "version": "1.0.0",
   "type": "module",
-  "description": "A template repository to get started with writing zero knowledge programs with Noir.",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "NETWORK=localhost bun run deploy && next -H 0.0.0.0",
-    "build": "bun run compile && bun run deploy && next build",
+    "dev": "NETWORK=localhost bun run deploy && bun run --filter @stealthdrop/webapp dev",
+    "build": "bun run deploy && bun run --filter @stealthdrop/webapp dev",
+    "build::plume": "bun run --filter plume-sig build",
     "test": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only' hardhat test",
-    "compile": "hardhat compile && cd circuits && nargo compile",
     "deploy": "hardhat compile && NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only --no-warnings=ExperimentalWarning' hardhat run --network ${NETWORK} scripts/deploy.ts",
     "gen": "bun run utils/mt/generateAddresses.ts"
   },
@@ -17,27 +19,15 @@
     "@nomicfoundation/hardhat-network-helpers": "1.0.12",
     "@nomicfoundation/hardhat-toolbox-viem": "3.0.0",
     "@nomicfoundation/hardhat-viem": "2.0.6",
-    "@openzeppelin/contracts": "^5.0.0",
-    "@tailwindcss/postcss": "^4.0.5",
-    "@tanstack/react-query": "^5.66.0",
-    "@types/classnames": "^2.3.0",
     "@zk-kit/lean-imt": "^2.2.2",
-    "autoprefixer": "^10.4.20",
-    "classnames": "^2.5.1",
     "dotenv": "^16.0.3",
     "hardhat": "^2.18.1",
     "hardhat-gas-reporter": "^1.0.8",
     "hardhat-plugin-noir": "0.3.0-next.0",
-    "next": "latest",
-    "postcss": "^8.5.1",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-toastify": "^9.1.1",
     "solidity-coverage": "^0.8.1",
-    "tailwindcss": "^4.0.5",
     "ts-node": "^10.9.1",
-    "viem": "2.22.21",
-    "wagmi": "2.14.9"
+    "viem": "2.22.21"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
@@ -45,10 +35,8 @@
     "@nomicfoundation/hardhat-verify": "^1.0.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.15.5",
-    "@types/react": "^18.0.26",
     "chai": "^4.3.10",
     "ethers": "^5.4.7",
-    "prettier": "3.4.2",
     "typescript": "^5.0.0"
   },
   "resolutions": {

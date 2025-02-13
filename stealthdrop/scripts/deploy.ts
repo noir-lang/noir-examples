@@ -18,14 +18,16 @@ async function main() {
   const merkleTree = new LeanIMT(poseidon);
   merkleTree.insertMany(merkle.addresses.map(BigInt));
 
-  const hashedMessage = hashMessage(MESSAGE_TO_HASH);
+  // const hashedMessage = hashMessage(MESSAGE_TO_HASH);
+  const messageBytesHex = toHex(MESSAGE_TO_HASH, { size: 8 });
+  // const messageBytes = MESSAGE_TO_HASH.split('').map((s, i) => MESSAGE_TO_HASH.charCodeAt(i));
 
-  console.log('hashedMessage', hashedMessage);
+  console.log('hashedMessage', messageBytesHex);
   console.log('verifier', verifier.address);
   console.log('merkleRoot', toHex(merkleTree.root, { size: 32 }));
   console.log('amount', '3500000000000000000000');
   const airdrop = new Airdrop(
-    hashedMessage,
+    messageBytesHex,
     verifier.address,
     toHex(merkleTree.root, { size: 32 }),
     '3500000000000000000000',

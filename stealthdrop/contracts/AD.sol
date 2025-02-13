@@ -1,13 +1,13 @@
 pragma solidity ^0.8.0;
 
 import { ERC20 } from '@openzeppelin/contracts/token/ERC20/ERC20.sol';
-import '../noir/target/stealthdrop.sol';
+import '../noir/stealthdrop/target/stealthdrop.sol';
 import 'hardhat/console.sol';
 
 error DoubleClaim();
 
 contract AD is ERC20 {
-    bytes32 public signThis;
+    bytes8 public signThis;
     bytes32 public merkleRoot;
     HonkVerifier public verifier;
 
@@ -23,7 +23,7 @@ contract AD is ERC20 {
 
     constructor(
         bytes32 _merkleRoot,
-        bytes32 _signThis,
+        bytes8 _signThis,
         HonkVerifier _verifier,
         uint256 _airdropAmount
     ) ERC20('Airdrop', 'ADRP') {
@@ -38,31 +38,32 @@ contract AD is ERC20 {
     function preparePublicInputs(
         bytes32[] memory _publicInputs,
         bytes32 publicInput,
-        uint256 offset
+        uint256 offset,
+        uint256 length
     ) private pure returns (bytes32[] memory) {
-        for (uint256 i = 0; i < 32; i++) {
+        for (uint256 i = 0; i < length; i++) {
             _publicInputs[i + offset] = (publicInput >> ((31 - i) * 8)) & bytes32(uint256(0xFF));
         }
         return _publicInputs;
     }
 
-    function claim(bytes calldata proof, bytes32 nullifier) external noDoubleClaim(nullifier) {
-        bytes32[] memory _publicInputs = new bytes32[](35);
-        _publicInputs = preparePublicInputs(_publicInputs, signThis, 0);
-        _publicInputs[32] = nullifier;
-        _publicInputs[33] = merkleRoot;
-        _publicInputs[34] = bytes32(uint256(uint160(msg.sender)));
-        console.logBytes32(_publicInputs[0]);
-        console.logBytes32(_publicInputs[1]);
-        console.logBytes32(_publicInputs[32]);
-        console.logBytes32(_publicInputs[33]);
-        console.logBytes32(_publicInputs[34]);
+    function concatenateNullifier(bytes32 x, bytes32 y) internal pure returns (bytes32) {
+        return keccak256(abi.encodePacked(x, y));
+    }
+
+    function claim(bytes calldata proof, bytes32 nullifier_x, bytes32 nullifier_y) external noDoubleClaim(concatenateNullifier(nullifier_x, nullifier_y)) {
+        bytes32[] memory _publicInputs = new bytes32[](74);
+        _publicInputs = preparePublicInputs(_publicInputs, signThis, 0, 8);
+        _publicInputs = preparePublicInputs(_publicInputs, nullifier_x, 8, 32);
+        _publicInputs = preparePublicInputs(_publicInputs, nullifier_y, 40, 32);
+        _publicInputs[72] = merkleRoot;
+        _publicInputs[73] = bytes32(uint256(uint160(msg.sender)));
 
         verifier.verify(proof, _publicInputs);
 
         _transfer(address(this), msg.sender, 3500000000000000000);
         emit TokensAirdropped(msg.sender, 3500000000000000000);
-        nullifiers[nullifier] = true;
+        nullifiers[concatenateNullifier(nullifier_x, nullifier_y)] = true;
     }
 
     function getRoot() public view returns (bytes32) {

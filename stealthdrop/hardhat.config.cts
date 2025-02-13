@@ -38,9 +38,13 @@ const config: HardhatUserConfig = {
   },
   paths: {
     sources: './contracts',
+    noir: 'noir/stealthdrop',
   },
   noir: {
     version: '1.0.0-beta.1',
+  },
+  mocha: {
+    timeout: 1000000,
   },
 };
 

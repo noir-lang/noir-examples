@@ -2,17 +2,21 @@ import { LeanIMT } from '@zk-kit/lean-imt';
 import merkle from '../utils/mt/merkle.json' with { type: 'json' };
 import hre from 'hardhat';
 const { viem } = hre;
+import { mnemonicToAccount } from 'viem/accounts';
 
 import { UltraHonkBackend, Fr } from '@aztec/bb.js';
-import { poseidon, bbSync } from '../utils/bb.js';
+import { poseidon, bbSync } from '../utils/bb.ts';
 
 import { WalletClient, fromHex, hashMessage, recoverPublicKey, toHex } from 'viem';
 
 import { Noir } from '@noir-lang/noir_js';
 import { ProofData } from '@noir-lang/types';
-import { Airdrop } from '../utils/airdrop.js';
+import { Airdrop } from '../utils/airdrop.ts';
 import { expect } from 'chai';
-import { MESSAGE_TO_HASH } from '../utils/const.js';
+import { MESSAGE_TO_HASH } from '../utils/const.ts';
+import { computeAllInputs } from '../packages/plume-js/src/index.ts';
+import { hexToUint8Array } from '../packages/plume-js/src/utils/encoding.ts';
+import { HardhatNetworkHDAccountsConfig } from 'hardhat/types';
 
 const primedMerkleTree = new LeanIMT(poseidon);
 const initialLeaves = merkle.addresses.map(addr => BigInt(addr));
@@ -21,28 +25,29 @@ primedMerkleTree.insertMany(initialLeaves);
 let airdrop: Airdrop;
 let hashedMessage: `0x${string}`;
 
+let user0: WalletClient;
 let user1: WalletClient;
-let user2: WalletClient;
+let claimer0: WalletClient;
 let claimer1: WalletClient;
-let claimer2: WalletClient;
 
 let backend: UltraHonkBackend;
 let noir: Noir;
 
 before(async () => {
-  [user1, user2, claimer1, claimer2] = await hre.viem.getWalletClients();
+  [user0, user1, claimer0, claimer1] = await hre.viem.getWalletClients();
 
   const verifier = await viem.deployContract('HonkVerifier');
   console.log(`Verifier deployed to ${verifier.address}`);
 
   // Setup merkle tree
   const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-  merkleTree.update(0, BigInt(user1.account!.address)); // only user1 is eligible
+  merkleTree.update(0, BigInt(user0.account!.address)); // only user0 is eligible
 
-  hashedMessage = hashMessage(MESSAGE_TO_HASH);
+  // hashedMessage = hashMessage(MESSAGE_TO_HASH);
+  const messageBytesHex = toHex(MESSAGE_TO_HASH, { size: 8 });
 
   airdrop = new Airdrop(
-    hashedMessage,
+    messageBytesHex,
     verifier.address,
     toHex(merkleTree.root, { size: 32 }),
     '3500000000000000000000',
@@ -53,14 +58,38 @@ before(async () => {
   console.log(`Airdrop deployed to ${airdrop.address}`);
 });
 
+// ON PLUME
+// just to make sure we're on the same page
+// this private key WON'T be exposed
+// we expect the wallet client (ex. Taho) to return PLUME with `eth_getPlumeSignature`
+// the structure of the returned signature is here: https://github.com/tahowallet/extension/blob/917c396fb7113a39be0ebc9ab50ddc2c6cc6b633/background/utils/signing.ts#L81
+// and is as follows:
+
+// export type PLUMESigningResponse = {
+//   plume: HexString; <---- very confusing, but this is the actual nullifier
+//   c: HexString;
+//   s: HexString;
+//   publicKey: HexString;
+//   gPowR: HexString;
+//   hashMPKPowR: HexString;
+// };
+
+// so what we're doing here is just emulating what the wallet client does
 const getClaimInputs = async ({
   merkleTree,
-  user,
+  testUserIndex,
 }: {
   merkleTree: LeanIMT;
-  user: WalletClient;
+  testUserIndex: number;
 }) => {
-  const leaf = user.account!.address;
+  const userAccount = mnemonicToAccount(
+    (hre.network.config.accounts as HardhatNetworkHDAccountsConfig).mnemonic,
+    {
+      addressIndex: testUserIndex,
+    },
+  );
+
+  const leaf = userAccount!.address;
   const index = merkleTree.indexOf(BigInt(leaf));
 
   // Check if address is in merkle tree
@@ -71,28 +100,30 @@ const getClaimInputs = async ({
     return null;
   }
 
-  const signature = await user.signMessage({
-    account: user.account!.address,
-    message: MESSAGE_TO_HASH,
-  });
-
-  const signatureBuffer = fromHex(signature as `0x${string}`, 'bytes').slice(0, 64);
-  const frArray: Fr[] = Array.from(signatureBuffer).map(byte => new Fr(BigInt(byte)));
-  const nullifier = bbSync.poseidon2Hash(frArray);
-  const pubKey = await recoverPublicKey({ hash: hashedMessage, signature });
-
+  // message to hash is above
+  const messageBytes = MESSAGE_TO_HASH.split('').map((s, i) => MESSAGE_TO_HASH.charCodeAt(i));
+  const privateKey = userAccount!.getHdKey().privateKey!;
+  const plume = await computeAllInputs(Uint8Array.from(messageBytes), privateKey);
   const proof = merkleTree.generateProof(index);
+  const pubKey = userAccount!.publicKey.slice(2);
+
   const inputs = {
-    pub_key: [...fromHex(pubKey, 'bytes').slice(1)],
-    signature: [...fromHex(signature as `0x${string}`, 'bytes').slice(0, 64)],
-    hashed_message: [...fromHex(hashedMessage, 'bytes')],
-    nullifier: nullifier.toString(),
-    merkle_path: proof.siblings.map(x => toHex(x, { size: 32 })),
-    index: index,
-    merkle_root: toHex(proof.root, { size: 32 }),
-    claimer_priv: claimer1.account!.address,
-    claimer_pub: claimer1.account!.address,
+    pub_key_x: [...fromHex(pubKey as `0x${string}`, 'bytes').slice(0, 32)],
+    pub_key_y: [...fromHex(pubKey as `0x${string}`, 'bytes').slice(32, 64)],
+    message: Array.from(messageBytes),
+
+    c: [...fromHex(`0x${plume.c}`, 'bytes')],
+    s: [...fromHex(`0x${plume.s}`, 'bytes')],
+    nullifier_x: [...fromHex(plume.nullifier.toHex() as `0x${string}`, 'bytes')].slice(0, 32),
+    nullifier_y: [...fromHex(plume.nullifier.toHex() as `0x${string}`, 'bytes')].slice(32, 64),
+
+    eligible_root: toHex(proof.root, { size: 32 }),
+    eligible_path: proof.siblings.map(x => toHex(x, { size: 32 })),
+    eligible_index: index,
+
+    claimer_priv: claimer0.account!.address,
   };
+
   return inputs;
 };
 
@@ -101,14 +132,13 @@ describe('Eligible user', () => {
 
   it('Generates a valid claim - off-chain', async () => {
     const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-    merkleTree.update(0, BigInt(user1.account!.address));
+    merkleTree.update(0, BigInt(user0.account!.address));
 
-    const inputs = await getClaimInputs({ merkleTree, user: user1 });
+    const inputs = await getClaimInputs({ merkleTree, testUserIndex: 0 });
     if (!inputs) {
       throw new Error('Failed to generate inputs - address not in merkle tree');
     }
 
-    console.log(inputs);
     const { witness } = await noir.execute(inputs);
     proof = await backend.generateProof(witness);
 
@@ -118,9 +148,9 @@ describe('Eligible user', () => {
 
   it('Verifies a valid claim - on-chain', async () => {
     const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-    merkleTree.update(0, BigInt(user1.account!.address));
+    merkleTree.update(0, BigInt(user0.account!.address));
 
-    const inputs = await getClaimInputs({ merkleTree, user: user1 });
+    const inputs = await getClaimInputs({ merkleTree, testUserIndex: 0 });
     if (!inputs) {
       throw new Error('Failed to generate inputs - address not in merkle tree');
     }
@@ -130,41 +160,60 @@ describe('Eligible user', () => {
     proof.proof = proof.proof.slice(4);
 
     const ad = await airdrop.contract();
-    await ad.write.claim([toHex(proof.proof), inputs.nullifier as `0x${string}`], {
-      account: claimer1.account!.address,
-    });
+    await ad.write.claim(
+      [
+        toHex(proof.proof),
+        toHex(Uint8Array.from(inputs.nullifier_x), { size: 32 }),
+        toHex(Uint8Array.from(inputs.nullifier_y), { size: 32 }),
+      ],
+      {
+        account: claimer0.account!.address,
+      },
+    );
   });
 });
 
 describe('Uneligible user', () => {
   let proof: ProofData;
+  let naughtyInputs: any;
   let inputs: any;
-  let validRoot: `0x${string}`;
 
   before(async () => {
-    // now we will trick our MT by instead of user1, we will add user2
-    // so we get a valid merkle tree for the inputs
-    // but will then feed the correct tree (without user2) into the contract
-    const naughtyMT = LeanIMT.import(poseidon, primedMerkleTree.export());
-    naughtyMT.update(0, BigInt(user2.account!.address));
+    const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
+    merkleTree.update(0, BigInt(user0.account!.address));
 
-    inputs = await getClaimInputs({ merkleTree: naughtyMT, user: user2 });
+    inputs = await getClaimInputs({ merkleTree, testUserIndex: 0 });
+
+    // now we will trick our MT by instead of user0, we will add user1
+    // so we get a valid merkle tree for the inputs
+    // but will then feed the correct tree (without user1) into the contract
+    const naughtyMerkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
+    naughtyMerkleTree.update(0, BigInt(user1.account!.address));
+
+    naughtyInputs = await getClaimInputs({ merkleTree: naughtyMerkleTree, testUserIndex: 1 });
   });
 
   it('Fails to generate a valid claim', async () => {
     try {
-      // this should fail, because even though user2 could generate a valid merkle tree proof
+      // this should fail, because even though user1 could generate a valid merkle tree proof
       // (by inserting their own address into the tree)
-      // the contract will use the stored "validRoot" (the original tree, without user2)
+      // the contract will use the stored "validRoot" (the original tree, without user1)
       // so the proof will be invalid
-      const { witness } = await noir.execute(inputs);
+      const { witness } = await noir.execute(naughtyInputs);
       proof = await backend.generateProof(witness, { keccak: true });
 
       const ad = await airdrop.contract();
 
-      await ad.write.claim([toHex(proof.proof), inputs.nullifier as `0x${string}`], {
-        account: claimer1.account!.address,
-      });
+      await ad.write.claim(
+        [
+          toHex(proof.proof),
+          toHex(Uint8Array.from(naughtyInputs.nullifier_x), { size: 32 }),
+          toHex(Uint8Array.from(naughtyInputs.nullifier_y), { size: 32 }),
+        ],
+        {
+          account: claimer0.account!.address,
+        },
+      );
     } catch (err: any) {
       expect(err.message).to.include('SumcheckFailed');
     }
@@ -172,24 +221,57 @@ describe('Uneligible user', () => {
 
   it('Fails to front-run the on-chain transaction with a invalid claimer', async () => {
     try {
-      const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
-      merkleTree.update(0, BigInt(user2.account!.address));
-      const inputs = await getClaimInputs({ merkleTree, user: user2 });
-      if (!inputs) {
-        throw new Error('Failed to generate inputs - address not in merkle tree');
-      }
       const { witness } = await noir.execute(inputs);
       proof = await backend.generateProof(witness, { keccak: true });
 
       const ad = await airdrop.contract();
 
-      // user1 generated a correct proof, but a nasty node takes the tx and tries to front-run it
-      await ad.write.claim([toHex(proof.proof), inputs.nullifier as `0x${string}`], {
-        account: claimer2.account!.address,
-      });
+      // user0 generated a correct proof, but a nasty node takes the tx and tries to front-run it
+      await ad.write.claim(
+        [
+          toHex(proof.proof),
+          toHex(Uint8Array.from(inputs.nullifier_x), { size: 32 }),
+          toHex(Uint8Array.from(inputs.nullifier_y), { size: 32 }),
+        ],
+        {
+          account: claimer1.account!.address,
+        },
+      );
     } catch (err: any) {
-      console.log(err);
-      expect(err.message).to.include('SumcheckFailed');
+      expect(err.message).to.include('An unknown RPC error occurred');
+    }
+  });
+
+  it('Fails to claim twice', async () => {
+    try {
+      const { witness } = await noir.execute(inputs);
+      proof = await backend.generateProof(witness, { keccak: true });
+
+      const ad = await airdrop.contract();
+
+      await ad.write.claim(
+        [
+          toHex(proof.proof),
+          toHex(Uint8Array.from(inputs.nullifier_x), { size: 32 }),
+          toHex(Uint8Array.from(inputs.nullifier_y), { size: 32 }),
+        ],
+        {
+          account: claimer0.account!.address,
+        },
+      );
+
+      await ad.write.claim(
+        [
+          toHex(proof.proof),
+          toHex(Uint8Array.from(inputs.nullifier_x), { size: 32 }),
+          toHex(Uint8Array.from(inputs.nullifier_y), { size: 32 }),
+        ],
+        {
+          account: claimer0.account!.address,
+        },
+      );
+    } catch (err: any) {
+      expect(err.message).to.include('An unknown RPC error occurred');
     }
   });
 });
