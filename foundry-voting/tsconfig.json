@@ -1,18 +1,27 @@
 {
   "compilerOptions": {
-    "strict": true,
-    "isolatedModules": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
+    // Enable latest features
+    "lib": ["ESNext"],
     "target": "ESNext",
     "module": "ESNext",
-    "skipLibCheck": true,
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
     "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "noImplicitAny": true,
-    "plugins": [],
-    "lib": ["dom", "EsNext"]
-  },
-  "exclude": ["node_modules", "**/node_modules/**"]
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false
+  }
 }
