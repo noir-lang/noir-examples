@@ -5,7 +5,6 @@ This is a reference repo to help you get started with writing zero-knowledge cir
 Each project is an example you can use for whatever you want. Feel free to mix them in order to find the best combination of technology that suits your needs.
 
 - Private Voting: [`./foundry-voting`](./foundry-voting)
-- Stealthdrop: [`./stealthdrop`](./stealthdrop)
 - Recursion: [`./recursion`](./recursion/)
 
 ## Starter
