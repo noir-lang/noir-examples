@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'foundry-voting/**'
+  workflow_dispatch:
 
 jobs:
   test:
