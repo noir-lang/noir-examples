@@ -4,7 +4,7 @@ import { resolve } from 'path';
 import eligible from './eligible.json' with { type: 'json' };
 
 const numCPUs = require('os').cpus().length;
-const depth = process.env.MERKLE_TREE_DEPTH as unknown as number;
+const depth = 12;
 const totalAddresses = Math.pow(2, depth) - 1;
 
 const addresses: string[] = [...eligible.map(a => a.address)];

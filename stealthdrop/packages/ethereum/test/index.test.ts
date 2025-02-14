@@ -1,21 +1,20 @@
 import { LeanIMT } from '@zk-kit/lean-imt';
-import merkle from '../utils/mt/merkle.json' with { type: 'json' };
+import merkle from '../../../utils/mt/merkle.json' with { type: 'json' };
 import hre from 'hardhat';
 const { viem } = hre;
 import { mnemonicToAccount } from 'viem/accounts';
 
 import { UltraHonkBackend, Fr } from '@aztec/bb.js';
-import { poseidon, bbSync } from '../utils/bb.ts';
+import { poseidon, bbSync } from '../../../utils/bb.ts';
 
 import { WalletClient, fromHex, hashMessage, recoverPublicKey, toHex } from 'viem';
 
 import { Noir } from '@noir-lang/noir_js';
 import { ProofData } from '@noir-lang/types';
-import { Airdrop } from '../utils/airdrop.ts';
+import { Airdrop } from '../../../utils/airdrop.ts';
 import { expect } from 'chai';
-import { MESSAGE_TO_HASH } from '../utils/const.ts';
-import { computeAllInputs } from '../packages/plume-js/src/index.ts';
-import { hexToUint8Array } from '../packages/plume-js/src/utils/encoding.ts';
+import { MESSAGE_TO_HASH } from '../../../utils/const.ts';
+import { computeAllInputs, hexToUint8Array } from 'plume-sig';
 import { HardhatNetworkHDAccountsConfig } from 'hardhat/types';
 
 const primedMerkleTree = new LeanIMT(poseidon);
