@@ -1,6 +1,5 @@
-# a github workflow that runs curl -L https://foundry.paradigm.xyz | bash then nargo codegen-verifier then nargo prove p
+name: Run Foundry-Voting Tests
 
-name: Run fourndry-voting Tests on PR
 on:
   pull_request:
     paths:
@@ -14,26 +13,50 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Install Nargo
-      uses: noir-lang/noirup@v0.1.2
+      run: |
+        curl -L https://raw.githubusercontent.com/noir-lang/noirup/refs/heads/main/install | bash
+        export PATH="$HOME/.nargo/bin:$PATH"
+        noirup
+
+    - name: Install Barretenberg
+      run: |
+        curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash
+        export PATH="$HOME/.bbup/bin:$PATH"
+        bbup
+
+    - name: Install Bun
+      uses: oven-sh/setup-bun@v1
       with:
-        toolchain: stable
+        bun-version: latest
+
+    - name: Install Dependencies
+      run: bun install
 
     - name: Install Foundry
       uses: foundry-rs/foundry-toolchain@v1
+      with:
+        version: nightly
 
-    - name: Generate verifier contract
-      run: |
-        nargo codegen-verifier
-      working-directory: foundry-voting/circuits
+    - name: Run Circuit Tests
+      run: bun run circuits:test
 
-    - name: Generate proof
-      run: |
-        nargo prove
-      working-directory: foundry-voting/circuits
+    - name: Execute Circuits
+      run: bun run circuits:execute
 
-    - name: Test with Foundry
-      run: |
-        forge test --optimize --optimizer-runs 5000 --evm-version london
+    - name: Generate UltraPlonk Proof
+      run: bun run circuits:ultraplonk:generate-proof
+
+    - name: Generate Verification Key
+      run: bun run circuits:ultraplonk:generate-vk
+
+    - name: Generate Circuit Contract
+      run: bun run circuits:contract
+
+    - name: Clean UltraPlonk Proof
+      run: bun run ultraplonk:clean-proof
+
+    - name: Run Forge Tests
+      run: forge test
