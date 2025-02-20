@@ -6,7 +6,7 @@
       "version": "1.0.0-beta.2"
     }
   },
-  "postStartCommand": [
+  "postCreateCommand": [
     "echo 'Starting installation...'",
     "curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash",
     "source ~/.bashrc",
