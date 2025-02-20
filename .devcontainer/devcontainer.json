@@ -6,12 +6,13 @@
       "version": "1.0.0-beta.2"
     }
   },
-  "postCreateCommand": [
+  "postStartCommand": [
     "echo 'Starting installation...'",
     "curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash",
     "source ~/.bashrc",
     "echo 'Installation complete.'",
-    "bbup"
-  ],
-  "postStartCommand": ["nargo --version", "bb --version"]
+    "bbup",
+    "nargo --version",
+    "bb --version"
+  ]
 }
