@@ -5,5 +5,9 @@
     "ghcr.io/noir-lang/features/noir:latest": {
       "version": "1.0.0-beta.2"
     }
-  }
+  },
+  "postCreateCommand": [
+    "curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash",
+    "bbup"
+  ]
 }
