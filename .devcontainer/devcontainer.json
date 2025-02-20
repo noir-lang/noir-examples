@@ -7,7 +7,11 @@
     }
   },
   "postCreateCommand": [
+    "echo 'Starting installation...'",
     "curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash",
+    "source ~/.bashrc",
+    "echo 'Installation complete.'",
     "bbup"
-  ]
+  ],
+  "postStartCommand": ["nargo --version", "bb --version"]
 }
