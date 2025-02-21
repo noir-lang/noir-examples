@@ -1,0 +1,11 @@
+{
+  "name": "Noir Examples Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["noir-lang.vscode-noir"]
+    }
+  }
+}
