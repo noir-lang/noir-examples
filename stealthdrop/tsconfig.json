@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "noEmitOnError": true,
+    "skipDefaultLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "composite": true,
+    "resolveJsonModule": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "moduleResolution": "nodenext"
+  },
+  "ts-node": {
+    "experimentalResolver": true,
+    "files": true
+  },
+  "include": ["packages/**/*.*ts", "packages/**/*.tsx", "utils/**/*.*ts"],
+  "exclude": ["dist", "node_modules", "artifacts", "noir"]
+}
