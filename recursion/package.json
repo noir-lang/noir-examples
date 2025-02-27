@@ -1,23 +1,47 @@
 {
   "name": "recursion",
   "private": true,
-  "packageManager": "yarn@4.1.0",
   "workspaces": [
-    "packages/hardhat",
-    "packages/noir",
+    "packages/ethereum",
     "packages/next"
   ],
   "engines": {
     "node": "^20.10.0"
   },
   "scripts": {
-    "dev": "yarn workspace hardhat run deploy && yarn workspace next run dev",
-    "test": "yarn workspace hardhat run test",
-    "build": "yarn workspace next run build"
+    "dev": "bun run --elide-lines 0 --filter hardhat run deploy && bun run --filter next run dev",
+    "test": "bun run --elide-lines 0 --filter hardhat test",
+    "build": "bun run --filter next run build"
   },
   "dependencies": {
-    "@noir-lang/backend_barretenberg": "^0.25.0",
-    "@noir-lang/noir_js": "^0.25.0",
-    "@noir-lang/noir_wasm": "^0.25.0"
-  }
+    "@aztec/bb.js": "../../aztec-packages/barretenberg/ts",
+    "@noir-lang/noir_js": "1.0.0-beta.2",
+    "@noir-lang/noir_wasm": "1.0.0-beta.2",
+    "@nomicfoundation/hardhat-network-helpers": "1.0.12",
+    "@nomicfoundation/hardhat-toolbox-viem": "3.0.0",
+    "@nomicfoundation/hardhat-viem": "2.0.6",
+    "hardhat": "^2.18.1",
+    "hardhat-gas-reporter": "^1.0.8"
+  },
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
+    "@nomicfoundation/hardhat-ethers": "^3.0.4",
+    "@nomicfoundation/hardhat-verify": "^1.0.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.15.5",
+    "chai": "^4.3.10",
+    "ethers": "^5.4.7"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "trustedDependencies": [
+    "@swc/core",
+    "keccak",
+    "secp256k1"
+  ],
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

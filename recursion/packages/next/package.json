@@ -1,6 +1,5 @@
 {
   "name": "next",
-  "packageManager": "yarn@4.1.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

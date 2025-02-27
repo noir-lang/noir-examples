@@ -2,6 +2,5 @@
 name = "main"
 type = "bin"
 authors = [""]
-compiler_version = ">=0.24.0"
 
 [dependencies]

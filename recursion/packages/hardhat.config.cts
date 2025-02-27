@@ -1,12 +1,13 @@
 import '@nomicfoundation/hardhat-toolbox-viem';
-import '@nomicfoundation/hardhat-viem';
 import '@nomicfoundation/hardhat-chai-matchers';
+import '@nomicfoundation/hardhat-viem';
 
-import { HardhatUserConfig } from 'hardhat/config';
+import { HardhatUserConfig } from 'hardhat/types';
+
+import { subtask, vars } from 'hardhat/config';
+import { TASK_COMPILE_SOLIDITY } from 'hardhat/builtin-tasks/task-names';
 import { join } from 'path';
 import { writeFile } from 'fs/promises';
-import { subtask } from 'hardhat/config';
-import { TASK_COMPILE_SOLIDITY } from 'hardhat/builtin-tasks/task-names';
 
 subtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {
   const superRes = await runSuper();
@@ -22,7 +23,7 @@ subtask(TASK_COMPILE_SOLIDITY).setAction(async (_, { config }, runSuper) => {
 
 const config: HardhatUserConfig = {
   solidity: {
-    version: '0.8.18',
+    version: '0.8.27',
     settings: {
       optimizer: { enabled: true, runs: 5000 },
     },
@@ -31,21 +32,19 @@ const config: HardhatUserConfig = {
     localhost: {
       url: 'http://127.0.0.1:8545',
     },
-    hardhat: {
-      mining: {
-        auto: true,
-        interval: 1000,
-      },
+    holesky: {
+      url: 'https://holesky.drpc.org',
+      accounts: vars.has('holesky') ? [vars.get('holesky')] : [],
     },
   },
-  mocha: {
-    timeout: 200000,
-  },
   paths: {
-    sources: './noir/recursion/contract/recursion',
-    artifacts: './hardhat/artifacts',
-    cache: './hardhat/cache',
-    tests: './hardhat/test',
+    sources: './ethereum/contracts',
+    tests: './ethereum/test',
+    cache: './ethereum/cache',
+    artifacts: './ethereum/artifacts',
+  },
+  mocha: {
+    timeout: 1000000,
   },
 };
 

@@ -1,0 +1,14 @@
+{
+  "name": "hardhat",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "test": "./test/test.sh",
+    "deploy": "./scripts/deploy.sh"
+  },
+  "engines": {
+    "node": "^20.10.0"
+  }
+}
