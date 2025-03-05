@@ -12,7 +12,7 @@ noirup -v 0.28.0
 
 ## Overview
 
-This is the model used for creating the [circuit](circuits/src/main.nr) and the [zkVote contract](src/zkVote.sol) to manage private voting.
+This is the model used for creating the [circuit](circuits/src/main.nr) and the [zkVote contract](contracts/zkVote.sol) to manage private voting.
 
 1. Create a set of voters. A merkle root is stored in the zkVote Solidity contract that voters will use to verify membership against. In this example, there are 4 accounts in the set of voters. The private keys are 0, 1, 2, 3 and the secret value to create the commitment is 9.
 
