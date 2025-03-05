@@ -28,7 +28,7 @@ This gives intermediate hashes of `0x046394ae1ebbf494f2cd2c2d37171099510d099489c
 2. Users will input their information into the circuit and generate a proof (see example inputs in [Prover.toml](./circuits/Prover.toml) and run `nargo prove` to generate the proof.)
    1. Public inputs and outputs are printed in [Verifier.toml](./circuits/Verifier.toml).
    2. The proof is saved to `./proofs/foundry_voting.proof`.
-3. The generated proof + the contents of Verifier.toml are sent in a transaction to the `castVote` function in the [zkVote](./src/zkVote.sol) contract. The function verifies that the sender is authorized to vote on the proposal, that they haven't already voted and tallies their vote.
+3. The generated proof + the contents of Verifier.toml are sent in a transaction to the `castVote` function in the [zkVote](./contracts/zkVote.sol) contract. The function verifies that the sender is authorized to vote on the proposal, that they haven't already voted and tallies their vote.
 
 ## Testing
 
