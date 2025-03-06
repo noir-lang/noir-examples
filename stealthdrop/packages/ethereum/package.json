@@ -1,0 +1,29 @@
+{
+  "name": "@stealthdrop/ethereum",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "test": "NODE_NO_WARNINGS=1 NODE_OPTIONS='--experimental-loader ts-node/esm/transpile-only' hardhat test",
+    "deploy": "hardhat vars set holesky ${DEPLOYER_PK} && hardhat deploy --network holesky"
+  },
+  "dependencies": {
+    "@aztec/bb.js": "0.67.0",
+    "@noir-lang/noir_js": "1.0.0-beta.1",
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "@zk-kit/lean-imt": "^2.2.2",
+    "hardhat": "^2.18.1",
+    "react": "^18.2.0",
+    "ts-node": "^10.9.1",
+    "viem": "^2.23.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.10",
+    "typescript": "^5.0.0"
+  },
+  "resolutions": {
+    "@aztec/bb.js": "0.67.0"
+  },
+  "trustedDependencies": [
+    "plume-sig"
+  ]
+}
