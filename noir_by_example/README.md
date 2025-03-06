@@ -10,7 +10,7 @@ The goal is to highlight the similarities and differences in the language and de
 
 You will need:
 
-- `nargo` installed [via noirup](https://noir-lang.org/docs/getting_started/installation/). Uses 0.34.0 (`noirup -v 0.34.0`)
+- `nargo` installed [via noirup](https://noir-lang.org/docs/getting_started/quick_start/). Uses 0.34.0 (`noirup -v 0.34.0`)
 - `cargo` installed [via rustup](https://www.rust-lang.org/tools/install) (optional: to see Rust output)
 
 ### What is not covered
