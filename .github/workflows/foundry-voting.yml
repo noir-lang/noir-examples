@@ -21,10 +21,16 @@ jobs:
       with:
         toolchain: stable
       
-    - name: Install BB
-      uses: AztecProtocol/aztec-packages/tree/master/barretenberg/bbup
-      with:
-        toolchain: stable
+    - name: Install bb
+      run: |
+        curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash
+        echo "PATH=$PATH:/home/runner/.bb" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Use bbup
+      run: |
+        bbup
+      shell: bash
 
     - name: Install Bun
       uses: oven-sh/setup-bun@v1

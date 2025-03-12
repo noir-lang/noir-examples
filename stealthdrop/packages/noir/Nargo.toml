@@ -1,0 +1,14 @@
+[package]
+name = "stealthdrop"
+type = "bin"
+authors = [""]
+
+[dependencies]
+trees = { git = "https://github.com/privacy-scaling-explorations/zk-kit.noir", tag = "main", directory = "packages/merkle-trees" }
+ecrecover = { tag = "main", git = "https://github.com/colinnielsen/ecrecover-noir" }
+# plume = { tag = "main", git = "https://github.com/signorecello/zk-nullifier-sig", directory = "circuits/noir/plume" }
+noir_bigcurve = { tag = "zkpedro/for_plume", git = "https://github.com/noir-lang/noir_bigcurve" }
+bignum = { tag = "main", git = "https://github.com/noir-lang/noir-bignum" }
+nodash = { tag = "main", git = "https://github.com/olehmisar/nodash" }
+
+plume = { path = "../../../zk-nullifier-sig/circuits/noir" }

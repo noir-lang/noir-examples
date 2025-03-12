@@ -1,0 +1,5 @@
+
+target/*
+!target/
+!target/stealthdrop.sol
+!target/stealthdrop.json
