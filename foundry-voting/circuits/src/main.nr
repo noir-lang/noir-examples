@@ -85,3 +85,69 @@ fn test_build_merkle_tree() {
     std::println([left_branch, right_branch]);
     std::println([commitment_0, commitment_1, commitment_2, commitment_3]);
 }
+#[test]
+fn test_main_function() {
+    let secret = 5;
+    let proposal_id = 42;
+    let vote = 1;
+
+    let note_commitment = std::hash::pedersen_hash([secret]);
+    let hash_path = [100, 200];
+    let index = 0;
+
+    let root = std::merkle::compute_merkle_root(note_commitment, index, hash_path);
+    let expected_nullifier = std::hash::pedersen_hash([root, secret, proposal_id]);
+
+    let result = main(root, index, hash_path, secret, proposal_id, vote);
+    assert(result == expected_nullifier);
+}
+//Test Different Votes (vote affects nothing for now)
+#[test]
+fn test_vote_does_not_affect_output() {
+    let secret = 3;
+    let proposal_id = 12;
+
+    let note_commitment = std::hash::pedersen_hash([secret]);
+    let hash_path = [9, 19];
+    let index = 0;
+    let root = std::merkle::compute_merkle_root(note_commitment, index, hash_path);
+
+    let result_vote_0 = main(root, index, hash_path, secret, proposal_id, 0);
+    let result_vote_1 = main(root, index, hash_path, secret, proposal_id, 1);
+
+    assert(result_vote_0 == result_vote_1); // vote has no effect
+}
+// Test Determinism (same inputs give same result)
+#[test]
+fn test_deterministic_output() {
+    let secret = 7;
+    let proposal_id = 21;
+    let vote = 1;
+
+    let note_commitment = std::hash::pedersen_hash([secret]);
+    let hash_path = [11, 22];
+    let index = 0;
+
+    let root = std::merkle::compute_merkle_root(note_commitment, index, hash_path);
+
+    let result1 = main(root, index, hash_path, secret, proposal_id, vote);
+    let result2 = main(root, index, hash_path, secret, proposal_id, vote);
+
+    assert(result1 == result2);
+}
+//Test with Invalid Root (should fail) This test intentionally gives a wrong root to trigger the assert(root == check_root).
+//#[test] 
+//fn test_invalid_root_should_fail() {
+  //  let secret = 5;
+    //let proposal_id = 42;
+    //let vote = 1;
+
+    //let note_commitment = std::hash::pedersen_hash([secret]);
+    //let hash_path = [100, 200];
+    //let index = 0;
+
+    //let wrong_root = 999; // intentionally incorrect
+
+    // This should panic due to the failed assert
+    //let _ = main(wrong_root, index, hash_path, secret, proposal_id, vote);
+//}
