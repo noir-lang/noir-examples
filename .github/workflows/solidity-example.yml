@@ -23,15 +23,11 @@ jobs:
 
     - name: Install bb
       run: | 
-        curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash
-        mkdir -p $HOME/.bbup/bin
-        curl -L https://github.com/AztecProtocol/aztec-packages/releases/download/bb-v0.1.0/bb -o $HOME/.bbup/bin/bb
-        chmod +x $HOME/.bbup/bin/bb
-        echo "$HOME/.bbup/bin" >> $GITHUB_PATH
-
-    - name: Run bbup
+        curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash 
+        
+    -name: Run bbup
       run: |
-        $HOME/.bbup/bin/bb --version
+        bbup
 
     - name: Install Foundry
       uses: foundry-rs/foundry-toolchain@v1
