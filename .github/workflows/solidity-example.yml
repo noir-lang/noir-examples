@@ -24,8 +24,10 @@ jobs:
     - name: Install bb
       run: | 
         curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash 
-        echo "$HOME/.bbup/bin" >> $GITHUB_PATH
-        
+
+    - name: Add bbup to PATH
+      run: echo "$HOME/.bbup/bin" >> $GITHUB_PATH
+
     - name: Run bbup
       run: |
         bbup
