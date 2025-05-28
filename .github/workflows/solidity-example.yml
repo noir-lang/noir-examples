@@ -1,0 +1,65 @@
+# a github workflow that runs curl -L https://foundry.paradigm.xyz | bash then nargo codegen-verifier then nargo prove p
+
+name: Run solidity-example Tests on PR
+on:
+  pull_request:
+    paths:
+      - 'solidity-example/**'
+
+jobs:
+  test:
+    defaults:
+      run:
+        working-directory: solidity-example
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Nargo
+      uses: noir-lang/noirup@v0.1.2
+      with:
+        toolchain: stable
+
+    - name: Install bb
+      run: | 
+        curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash && bbup
+
+    - name: Install Foundry
+      uses: foundry-rs/foundry-toolchain@v1
+
+    - name: Generate verifier contract
+      run: |
+        ./build.sh
+      working-directory: solidity-example/circuits
+
+    - name: Install JS dependencies
+      working-directory: solidity-example/js
+      run: |
+        yarn install
+
+    - name: Generate proof in JS and test with Foundry
+      run: |
+        yarn generate-proof
+        cd ../contract && forge test --optimize --optimizer-runs 5000 --evm-version london
+      working-directory: solidity-example/js
+
+    - name: Generate CLI proof and test with Foundry
+      working-directory: solidity-example/circuits
+      run: |
+        nargo execute
+        bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target --oracle_hash keccak
+        PROOF_HEX=$(cat ./target/proof | od -An -v -t x1 | tr -d $' \n' | sed 's/^.\{8\}//')
+
+        NUM_PUBLIC_INPUTS=1
+        HEX_PUBLIC_INPUTS=${PROOF_HEX:0:$((32 * $NUM_PUBLIC_INPUTS * 2))}
+        SPLIT_HEX_PUBLIC_INPUTS=$(sed -e 's/.\{64\}/0x&,/g' <<<$HEX_PUBLIC_INPUTS)
+        PROOF_WITHOUT_PUBLIC_INPUTS="${PROOF_HEX:$((NUM_PUBLIC_INPUTS * 32 * 2))}"
+
+        # Save proof and public inputs to files
+        echo $PROOF_WITHOUT_PUBLIC_INPUTS | xxd -r -p > ./target/proof
+        echo "[\"$SPLIT_HEX_PUBLIC_INPUTS\"]" > ./target/public-inputs
+
+        # Run foundry test to read generated proof and verify
+        cd ..
+        (cd contract && forge test --optimize --optimizer-runs 5000 --gas-report -vvv)
