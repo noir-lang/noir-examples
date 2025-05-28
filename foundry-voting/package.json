@@ -1,33 +1,22 @@
 {
   "name": "foundry-voting",
-  "version": "1.0.0",
-  "description": "[![Run Tests on PR](https://github.com/noir-lang/noir-starter/actions/workflows/foundry-voting.yml/badge.svg)](https://github.com/noir-lang/noir-starter/actions/workflows/foundry-voting.yml)",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib",
-    "test": "test"
-  },
+  "module": "index.ts",
+  "type": "module",
   "scripts": {
-    "test": "forge test"
-  },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@iarna/toml": "^2.2.5",
-    "fflate": "^0.8.0",
-    "toml": "^3.0.0"
+    "circuits:test": "cd circuits && nargo test --show-output",
+    "circuits:execute": "cd circuits && nargo execute",
+    "circuits:ultraplonk:generate-proof": "cd circuits && nargo execute && bb prove -b ./target/circuits.json -w ./target/circuits.gz -o ./target/proof",
+    "circuits:ultraplonk:generate-vk": "cd circuits && bb write_vk -b ./target/circuits.json -o ./target/vk",
+    "circuits:contract": "cd circuits && bb contract",
+    "ultraplonk:clean-proof": "bash ./scripts/ultraplonk-clean-proof.sh",
+    "test": "forge test",
+    "build:ultraplonk": "bash ./scripts/ultraplonk-all.sh"
   },
   "devDependencies": {
-    "@typechain/ethers-v5": "^10.0.0",
-    "@types/chai": "^4.3.0",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^17.0.35",
-    "chai": "^4.3.6",
-    "ethers": "^5.7.2",
-    "mocha": "^10.0.0",
-    "ts-node": "^10.9.1",
-    "typechain": "^8.1.0",
-    "typescript": "^4.9.3",
-    "vitest": "^0.31.4"
+    "@types/bun": "latest",
+    "forge-std": "github:foundry-rs/forge-std#v1.8.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
   }
 }

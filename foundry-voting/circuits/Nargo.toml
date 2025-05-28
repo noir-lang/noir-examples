@@ -1,7 +1,6 @@
 [package]
-authors = [""]
-compiler_version = ">=0.22.0"
-name="foundry_voting"
-type="bin"
+name = "circuits"
+type = "bin"
+authors = ["Satyam Bansal"]
 
 [dependencies]

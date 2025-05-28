@@ -3,7 +3,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.19;
 
-import {UltraVerifier} from "../circuits/contract/foundry_voting/plonk_vk.sol";
+import {UltraVerifier} from "../circuits/target/contract.sol";
 
 contract zkVote {
     UltraVerifier verifier;
@@ -31,7 +31,6 @@ contract zkVote {
         return proposalCount;
     }
 
-    /// @param vote - Must be "1" to count as a forVote
     function castVote(bytes calldata proof, uint256 proposalId, uint256 vote, bytes32 nullifierHash)
         public
         returns (bool)
@@ -53,7 +52,6 @@ contract zkVote {
         else {
             proposals[proposalId].againstVotes += 1;
         }
-
         return true;
     }
 }
