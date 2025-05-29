@@ -12,7 +12,7 @@ fn main(
     let nullifier = std::hash::pedersen_hash([root, secret, proposalId]);
 
     let check_root = std::merkle::compute_merkle_root(note_commitment, index, hash_path);
-    assert(root == check_root);
+assert(root == check_root);
 
     // Originally contrained the vote to avoid front-running,
     // but including the vote as a public input is sufficient
@@ -21,7 +21,6 @@ fn main(
 
     nullifier
 }
-
 #[test]
 fn test_valid_build_merkle_tree() {
     let commitment_0 = std::hash::pedersen_hash([1]);
@@ -85,6 +84,7 @@ fn test_build_merkle_tree() {
     std::println([left_branch, right_branch]);
     std::println([commitment_0, commitment_1, commitment_2, commitment_3]);
 }
+
 #[test]
 fn test_main_function() {
     let secret = 5;
@@ -151,3 +151,9 @@ fn test_deterministic_output() {
     // This should panic due to the failed assert
     //let _ = main(wrong_root, index, hash_path, secret, proposal_id, vote);
 //}
+
+
+
+
+		
+		
