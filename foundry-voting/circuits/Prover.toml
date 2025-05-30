@@ -1,9 +1,0 @@
-hash_path = [
-  "0x1efa9d6bb4dfdf86063cc77efdec90eb9262079230f1898049efad264835b6c8",
-  "0x2a653551d87767c545a2a11b29f0581a392b4e177a87c8e3eb425c51a26a8c77"
-]
-index = "0"
-proposalId = "0"
-root = "0x215597bacd9c7e977dfc170f320074155de974be494579d2586e5b268fa3b629"
-secret = "1"
-vote = "1"
