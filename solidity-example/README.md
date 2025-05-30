@@ -11,10 +11,7 @@ Tested with Noir 1.0.0-beta.3 and bb 0.82.2
 ### Installation / Setup
 ```ssh
 # Foundry
-# Install and initialize foundry
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-forge install foundry-rs/forge-std
+git submodule update
 
 # Build circuits, generate verifier contract
 (cd circuits && ./build.sh)
