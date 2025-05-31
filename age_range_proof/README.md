@@ -166,4 +166,4 @@ jobs:
 ## 📝 License
 MIT License. Feel free to use and adapt this project.
 ## 🤝 Contributing
-Contributions and suggestions welcome! Please open an issue or pull request.
+We welcome contributions! Check out the [contributing guidelines](https://github.com/cypriansakwa/noir-examples/blob/Age-Range/CONTRIBUTING.md) for more info.
