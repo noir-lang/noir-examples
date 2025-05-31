@@ -164,6 +164,6 @@ jobs:
         run: ./scripts/test.sh
 ```
 ## 📝 License
-MIT License. Feel free to use and adapt this project.
+[License](https://github.com/cypriansakwa/noir-examples/blob/Age-Range/LICENSE)
 ## 🤝 Contributing
 We welcome contributions! Check out the [contributing guidelines](https://github.com/cypriansakwa/noir-examples/blob/Age-Range/CONTRIBUTING.md) for more info.
