@@ -1,7 +1,9 @@
 [package]
-name="noir_solidity"
-type="bin"
+name = "noir_solidity"
+type = "bin"
 authors = ["saleel"]
 compiler_version = ">=1.0.0"
 
 [dependencies]
+# dependencies go here, e.g.
+# foo = "1.0"

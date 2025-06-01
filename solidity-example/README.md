@@ -50,7 +50,7 @@ bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target -
 # Convert proof to hex, and slice first 4 bytes of metadata
 PROOF_HEX=$(cat ./target/proof | od -An -v -t x1 | tr -d $' \n' | sed 's/^.\{8\}//')
 
-NUM_PUBLIC_INPUTS=1
+NUM_PUBLIC_INPUTS=2
 HEX_PUBLIC_INPUTS=${PROOF_HEX:0:$((32 * $NUM_PUBLIC_INPUTS * 2))}
 SPLIT_HEX_PUBLIC_INPUTS=$(sed -e 's/.\{64\}/0x&,/g' <<<$HEX_PUBLIC_INPUTS)
 PROOF_WITHOUT_PUBLIC_INPUTS="${PROOF_HEX:$((NUM_PUBLIC_INPUTS * 32 * 2))}"
