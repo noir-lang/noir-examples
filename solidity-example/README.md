@@ -7,6 +7,11 @@ An example repo to verify Noir circuits (with bb backend) using a Solidity verif
 - `/js` - JS code to generate proof and save as a file.
 
 Tested with Noir 1.0.0-beta.3 and bb 0.82.2
+## Circuit Logic
+
+The Noir circuit checks if `x * 2 + y == expected`, where:
+- `x` is a private input
+- `y` and `expected` are public inputs
 
 ### Installation / Setup
 ```ssh
