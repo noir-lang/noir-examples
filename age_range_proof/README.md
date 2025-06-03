@@ -4,7 +4,21 @@ This project implements a zero-knowledge proof circuit in [Noir](https://noir-la
 
 It uses the `bb` backend with the `ultra_honk` scheme and supports exporting a Solidity verifier contract for on-chain use.
 
+⚠️ This example does not use a trusted credential system — the user can input any value they choose. It is intended as an educational example of range constraints in Noir.
+
+For real-world use cases involving verified identity and age proofs using ZK credentials, see:
+- [zkPassport](https://docs.zkpassport.id/intro)
+- [Privado ID (formerly Polygon ID)](https://www.privado.id/) — a decentralized identity protocol that allows users to prove claims (like age over 18) without revealing personal information.
+-  [Privado ID Documentation](https://docs.privado.id/) — for developers looking to integrate ZK-based credentials into applications.
+
 ---
+## Purpose
+
+This example is educational and meant to show:
+- How to use `assert` for value checks
+- How to write test cases for valid/invalid inputs
+- How to structure a simple Noir project
+
 
 ## 🚀 Quickstart
 
@@ -203,6 +217,14 @@ jobs:
       - name: Run tests
         run: ./scripts/test.sh
 ```
+## ⚠️ Caveats
+
+This example does **not** verify the truth of the user's input — it simply enforces that the input lies within a certain range.
+
+In real-world applications, such a circuit would be combined with trusted cryptographic credentials (e.g., a government-issued age proof). For such cases, check out:
+- [zkPassport](https://docs.zkpassport.id/intro)
+- [Privado ID (formerly Polygon ID)](https://www.privado.id/) 
+-  [Privado ID Documentation](https://docs.privado.id/) 
 
 ## 📝 License
 
