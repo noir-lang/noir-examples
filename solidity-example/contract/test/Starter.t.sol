@@ -25,4 +25,20 @@ contract StarterTest is Test {
         console.log("Proof length:", proof.length);
         starter.verifyEqual(proof, publicInputs);
     }
+  function testRejectsInvalidProof() public {
+    // Load a valid proof
+    bytes memory proof = vm.readFileBinary("../circuits/target/proof");
+
+    // Load and decode public inputs as bytes32[], avoiding name shadowing
+    string memory publicInputsJson = vm.readFile("../circuits/target/public-inputs");
+    bytes32[] memory inputs = abi.decode(vm.parseJson(publicInputsJson), (bytes32[]));
+
+    // Corrupt the proof (e.g., flip the last byte)
+    proof[proof.length - 1] = bytes1(uint8(proof[proof.length - 1]) ^ 0x01);
+
+    // Expect the verifier to revert due to invalid proof
+    vm.expectRevert();
+    starter.verifyEqual(proof, inputs);
+}
+
 }

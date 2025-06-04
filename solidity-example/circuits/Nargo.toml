@@ -1,6 +1,11 @@
 [package]
+<<<<<<< HEAD
 name = "noir_solidity"
 type = "bin"
+=======
+name = "noir_solidity"       
+type = "bin"                
+>>>>>>> b7d8fb0 (Resolve Foundry test)
 authors = ["saleel"]
 compiler_version = ">=1.0.0"
 

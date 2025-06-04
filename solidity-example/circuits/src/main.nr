@@ -20,11 +20,11 @@ fn test_correct_values_case2() {
     let res = x * 2 + y;
     assert(res == expected); }
 
-//#[test]
-//fn test_incorrect_expected() {
-  //  let x = 2;
-   // let y = 1;
-   // let expected = 9;
-   // let res = x * 2 + y;
-   // assert(res == expected); // This should fail if uncommented
-//} 
+#[test]
+fn test_incorrect_expected() {
+  let x = 2;
+  let y = 1;
+  let expected = 9;
+  let res = x * 2 + y;
+  assert(res == expected); // This should fail if uncommented
+} 
