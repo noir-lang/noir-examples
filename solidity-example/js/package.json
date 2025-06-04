@@ -1,8 +1,7 @@
 {
   "name": "js",
   "scripts": {
-    "generate-proof": "ts-node generate-proof.ts",
-    "format": "prettier . --write"
+    "generate-proof": "ts-node generate-proof.ts"
   },
   "dependencies": {
     "@aztec/bb.js": "^0.82.2",
