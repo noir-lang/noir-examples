@@ -11,14 +11,8 @@
     "outDir": "./dist",
     "baseUrl": "."
   },
-  "include": [
-    "./**/*.ts",
-    "./**/*.json"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
+  "include": ["./**/*.ts", "./**/*.json"],
+  "exclude": ["node_modules", "dist"],
   "ts-node": {
     "compilerOptions": {
       "module": "NodeNext"
