@@ -21,7 +21,6 @@ git submodule update
 
 ```
 
-
 ### Proof generation in JS
 
 
