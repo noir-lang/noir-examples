@@ -1,15 +1,22 @@
+#!/bin/bash
 set -e
 
 echo "Compiling circuit..."
 if ! nargo compile; then
-    echo "Compilation failed. Exiting..."
+    echo "❌ Circuit compilation failed. Exiting..."
     exit 1
 fi
 
-echo "Generating vkey..."
-bb write_vk --oracle_hash keccak -b ./target/noir_solidity.json -o ./target
+echo "Generating verification key (vkey)..."
+if ! bb write_vk --oracle_hash keccak -b ./target/noir_solidity.json -o ./target; then
+    echo "❌ Failed to generate verification key. Exiting..."
+    exit 1
+fi
 
-echo "Generating solidity verifier..."
-bb write_solidity_verifier -k ./target/vk -o ../contract/Verifier.sol
+echo "Generating Solidity verifier contract..."
+if ! bb write_solidity_verifier -k ./target/vk -o ../contract/Verifier.sol; then
+    echo "❌ Failed to generate Solidity verifier. Exiting..."
+    exit 1
+fi
 
-echo "Done"
+echo "✅ Build complete!"
