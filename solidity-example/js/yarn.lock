@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aztec/bb.js@^0.82.2":
-  version "0.82.3"
-  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.82.3.tgz#bcd4cd14de7faca537f1298ce56a53b1e1d892a6"
-  integrity sha512-jtnCqf+/QLw5yJGOmy818RMQqzHzHqcROtTdQZJybSxp0z3h76xpLSwoDQUBmZZVbP9e46FJjOLqB6gM9gY5cw==
+"@aztec/bb.js@^0.84.0":
+  version "0.84.0"
+  resolved "https://registry.yarnpkg.com/@aztec/bb.js/-/bb.js-0.84.0.tgz#58ef86587160ff559d39bbc3068b1cd25ef91917"
+  integrity sha512-jNx35PCtevQnIBAyld90JjI+fGTrhcbXH6FkcZoRRpBPvnlZVTmIAU3j16q136m+mFgIBlCuzjOE6ND4cOgnQQ==
   dependencies:
     comlink "^4.4.1"
     commander "^12.1.0"
@@ -39,31 +39,32 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@noir-lang/acvm_js@1.0.0-beta.3":
-  version "1.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-1.0.0-beta.3.tgz#013f43e8238aa0e7733514dc055c5ecfdd3b8364"
-  integrity sha512-Dc6g5rJr/x7tKsWvnTbZvjwqI1uiAtvq+NAz5tcLRzUHJw6NAvDXEH5h117h+BfIAhhsHXuPTkDfDB1Gnqp/Bg==
+"@noir-lang/acvm_js@1.0.0-beta.6":
+  version "1.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-1.0.0-beta.6.tgz#44c71f9c9000e5761c0ae105fa58e4ef1c747f43"
+  integrity sha512-/gaUKaUIon3xCekEIvrz9sUj+h1tue6CchNUZwmuXoqbwccRQchr850vbQMQxxnQvFIAfbaKD+Vkkh3RNWpG2Q==
 
-"@noir-lang/noir_js@1.0.0-beta.3":
-  version "1.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@noir-lang/noir_js/-/noir_js-1.0.0-beta.3.tgz#709afad05186df929c5e0f67bbdabd5d64ed0cc2"
-  integrity sha512-Nt/rP7zRMOfNq9urD8+GtRpYqEc0K10FoKXs/v+ZTbGaP6Jkm7+F+UPj2bkWy66k1HNzsN6ortli7c7mnLDHwA==
+"@noir-lang/noir_js@1.0.0-beta.6":
+  version "1.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noir_js/-/noir_js-1.0.0-beta.6.tgz#08234b5d85a9491b9b33f0219965e6f5bbfd486f"
+  integrity sha512-FRHrCgRcyD4LAh4FtVYZh/wwdoV2px3kokudLl5GfFaBmXHCpXyA0jKzda3ObI/Teasl2VAE+ZQoV7ZKqq5txA==
   dependencies:
-    "@noir-lang/acvm_js" "1.0.0-beta.3"
-    "@noir-lang/noirc_abi" "1.0.0-beta.3"
-    "@noir-lang/types" "1.0.0-beta.3"
+    "@noir-lang/acvm_js" "1.0.0-beta.6"
+    "@noir-lang/noirc_abi" "1.0.0-beta.6"
+    "@noir-lang/types" "1.0.0-beta.6"
+    pako "^2.1.0"
 
-"@noir-lang/noirc_abi@1.0.0-beta.3":
-  version "1.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@noir-lang/noirc_abi/-/noirc_abi-1.0.0-beta.3.tgz#b5a5233d59e260d66c3e2644d8bc0dff0aec228e"
-  integrity sha512-L6BI64ennatwTUciHqQ14ahUFsgzL41tzghqUELzO7XojasStcWDaSMjlTxca/2pvpWtEJHDtseKe1VZWIIVXQ==
+"@noir-lang/noirc_abi@1.0.0-beta.6":
+  version "1.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noirc_abi/-/noirc_abi-1.0.0-beta.6.tgz#69797bdfc1a3ccf21df835eae706389d959af796"
+  integrity sha512-AFRl7zAK1ooA7AeKTt5dSxjfcXdmpYU4imRx8MS/UGhuLvUULM6d+AQ/OGEb1kdGwnw+qN4REnxJg7R4qsRpVQ==
   dependencies:
-    "@noir-lang/types" "1.0.0-beta.3"
+    "@noir-lang/types" "1.0.0-beta.6"
 
-"@noir-lang/types@1.0.0-beta.3":
-  version "1.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/@noir-lang/types/-/types-1.0.0-beta.3.tgz#0170d3b72c55fde76df65e03b98acb3be6a20f4b"
-  integrity sha512-BPOmf0qDiTn4wH1Lo7mHa67GTQFueIVaDUcUb+N9+ALiXC5nVU8HrzWmx1yvZB64ZiCEy7yPdNEaNrszSrE2fg==
+"@noir-lang/types@1.0.0-beta.6":
+  version "1.0.0-beta.6"
+  resolved "https://registry.yarnpkg.com/@noir-lang/types/-/types-1.0.0-beta.6.tgz#75e5927a73e32b94974ec45dffaf2e12ed47b83d"
+  integrity sha512-YmNOpr51XIOrJ+yppPbDFlpAG6ZU7qh0Uu0ZCXmon2MGD4TlnC8d/ex7YzSUH/+3zgESuCmicKnMVxEFszgmtA==
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.11"
