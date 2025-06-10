@@ -1,0 +1,15 @@
+---
+description: Rules for implementing and maintaining tests in Noir projects.
+globs: 
+alwaysApply: false
+---
+- Must include both unit and integration tests
+- Must cover both valid and invalid inputs
+- Unit tests for individual Noir circuits
+- Integration tests for complete workflows
+
+### CI/CD Integration
+- Tests must run in CI/CD pipeline
+- Test results must be reported
+- Failed tests must block PR merges
+

@@ -1,0 +1,20 @@
+---
+description: Rules for implementing and maintaining security in Noir projects.
+globs: 
+alwaysApply: false
+---
+- Must implement comprehensive input validation
+- Must document validation rules
+- Must handle edge cases appropriately
+
+### Security Documentation
+- Must document potential security considerations
+- Must document attack vectors
+- Must include warnings about common pitfalls
+- Must provide security recommendations for production use
+
+### Best Practices
+- Must follow Noir's security best practices
+- Must document known limitations
+- Must document edge cases
+- Must include security testing procedures

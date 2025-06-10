@@ -1,0 +1,44 @@
+---
+description: Rules for implementing and maintaining Solidity contracts that interact with Noir circuits.
+globs: 
+alwaysApply: false
+---
+### Contract Structure
+- Must separate circuit verification logic from business logic
+- Must use clear naming conventions for verification functions
+- Must implement proper access control for verification functions
+- Must include events for important state changes
+
+### Gas Optimization
+- Must optimize proof verification gas costs
+- Must document gas usage for different input sizes
+- Must implement batch verification where applicable
+- Must use appropriate data types to minimize storage costs
+
+### Security
+- Must validate all inputs before verification
+- Must implement proper error handling for failed verifications
+- Must include circuit-specific security checks
+- Must protect against replay attacks
+- Must implement proper access control for sensitive operations
+
+### Testing
+- Must include Solidity tests for verification functions
+- Must test edge cases and error conditions
+- Must verify gas costs meet requirements
+- Must test integration with Noir circuits
+
+### Documentation
+- Must document verification function parameters
+- Must explain circuit integration points
+- Must include gas usage documentation
+- Must document security considerations
+- Must provide examples of contract usage
+
+### Best Practices
+- Must follow Solidity style guide
+- Must use latest stable compiler version
+- Must implement proper upgrade patterns if needed
+- Must include circuit version management
+- Must handle circuit updates gracefully
+

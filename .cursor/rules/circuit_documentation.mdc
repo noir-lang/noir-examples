@@ -1,0 +1,9 @@
+---
+description: Rules for documenting Noir circuits in the repository.
+globs: 
+alwaysApply: false
+---
+- Every Noir circuit must have a clear description of its purpose and functionality
+- Documentation must be placed at the top of the circuit file
+- All input and output parameters must be documented
+- Must provide example values where applicable
