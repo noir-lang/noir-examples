@@ -119,6 +119,7 @@ __metadata:
 "@types/node@npm:^22.10.1":
   version: 22.14.0
   resolution: "@types/node@npm:22.14.0"
+
   dependencies:
     undici-types: "npm:~6.21.0"
   checksum: 10/d0669a8a37a18532c886ccfa51eb3fe1e46088deb4d3d27ebcd5d7d68bd6343ad1c7a3fcb85164780a57629359c33a6c917ecff748ea232bceac7692acc96537
