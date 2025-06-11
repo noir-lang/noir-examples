@@ -1,0 +1,58 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# File Structure Guide
+
+## Root Directory
+
+- [README.md](mdc:README.md): Project overview and getting started guide
+- [CONTRIBUTING.md](mdc:CONTRIBUTING.md): Contribution guidelines
+- [LICENSE](mdc:LICENSE): Project license information
+
+## Example Projects
+
+### Solidity Example
+Located in [solidity-example/](mdc:solidity-example):
+- Noir circuits for Solidity integration
+- Smart contract examples
+- Testing infrastructure
+
+### Recursion
+Located in [recursion/](mdc:recursion):
+- Recursive proof examples
+- Circuit implementation
+- Integration tests
+
+### Noir by Example
+Located in [noir_by_example/](mdc:noir_by_example):
+- Basic Noir programming examples
+- Circuit patterns
+- Common use cases
+
+### Stealthdrop
+Located in [stealthdrop/](mdc:stealthdrop):
+- Stealth drop implementation
+- Privacy-preserving functionality
+- Integration examples
+
+### Lib Examples
+Located in [lib_examples/](mdc:lib_examples):
+- Standard library usage examples
+- Common Noir patterns
+- Utility functions
+
+## Common File Types
+
+- `.nr`: Noir circuit files
+- `.sol`: Solidity smart contracts
+- `.js`/`.ts`: JavaScript/TypeScript integration code
+- `.md`: Documentation files
+- `.yml`/`.yaml`: Configuration files (e.g., CI/CD)
+
+## Configuration Files
+
+- `.gitignore`: Git ignore rules
+- `.gitattributes`: Git attributes configuration
+- `.github/workflows/`: CI/CD configuration files

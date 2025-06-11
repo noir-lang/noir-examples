@@ -1,0 +1,49 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Development Guidelines
+
+## Contributing Process
+
+1. Discuss changes via an issue before starting work
+2. For existing examples, tag @critesjosh or @signorecello with suggestions
+3. For new examples, create a new branch and follow the project structure guidelines
+
+## New Project Requirements
+
+When adding a new example project, include:
+
+1. **Noir Circuits**
+   - Include `.nr` files demonstrating the example's core functionality
+   - Document circuit design and implementation details
+
+2. **Integration Context**
+   - Provide integration code (e.g., Solidity, JavaScript)
+   - Include proof generation and verification examples
+
+3. **Documentation**
+   - Create a detailed README.md
+   - Include installation instructions
+   - Document any gotchas or important considerations
+   - Provide usage examples
+
+4. **Testing**
+   - Include automated tests
+   - Document test cases and expected behavior
+   - Ensure tests run in CI/CD pipeline
+
+## Code Style
+
+- Follow Noir's standard coding conventions
+- Include comments for complex logic
+- Use meaningful variable and function names
+- Document public interfaces and important functions
+
+## Pull Request Process
+
+1. Create a new branch for your changes
+2. Ensure all tests pass
+3. Update documentation as needed
+4. Request review from @critesjosh and @signorecello

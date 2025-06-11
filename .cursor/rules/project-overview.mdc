@@ -1,0 +1,33 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Noir Examples Project Overview
+
+This repository contains example projects demonstrating how to write zero-knowledge circuits and applications using the Noir programming language.
+
+## Key Components
+
+- **Solidity Example**: Located in [solidity-example/](mdc:solidity-example), demonstrates Noir integration with Solidity smart contracts
+- **Recursion**: Located in [recursion/](mdc:recursion), shows how to implement recursive proofs in Noir
+- **Noir by Example**: Located in [noir_by_example/](mdc:noir_by_example), contains basic Noir programming examples
+- **Stealthdrop**: Located in [stealthdrop/](mdc:stealthdrop), demonstrates stealth drop functionality using Noir
+- **Lib Examples**: Located in [lib_examples/](mdc:lib_examples), shows how to use Noir's standard library
+
+## Project Structure
+
+Each example project typically contains:
+1. Noir circuits (`.nr` files)
+2. Integration code (e.g., Solidity, JavaScript)
+3. Tests
+4. Documentation (README.md)
+
+## Getting Started
+
+For simpler, boilerplate projects, refer to the [Noir Starter](mdc:https:/github.com/noir-lang/noir-starter) repository.
+
+## Support
+
+- Join the [Noir Discord](mdc:https:/discord.gg/JtqzkdeQ6G)
+- Follow [Noir on X](mdc:https:/x.com/NoirLang)
