@@ -24,7 +24,7 @@ git submodule update
 # Install JS dependencies
 (cd js && yarn)
 
-```
+```  
 
 ### Proof generation in JS
 
@@ -93,7 +93,7 @@ This script will:
 ### 🛠 Building the Solidity Verifier
 Use the `build.sh` script to compile the circuit and generate the Solidity verifier:
 ```bash
-./circuits/build.sh
+./build.sh
 ```
 This will:
 - Compile the Noir circuit

@@ -5,9 +5,9 @@ __metadata:
   version: 8
   cacheKey: 10
 
-"@aztec/bb.js@npm:^0.82.2":
-  version: 0.82.3
-  resolution: "@aztec/bb.js@npm:0.82.3"
+"@aztec/bb.js@npm:^0.84.0":
+  version: 0.84.0
+  resolution: "@aztec/bb.js@npm:0.84.0"
   dependencies:
     comlink: "npm:^4.4.1"
     commander: "npm:^12.1.0"
@@ -17,7 +17,7 @@ __metadata:
     tslib: "npm:^2.4.0"
   bin:
     bb.js: dest/node/main.js
-  checksum: 10/715c67cd55dbf6a3cc3c10d57810101db00a4654106982b44d6adadf3a21057eda635ea8f97442ff2b2559ee10d5ae4067b81937e693f8de4b2955fd2b52205b
+  checksum: 10/cdb8c88746795e4f3f334341cc7f3915152465eabb3863fbb5fa60661fcafeffe0d3998822137b395de6453829fedf49532dae136c8ce1bdb2612d8be5631dc3
   languageName: node
   linkType: hard
 
@@ -54,37 +54,38 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noir-lang/acvm_js@npm:1.0.0-beta.3":
-  version: 1.0.0-beta.3
-  resolution: "@noir-lang/acvm_js@npm:1.0.0-beta.3"
-  checksum: 10/e314c00a6509cf6bb0395ebcdbe78b45d3136eb50e4e4756de201faa1e0f62f147f7d9d039e1db13446443b6973409ccf108e4fb4d45abdd2f4981d0c2aecf7d
+"@noir-lang/acvm_js@npm:1.0.0-beta.6":
+  version: 1.0.0-beta.6
+  resolution: "@noir-lang/acvm_js@npm:1.0.0-beta.6"
+  checksum: 10/2cffc75900612ad66f8653b5212dbf24abedd269efc948dfb4037addec7aa51942071024aabfffbd4343e6e93fa90d748a6d06e2e79cf9d062b2a78c840e77a2
   languageName: node
   linkType: hard
 
-"@noir-lang/noir_js@npm:1.0.0-beta.3":
-  version: 1.0.0-beta.3
-  resolution: "@noir-lang/noir_js@npm:1.0.0-beta.3"
+"@noir-lang/noir_js@npm:1.0.0-beta.6":
+  version: 1.0.0-beta.6
+  resolution: "@noir-lang/noir_js@npm:1.0.0-beta.6"
   dependencies:
-    "@noir-lang/acvm_js": "npm:1.0.0-beta.3"
-    "@noir-lang/noirc_abi": "npm:1.0.0-beta.3"
-    "@noir-lang/types": "npm:1.0.0-beta.3"
-  checksum: 10/4e756f69e5c8fcfe4f1243f026e37d68584852ad18887414ccc74de928ff2c019ea785ae06e48c523744676ccff2993b4d3ed8b971d6478e431af38574b4e924
+    "@noir-lang/acvm_js": "npm:1.0.0-beta.6"
+    "@noir-lang/noirc_abi": "npm:1.0.0-beta.6"
+    "@noir-lang/types": "npm:1.0.0-beta.6"
+    pako: "npm:^2.1.0"
+  checksum: 10/ecd3334fd45693b856ec95ddd622eb6a119a10b4ce6b7f560e3400683cf0dc80499ea1d03cdf83456c5a24e6204a026d845cb0019395e33e976b7c23875519a9
   languageName: node
   linkType: hard
 
-"@noir-lang/noirc_abi@npm:1.0.0-beta.3":
-  version: 1.0.0-beta.3
-  resolution: "@noir-lang/noirc_abi@npm:1.0.0-beta.3"
+"@noir-lang/noirc_abi@npm:1.0.0-beta.6":
+  version: 1.0.0-beta.6
+  resolution: "@noir-lang/noirc_abi@npm:1.0.0-beta.6"
   dependencies:
-    "@noir-lang/types": "npm:1.0.0-beta.3"
-  checksum: 10/325b3a89197974960f62879715f6d3d545e80a091a0a4189b79adcb5318c6eb074c0cf6e653f33fcad8ac2db26ede68a438103aa369543d70b4ab667a0625ce5
+    "@noir-lang/types": "npm:1.0.0-beta.6"
+  checksum: 10/49c5a555b2babdcd1b66c00f2daaec6a82f04116c11ef0ba45389c2ca6735c93f0fdcd01746ea8380b339b8c67463b6eeb5b99e068413efb5927beedf5a23505
   languageName: node
   linkType: hard
 
-"@noir-lang/types@npm:1.0.0-beta.3":
-  version: 1.0.0-beta.3
-  resolution: "@noir-lang/types@npm:1.0.0-beta.3"
-  checksum: 10/3425d082fe1496781dac590877b4c5d67c6e3d26fdeb0d039d2284494e4dea55193419260709027a3161369a90c28775d0eca5eee728b54c9ea9b3abf414f9b8
+"@noir-lang/types@npm:1.0.0-beta.6":
+  version: 1.0.0-beta.6
+  resolution: "@noir-lang/types@npm:1.0.0-beta.6"
+  checksum: 10/7828626888a56d688563172834f36e84bb32d12a5951746126cfa4af5c207824c71e6aba33ffd89cb099e433e050c084db38cab2dd54788996d2c27d99c2411e
   languageName: node
   linkType: hard
 
@@ -119,7 +120,6 @@ __metadata:
 "@types/node@npm:^22.10.1":
   version: 22.14.0
   resolution: "@types/node@npm:22.14.0"
-
   dependencies:
     undici-types: "npm:~6.21.0"
   checksum: 10/d0669a8a37a18532c886ccfa51eb3fe1e46088deb4d3d27ebcd5d7d68bd6343ad1c7a3fcb85164780a57629359c33a6c917ecff748ea232bceac7692acc96537
@@ -202,8 +202,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "js@workspace:."
   dependencies:
-    "@aztec/bb.js": "npm:^0.82.2"
-    "@noir-lang/noir_js": "npm:1.0.0-beta.3"
+    "@aztec/bb.js": "npm:^0.84.0"
+    "@noir-lang/noir_js": "npm:1.0.0-beta.6"
     "@types/node": "npm:^22.10.1"
     prettier: "npm:3.5.3"
     ts-node: "npm:^10.9.2"
