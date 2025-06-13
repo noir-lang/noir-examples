@@ -1,0 +1,7 @@
+[package]
+name="noir_uh_starter"
+type="bin"
+authors = ["saleel"]
+compiler_version = ">=1.0.0"
+
+[dependencies]
