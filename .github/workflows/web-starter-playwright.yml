@@ -6,10 +6,6 @@ on:
 
 jobs:
   test:
-    defaults:
-      run:
-        working-directory: web-starter
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -30,24 +26,39 @@ jobs:
 
       - name: Build circuits
         run: |
-          cd circuits && ./build.sh
+          cd web-starter/circuits && ./build.sh
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: lts/*
 
-      - name: Install JS dependencies
-        working-directory: web-starter/web
+      - name: Install JS dependencies (vite)
+        working-directory: web-starter/web/vite
         run: |
           yarn install
 
-      - name: Install Playwright Browsers
-        working-directory: web-starter/web
+      - name: Install Playwright Browsers (vite)
+        working-directory: web-starter/web/vite
         run: |
           yarn playwright install --with-deps
 
-      - name: Run Playwright tests
-        working-directory: web-starter/web
+      - name: Run Playwright tests (vite)
+        working-directory: web-starter/web/vite
+        run: |
+          yarn test:e2e
+
+      - name: Install JS dependencies (webpack)
+        working-directory: web-starter/web/webpack
+        run: |
+          yarn install
+
+      - name: Install Playwright Browsers (webpack)
+        working-directory: web-starter/web/webpack
+        run: |
+          yarn playwright install --with-deps
+
+      - name: Run Playwright tests (webpack)
+        working-directory: web-starter/web/webpack
         run: |
           yarn test:e2e
