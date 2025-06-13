@@ -3,12 +3,17 @@ on:
   pull_request:
     paths:
       - "recursion/**"
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
 
 jobs:
   test:
     defaults:
       run:
         working-directory: recursion
+    permissions:
+      issues: write
 
     runs-on: ubuntu-latest
     steps:
@@ -42,3 +47,16 @@ jobs:
         run: |
           yarn generate-proof
         working-directory: recursion/js
+
+      - name: Create issue on failure (nightly)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '[Nightly] Recursion workflow failed',
+              body: `The nightly Recursion workflow failed. Please investigate.\n\n/cc @noir-lang/developerrelations`,
+              labels: ['nightly', 'bug']
+            })

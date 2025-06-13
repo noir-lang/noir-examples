@@ -5,12 +5,17 @@ on:
   pull_request:
     paths:
       - "solidity-example/**"
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
 
 jobs:
   test:
     defaults:
       run:
         working-directory: solidity-example
+    permissions:
+      issues: write
 
     runs-on: ubuntu-latest
     steps:
@@ -56,3 +61,16 @@ jobs:
           bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target --oracle_hash keccak
           cd ..
           (cd contract && forge test --optimize --optimizer-runs 5000 --gas-report -vvv)
+
+      - name: Create issue on failure (nightly)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '[Nightly] Solidity-example workflow failed',
+              body: `The nightly Solidity-example workflow failed. Please investigate.\n\n/cc @noir-lang/developerrelations`,
+              labels: ['nightly', 'bug']
+            })
