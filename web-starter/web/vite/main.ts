@@ -1,5 +1,5 @@
 import { UltraHonkBackend } from "@aztec/bb.js";
-import circuit from "../circuits/target/noir_uh_starter.json" with { type: "json" };
+import circuit from "../../circuits/target/noir_uh_starter.json" with { type: "json" };
 import { Noir } from "@noir-lang/noir_js";
 
 function log(message: string) {

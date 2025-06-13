@@ -8,21 +8,13 @@ Tested with Noir 1.0.0-beta.6 and bb 0.84.0
 ## Setup
 
 ```bash
-(cd circuits && ./build.sh)
-
-# vite
-(cd web/vite && yarn install)
-
-# webpack
-(cd web/webpack && yarn install)
+(cd ../../circuits && ./build.sh)
+yarn
 ```
 
 ## Run
 
 ```bash
 # vite
-(cd web/vite && yarn dev)
-
-# webpack
-(cd web/webpack && yarn dev)
+yarn dev
 ```
