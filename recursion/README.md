@@ -1,25 +1,28 @@
-# Recursive proofs with Noir
+# Noir Recursion Example
 
-Recursive proofs mean you prove that another proof is correct. A bit of a proofinception but bear
-with me:
+E2E example of generating a recursive proof using Noir and bb.js.
 
-- You prove that `x != y`
-- You pick that proof and send it to another circuit (the "outer" proof)
-- You generate the outer proof and verify it
+- Circuits in `circuits/` directory
+- JS code in `js/generate-proof.ts`
 
-Why is this useful? In this example, it doesn't do much. But you could verify two proofs within a
-proof, which can be incredibly useful.
+### Version used
 
-You could also avoid verifying stuff on-chain for turn-based games, for example. Check out the
-[Noir Docs](https://noir-lang.org/docs/explainers/explainer-recursion) for a high-level explanation.
+```
+Noir 1.0.0-beta.6
+bb 0.84.0
+```
 
-## Getting Started
+### Steps
 
-1. Install dependencies by running `yarn`
-2. For on-chain verification, open another terminal, and run
-   `cd packages/hardhat && npx hardhat node`
-3. Run `yarn dev`
+1. Compile the circuits
 
-## Testing
+```bash
+(cd circuits && ./build.sh)
+```
 
-To run the [test file](./packages/hardhat/test/index.test.ts), try `yarn test`
+2. Generate inner and recursive proof, and verify the recursive proof
+
+```bash
+(cd js && yarn install)
+(cd js && yarn generate-proof)
+```
