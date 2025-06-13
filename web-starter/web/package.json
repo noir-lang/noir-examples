@@ -1,5 +1,6 @@
 {
   "name": "js",
+  "type": "module",
   "dependencies": {
     "@aztec/bb.js": "0.84.0",
     "@noir-lang/noir_js": "1.0.0-beta.6"
@@ -10,16 +11,20 @@
     "webpack:preview": "webpack serve --mode production",
     "vite:dev": "vite",
     "vite:build": "vite build",
-    "vite:serve": "vite serve"
+    "vite:serve": "vite serve",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@babel/core": "^7.26.7",
     "@babel/preset-env": "^7.26.7",
+    "@playwright/test": "^1.53.0",
     "@types/node": "^22.10.1",
     "babel-loader": "^9.2.1",
     "html-webpack-plugin": "^5.6.3",
+    "playwright": "^1.53.0",
+    "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.2",
+    "typescript": "^5.8.3",
     "vite": "^6.1.0",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1",

@@ -11,3 +11,13 @@ Tested with Noir 1.0.0-beta.6 and bb 0.84.0
 (cd circuits && ./build.sh)
 (cd web && yarn)
 ```
+
+## Run
+
+```bash
+# vite
+(cd web && yarn vite:dev)
+
+# webpack
+(cd web && yarn webpack:dev)
+```

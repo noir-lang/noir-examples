@@ -1,22 +1,23 @@
 import { UltraHonkBackend } from "@aztec/bb.js";
-import circuit from "../circuits/target/noir_uh_starter.json";
+import circuit from "../circuits/target/noir_uh_starter.json" with { type: "json" };
 import { Noir } from "@noir-lang/noir_js";
 
-
-function log(message) {
+function log(message: string) {
     console.log(message);
     const resultDiv = document.getElementById('result');
-    resultDiv.textContent += message + '\n\n';
+    if (resultDiv) {
+        resultDiv.textContent += message + '\n\n';
+    }
 }
 
-async function generateProof() {
+async function generateProof(): Promise<void> {
     try {
         log('Generating proof...');
 
-        const noir = new Noir(circuit);
+        const noir = new Noir(circuit as any);
         const honk = new UltraHonkBackend(circuit.bytecode, { threads: 8 });
 
-        const inputs = { x: 3, y: 3 }
+        const inputs = { x: 3, y: 3 };
         const { witness } = await noir.execute(inputs);
         const { proof, publicInputs } = await honk.generateProof(witness);
 
@@ -34,5 +35,7 @@ async function generateProof() {
 // Add click event listener when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById('generateProofBtn');
-    button.addEventListener('click', generateProof);
-});
+    if (button) {
+        button.addEventListener('click', generateProof);
+    }
+}); 
