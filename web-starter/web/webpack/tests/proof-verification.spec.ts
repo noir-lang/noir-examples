@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 
+// Webpack version
 test('proof verification works in the browser', async ({ page }: { page: Page }) => {
     await page.goto('/');
     await page.click('#generateProofBtn');
