@@ -4,12 +4,12 @@
 const config = {
     webServer: {
         command: 'yarn dev',
-        port: 3001,
+        port: 3000,
         timeout: 120 * 1000,
         reuseExistingServer: !process.env.CI,
     },
     use: {
-        baseURL: 'http://localhost:3001',
+        baseURL: 'http://localhost:3000',
         headless: true,
     },
     projects: [
