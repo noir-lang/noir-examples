@@ -1,0 +1,10 @@
+cache
+out
+proofs
+broadcast
+.env
+plonk_vk.sol
+web/node_modules
+.DS_Store
+web/dist
+web/test-results

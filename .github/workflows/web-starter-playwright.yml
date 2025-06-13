@@ -1,0 +1,53 @@
+name: Run web-starter Playwright Tests on PR
+on:
+  pull_request:
+    paths:
+      - "web-starter/**"
+
+jobs:
+  test:
+    defaults:
+      run:
+        working-directory: web-starter
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Nargo
+        uses: noir-lang/noirup@v0.1.2
+        with:
+          toolchain: stable
+
+      - name: Install bb
+        run: |
+          curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash
+          echo "PATH=$PATH:/home/runner/.bb" >> $GITHUB_ENV
+
+      - name: Run bbup
+        run: |
+          bbup
+
+      - name: Build circuits
+        run: |
+          cd circuits && ./build.sh
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+
+      - name: Install JS dependencies
+        working-directory: web-starter/web
+        run: |
+          yarn install
+
+      - name: Install Playwright Browsers
+        working-directory: web-starter/web
+        run: |
+          yarn playwright install --with-deps
+
+      - name: Run Playwright tests
+        working-directory: web-starter/web
+        run: |
+          yarn test:e2e
