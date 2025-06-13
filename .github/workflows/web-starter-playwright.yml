@@ -62,3 +62,18 @@ jobs:
         working-directory: web-starter/web/webpack
         run: |
           yarn test:e2e
+
+      - name: Install JS dependencies (next)
+        working-directory: web-starter/web/next
+        run: |
+          yarn install
+
+      - name: Install Playwright Browsers (next)
+        working-directory: web-starter/web/next
+        run: |
+          yarn playwright install --with-deps
+
+      - name: Run Playwright tests (next)
+        working-directory: web-starter/web/next
+        run: |
+          yarn test:e2e
