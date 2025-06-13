@@ -38,16 +38,16 @@ jobs:
           node-version: lts/*
 
       - name: Install JS dependencies
-        working-directory: web
+        working-directory: web-starter/web
         run: |
           yarn install
 
       - name: Install Playwright Browsers
-        working-directory: web
+        working-directory: web-starter/web
         run: |
           yarn playwright install --with-deps
 
       - name: Run Playwright tests
-        working-directory: web
+        working-directory: web-starter/web
         run: |
           yarn test:e2e
