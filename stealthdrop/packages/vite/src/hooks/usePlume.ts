@@ -17,8 +17,8 @@ export function usePlume() {
       MESSAGE_TO_HASH.charCodeAt(i),
     );
 
-    const { computeAllInputs } = await import('plume-sig');
-    const plume = await computeAllInputs(Uint8Array.from(messageBytes), privateKey);
+    const { curves } = await import('plume-sig');
+    const plume = await curves.secp256k1.computeAllInputs(Uint8Array.from(messageBytes), privateKey);
 
     setPlume({
       nullifier: plume.nullifier,

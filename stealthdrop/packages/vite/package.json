@@ -9,8 +9,8 @@
     "gen": "bun run utils/mt/generateAddresses.ts"
   },
   "dependencies": {
-    "@aztec/bb.js": "0.67.0",
-    "@noir-lang/noir_js": "1.0.0-beta.1",
+    "@aztec/bb.js": "0.84.0",
+    "@noir-lang/noir_js": "1.0.0-beta.6",
     "@nomicfoundation/hardhat-network-helpers": "1.0.12",
     "@nomicfoundation/hardhat-toolbox-viem": "3.0.0",
     "@nomicfoundation/hardhat-viem": "2.0.6",
