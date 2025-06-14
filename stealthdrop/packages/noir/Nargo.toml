@@ -5,10 +5,8 @@ authors = [""]
 
 [dependencies]
 trees = { git = "https://github.com/privacy-scaling-explorations/zk-kit.noir", tag = "main", directory = "packages/merkle-trees" }
-ecrecover = { tag = "main", git = "https://github.com/colinnielsen/ecrecover-noir" }
-# plume = { tag = "main", git = "https://github.com/signorecello/zk-nullifier-sig", directory = "circuits/noir/plume" }
-noir_bigcurve = { tag = "zkpedro/for_plume", git = "https://github.com/noir-lang/noir_bigcurve" }
-bignum = { tag = "main", git = "https://github.com/noir-lang/noir-bignum" }
-nodash = { tag = "main", git = "https://github.com/olehmisar/nodash" }
-
-plume = { path = "../../../zk-nullifier-sig/circuits/noir" }
+plume = { tag = "main", git = "https://github.com/signorecello/zk-nullifier-sig", directory = "circuits/noir" }
+noir_bigcurve = { tag = "v0.9.0", git = "https://github.com/noir-lang/noir_bigcurve" }
+bignum = { tag = "v0.7.3", git = "https://github.com/noir-lang/noir-bignum" }
+array_helpers = { tag = "v0.30.0", git = "https://github.com/colinnielsen/noir-array-helpers" }
+keccak256 = { tag = "v0.1.0", git = "https://github.com/noir-lang/keccak256" }
