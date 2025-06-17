@@ -21,6 +21,16 @@ export default function ProofComponent() {
       setResult(prev => prev + 'Public inputs: ' + publicInputs + '\n\n');
       const verified = await honk.verifyProof({ proof, publicInputs });
       setResult(prev => prev + 'Verified: ' + verified + '\n\n');
+
+      // Send proof to server for server-side verification
+      setResult(prev => prev + 'Verifying on server...\n\n');
+      const response = await fetch('/api/endpoint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proof, publicInputs })
+      });
+      const serverResult = await response.json();
+      setResult(prev => prev + 'Server verified: ' + serverResult.verified + '\n\n');
     } catch (error) {
       setResult(prev => prev + 'Error: ' + error + '\n\n');
     }
