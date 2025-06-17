@@ -17,4 +17,27 @@ test('proof verification works in the browser', async ({ page }: { page: Page })
     }
     // Check that the result contains 'Verified: true' (or similar)
     expect(resultText).toMatch(/Verified:\s*(true|1)/i);
+});
+
+test('proof is correctly verified server side', async () => {
+    // Import dependencies for proof generation
+    const { UltraHonkBackend } = await import('@aztec/bb.js');
+    const { Noir } = await import('@noir-lang/noir_js');
+    const circuit = await import('../../../circuits/target/noir_uh_starter.json');
+
+    // Prepare inputs matching the circuit
+    const noir = new Noir(circuit as any);
+    const honk = new UltraHonkBackend(circuit.bytecode, { threads: 8 });
+    const inputs = { x: 3, y: 3 };
+    const { witness } = await noir.execute(inputs);
+    const { proof, publicInputs } = await honk.generateProof(witness);
+
+    // POST to the API endpoint
+    const res = await fetch('http://localhost:3000/api/endpoint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ proof, publicInputs })
+    });
+    const data = await res.json();
+    expect(data.verified).toBe(true);
 }); 
