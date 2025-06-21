@@ -1,0 +1,23 @@
+# Noir build artifacts
+target/
+cache/
+out/
+proofs/
+circuits/target/
+
+# Inputs/outputs that may be generated during builds
+*.json
+
+# Environment variables
+.env
+
+# macOS system file
+.DS_Store
+
+# Node.js artifacts (if using JS tooling)
+node_modules/
+
+# Solidity / Foundry (if added later)
+lib/
+artifacts/
+cache-foundry/
