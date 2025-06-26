@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
 import "./Verifier.sol";
@@ -15,8 +16,9 @@ contract Starter {
         return verifiedCount;
     }
 
-    function verifyEqual(bytes calldata proof, bytes32[] calldata y) public returns (bool) {
-        bool proofResult = verifier.verify(proof, y);
+    function verifyEqual(bytes calldata proof, bytes32[] calldata publicInputs) public returns (bool) {
+        bool proofResult = verifier.verify(proof, publicInputs);
+        require(publicInputs.length == 2, "Expected 2 public inputs: y and expected");
         require(proofResult, "Proof is not valid");
         verifiedCount++;
         return proofResult;

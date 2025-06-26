@@ -205,7 +205,7 @@ __metadata:
     "@aztec/bb.js": "npm:^0.84.0"
     "@noir-lang/noir_js": "npm:1.0.0-beta.6"
     "@types/node": "npm:^22.10.1"
-    prettier: "npm:3.5.3"
+    prettier: "npm:3.6.1"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.7.2"
   languageName: unknown
@@ -232,12 +232,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.5.3":
-  version: 3.5.3
-  resolution: "prettier@npm:3.5.3"
+"prettier@npm:3.6.1":
+  version: 3.6.1
+  resolution: "prettier@npm:3.6.1"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10/7050c08f674d9e49fbd9a4c008291d0715471f64e94cc5e4b01729affce221dfc6875c8de7e66b728c64abc9352eefb7eaae071b5f79d30081be207b53774b78
+  checksum: 10/e2c4b47bf1bda4f932143e52e0f57239dd60cfef08296b56d4073426e2d310edc353a7daa5285a546bd3c1619c76894759cc98d82d4ac710f72a711ae2899bcc
   languageName: node
   linkType: hard
 
