@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# This script was created to make it easy to set up the environment for OpenAI Codex.
+# It automates the installation and setup of all necessary dependencies for the
+# noir-examples repository, including Noir, Barretenberg, Node.js packages, and Rust projects.
+
 set -euo pipefail
 
 # Install Noir (noirup) and Barretenberg (bbup)
