@@ -3,5 +3,5 @@ members = [
     "simple_macros/rust",
     "loops/rust",
     "generic_traits/rust"
-]
+, "basic_arithmetic_and_types/rust"]
 resolver = "1"

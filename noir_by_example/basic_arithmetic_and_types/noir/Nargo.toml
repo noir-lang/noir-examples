@@ -1,0 +1,8 @@
+[package]
+name = "basic_arithmetic_and_types"
+type = "bin"
+authors = [""]
+
+compiler_version = ">=1.0.0"
+
+[dependencies]
