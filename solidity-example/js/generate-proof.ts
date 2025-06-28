@@ -1,6 +1,6 @@
 import { UltraHonkBackend } from "@aztec/bb.js";
 import fs from "fs";
-import circuit from "../circuits/target/noir_solidity.json";
+import circuit from "../circuits/target/prove_weighted_threshold_compliance.json";
 // @ts-ignore
 import { Noir } from "@noir-lang/noir_js";
 
@@ -9,7 +9,7 @@ import { Noir } from "@noir-lang/noir_js";
     const noir = new Noir(circuit as any);
     const honk = new UltraHonkBackend(circuit.bytecode, { threads: 1 });
 
-    const inputs = { x: 3, y: 3, expected: 9 };
+    const inputs = { secret_weight: 4, public_modifier: 3, required_score: 11 };
     const { witness } = await noir.execute(inputs);
     const { proof, publicInputs } = await honk.generateProof(witness, {
       keccak: true,

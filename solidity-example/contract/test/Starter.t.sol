@@ -9,14 +9,13 @@ import "../Verifier.sol";
 contract StarterTest is Test {
     Starter public starter;
     HonkVerifier public verifier;
-    bytes32[] publicInputs = new bytes32[](2); // Now expecting 2 public inputs
+    bytes32[] public publicInputs = new bytes32[](2);
 
-
- function setUp() public {
+    function setUp() public {
     verifier = new HonkVerifier();
     starter = new Starter(verifier);
-publicInputs[0] = bytes32(0x0000000000000000000000000000000000000000000000000000000000000003);// y = 3
-publicInputs[1] = bytes32(0x0000000000000000000000000000000000000000000000000000000000000009);// expected = 9
+publicInputs[0] = bytes32(0x0000000000000000000000000000000000000000000000000000000000000003);
+publicInputs[1] = bytes32(0x000000000000000000000000000000000000000000000000000000000000000b);
 }
     function testVerifyProof() public {
         bytes memory proof = vm.readFileBinary("../circuits/target/proof");

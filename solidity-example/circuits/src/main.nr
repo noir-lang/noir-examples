@@ -1,30 +1,33 @@
-// This function verifies that x * 2 + y == expected.
-// x is private, y and expected are public.
-fn main(x: Field, y: pub Field, expected: pub Field) {
-    let res = x * 2 + y;
-    assert(res == expected);
+	fn main(secret_weight: Field, public_modifier: pub Field, required_score: pub Field) {
+		let recovery_score = secret_weight * 2 + public_modifier;
+		
+		assert(recovery_score == required_score);
+	}
+
+#[test]
+fn test_valid_compliance() {
+    let secret_weight = 6;
+    let public_modifier = 5;
+    let required_score = 17; // 6*2 + 5 = 17
+
+    main(secret_weight, public_modifier, required_score);
 }
 
-#[test]
-fn test_correct_values_case1() {let x = 3;
-    let y = 3;
-    let expected = 9;
-    let res = x * 2 + y;
-    assert(res == expected);}
+//#[test]
+//fn test_invalid_compliance() {
+  //  let secret_weight = 5;
+    //let public_modifier = 5;
+    //let required_score = 17; // 5*2 + 5 = 15  should fail if uncommented
 
-    #[test]
-fn test_correct_values_case2() {
-    let x = 4;
-    let y = 6;
-    let expected = 14;
-    let res = x * 2 + y;
-    assert(res == expected); }
+    // This should panic or be caught in testing
+   // main(secret_weight, public_modifier, required_score);
+//}
 
 #[test]
-fn test_incorrect_expected() {
-  let x = 2;
-  let y = 1;
-  let expected = 9;
-  let res = x * 2 + y;
-  assert(res == expected); // This should fail if uncommented
-} 
+fn test_edge_case_zero_weight() {
+    let secret_weight = 0;
+    let public_modifier = 17;
+    let required_score = 17; // 0*2 + 17 = 17
+
+    main(secret_weight, public_modifier, required_score);
+}

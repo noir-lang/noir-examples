@@ -18,7 +18,7 @@ contract Starter {
 
     function verifyEqual(bytes calldata proof, bytes32[] calldata publicInputs) public returns (bool) {
         bool proofResult = verifier.verify(proof, publicInputs);
-        require(publicInputs.length == 2, "Expected 2 public inputs: y and expected");
+        require(publicInputs.length == 2, "Expected 2 public inputs: public_modifier and required_score");
         require(proofResult, "Proof is not valid");
         verifiedCount++;
         return proofResult;
