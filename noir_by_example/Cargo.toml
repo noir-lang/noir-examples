@@ -5,4 +5,4 @@ members = [
     "generic_traits/rust",
     "threshold_comparison"
 ]
-resolver = "1"
+resolver = "2"
