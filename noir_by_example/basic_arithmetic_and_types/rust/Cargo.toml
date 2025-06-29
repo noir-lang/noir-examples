@@ -1,0 +1,6 @@
+[package]
+name = "basic_arithmetic_and_types"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]

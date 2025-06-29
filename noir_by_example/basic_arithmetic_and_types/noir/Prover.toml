@@ -1,0 +1,4 @@
+x = 3
+y = 4
+expected_sum = 7
+expected_mul = 12
