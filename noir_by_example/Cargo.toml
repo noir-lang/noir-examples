@@ -5,4 +5,4 @@ members = [
     "generic_traits/rust",
     "ternary_condition"
 ]
-resolver = "1"
+resolver = "2"
