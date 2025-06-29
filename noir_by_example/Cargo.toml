@@ -2,6 +2,7 @@
 members = [
     "simple_macros/rust",
     "loops/rust",
-    "generic_traits/rust"
+    "generic_traits/rust",
+    "threshold_comparison",
 ]
 resolver = "1"
