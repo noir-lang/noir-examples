@@ -18,3 +18,16 @@ Need help? Join the [Noir Discord](https://discord.gg/JtqzkdeQ6G) or reach out o
 ## Contributing
 
 We welcome contributions! Check out the [contributing guidelines](./CONTRIBUTING.md) for more info.
+
+## OpenAI Codex
+
+If using [OpenAI Codex](https://chatgpt.com/codex/) add the following to your environment, so that the agents can run `nargo` and `bb` commands.
+
+Make it so that it can run the startup script.
+
+```bash
+chmod +x ./scripts/setup-all.sh
+./scripts/setup-all.sh
+```
+
+And turn on internet access. Giving access to "Common Dependencies" and this specific url should be sufficient, `aztec-ignition.s3.amazonaws.com`.
