@@ -2,6 +2,6 @@
 members = [
     "simple_macros/rust",
     "loops/rust",
-    "generic_traits/rust"
-]
+    "generic_traits/rust",
+    "discount_example"]
 resolver = "1"
