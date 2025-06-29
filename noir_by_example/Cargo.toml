@@ -4,4 +4,4 @@ members = [
     "loops/rust",
     "generic_traits/rust"
 , "basic_arithmetic_and_types/rust"]
-resolver = "1"
+resolver = "2"
