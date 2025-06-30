@@ -18,8 +18,8 @@ This project implements a zero-knowledge proof circuit in [Noir](https://noir-la
 
 ### 1. Prerequisites
 
-- [Noir language toolchain](https://noir-lang.org/docs/getting_started/installation/)
-- (Optional) [Nargo](https://noir-lang.org/docs/tools/nargo/) for running and debugging locally
+- [Noir language toolchain](https://noir-lang.org/docs/getting_started/noir_installation)
+- (Optional) [Nargo](https://noir-lang.org/docs/getting_started/quick_start#nargo) for running and debugging locally
 - (If using Solidity verifier) [Foundry](https://getfoundry.sh/), [Yarn](https://yarnpkg.com/)
 An example repo to verify Noir circuits (with bb backend) using a Solidity verifier.
 ### Project Structure
