@@ -1,0 +1,1 @@
+{"version":3,"file":"function_declaration.d.ts","sourceRoot":"","sources":["../../../src/bindgen/function_declaration.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,GAAG;IAClB,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,EAAE,MAAM,CAAC;CACd;AAED,MAAM,WAAW,mBAAmB;IAClC,YAAY,EAAE,MAAM,CAAC;IACrB,MAAM,EAAE,GAAG,EAAE,CAAC;IACd,OAAO,EAAE,GAAG,EAAE,CAAC;IACf,OAAO,EAAE,OAAO,CAAC;CAClB"}
