@@ -1,2 +1,0 @@
-export { CachedNetCrs as Crs, CachedNetGrumpkinCrs as GrumpkinCrs } from './cached_net_crs.js';
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi9zcmMvY3JzL2Jyb3dzZXIvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxFQUFFLFlBQVksSUFBSSxHQUFHLEVBQUUsb0JBQW9CLElBQUksV0FBVyxFQUFFLE1BQU0scUJBQXFCLENBQUMifQ==
