@@ -1,25 +1,8 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    outputFileTracingIncludes: {
-      '/api/endpoint': [
-        './node_modules/@aztec/bb.js/dest/node/barretenberg_wasm/**/*',
-        './node_modules/@aztec/bb.js/dest/node/barretenberg_wasm/barretenberg_wasm_main/factory/node/main.worker.js',        
-        './node_modules/@aztec/bb.js/dest/node/barretenberg_wasm/barretenberg-threads.wasm.gz',
-        './node_modules/@aztec/bb.js/dest/node/barretenberg_wasm/barretenberg_wasm_thread/factory/node/thread.worker.js'
-      ]
-    },
-  },
-  // reactStrictMode: false,
-  // webpack: (config) => {
-  //   config.experiments = {
-  //     asyncWebAssembly: true,
-  //     syncWebAssembly: true,
-  //     layers: true,
-  //   };
-  //   return config
-  // },
+  // Configuration for Next.js Noir example
+  // Server-side WASM configuration removed for simplicity
   // async headers() {
   //   return [
   //     {
