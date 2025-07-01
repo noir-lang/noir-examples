@@ -19,10 +19,14 @@ comptime global B: u32 = comptime {
 
 fn main(input: str<U>, base64_encoded: str<B>) {
     for _ in 0..ENCODE_RUNS {
-        let _encoded: [u8; B] = BASE64_ENCODER.encode(input.as_bytes());
+        let encoded: [u8; B] = BASE64_ENCODER.encode(input.as_bytes());
+        // Check that the encoding matches expected
+        assert(encoded == base64_encoded.as_bytes());
     }
     for _ in 0..DECODE_RUNS {
-        let _decoded: [u8; U] = BASE64_DECODER.decode(base64_encoded.as_bytes());
+        let decoded: [u8; U] = BASE64_DECODER.decode(base64_encoded.as_bytes());
+        // Check that the decoding matches input
+        assert(decoded == input.as_bytes());
     }
 }
 
