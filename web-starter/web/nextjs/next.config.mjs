@@ -1,8 +1,22 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuration for Next.js Noir example
-  // Server-side WASM configuration removed for simplicity
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/verify': [
+        './node_modules/@aztec/bb.js/dest/node/barretenberg_wasm/**/*',
+        './node_modules/@aztec/bb.js/dest/node/barretenberg_wasm/barretenberg_wasm_thread/factory/node/thread.worker.js'
+      ],
+    },
+  },
+  webpack: (config) => {
+    config.experiments = {
+      asyncWebAssembly: true,
+      syncWebAssembly: true,
+      layers: true,
+    };
+    return config;
+  },
   // async headers() {
   //   return [
   //     {
