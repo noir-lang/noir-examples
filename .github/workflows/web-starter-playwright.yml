@@ -83,3 +83,16 @@ jobs:
         working-directory: web-starter/web/nextjs
         run: |
           yarn test:e2e
+
+      - name: Create issue on failure (nightly)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '[Nightly] Web-starter Playwright workflow failed',
+              body: `The nightly Web-starter Playwright workflow failed. Please investigate.\n\n/cc @noir-lang/developerrelations`,
+              labels: ['nightly', 'bug']
+            })
