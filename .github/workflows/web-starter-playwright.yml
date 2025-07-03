@@ -69,6 +69,21 @@ jobs:
         run: |
           yarn test:e2e
 
+      - name: Install JS dependencies (next)
+        working-directory: web-starter/web/nextjs
+        run: |
+          yarn install
+
+      - name: Install Playwright Browsers (next)
+        working-directory: web-starter/web/nextjs
+        run: |
+          yarn playwright install --with-deps
+
+      - name: Run Playwright tests (next)
+        working-directory: web-starter/web/nextjs
+        run: |
+          yarn test:e2e
+
       - name: Create issue on failure (nightly)
         if: failure() && github.event_name == 'schedule'
         uses: actions/github-script@v6
