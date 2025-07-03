@@ -25,6 +25,11 @@ jobs:
         uses: noir-lang/noirup@v0.1.2
         with:
           toolchain: stable
+          
+      - name: Run Noir unit tests
+        working-directory: solidity-example/circuits
+        run: |
+          nargo test
 
       - name: Install bb
         run: |
