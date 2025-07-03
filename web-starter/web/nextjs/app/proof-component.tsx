@@ -14,7 +14,7 @@ export default function ProofComponent() {
     try {
       const noir = new Noir(circuit as any);
       const honk = new UltraHonkBackend((circuit as any).bytecode, {
-        threads: 8,
+        threads: 8, // This will only work if SharedArrayBuffer is enabled (see next.config.mjs)
       });
       const inputs = { x: 3, y: 3 };
       const { witness } = await noir.execute(inputs);

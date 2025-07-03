@@ -2,11 +2,14 @@
 const nextConfig = {
   webpack: (config) => {
     config.experiments = {
+      // This is required for @aztec/bb.js as it imports wasm files
       asyncWebAssembly: true,
       layers: true,
     };
     return config;
   },
+  // These headers enable SharedArrayBuffer which is required for running
+  // @aztec/bb.js wasm in multiple threads.
   async headers() {
     return [
       {
