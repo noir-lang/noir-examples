@@ -1,0 +1,8 @@
+[profile.default]
+src = "."
+out = "out"
+libs = ["lib"]
+fs_permissions = [{ access = "read-write", path = "../base64_example/target"},{ access = "read-write", path = "/tmp/"}]
+ffi = true
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config

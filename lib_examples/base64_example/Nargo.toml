@@ -1,8 +1,8 @@
 [package]
 name = "base64_example"
 type = "bin"
-authors = [""]
-compiler_version = ">=0.36.0"
+authors = ["cypriansakwa"]
+compiler_version = ">=1.0.0"
 
 [dependencies]
-base64 = {tag = "v0.3.1", git = "https://github.com/noir-lang/noir_base64.git"}
+noir_base64_lib = { path = "./noir_base64_lib" }

@@ -1,0 +1,1 @@
+{"version":3,"file":"ptr.d.ts","sourceRoot":"","sources":["../../../src/types/ptr.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,YAAY,EAAE,MAAM,uBAAuB,CAAC;AAErD;;;GAGG;AACH,qBAAa,GAAG;aAGc,KAAK,EAAE,UAAU;IAF7C,MAAM,CAAC,aAAa,SAAK;gBAEG,KAAK,EAAE,UAAU;IAE7C,MAAM,CAAC,UAAU,CAAC,MAAM,EAAE,UAAU,GAAG,YAAY;IAKnD,QAAQ;CAGT"}

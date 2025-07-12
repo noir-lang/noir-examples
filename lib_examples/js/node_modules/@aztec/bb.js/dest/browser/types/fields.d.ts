@@ -1,0 +1,44 @@
+/// <reference types="node" resolution-mode="require"/>
+import { BufferReader } from '../serialize/index.js';
+/**
+ * Fr field class.
+ * @dev This class is used to represent elements of BN254 scalar field or elements in the base field of Grumpkin.
+ * (Grumpkin's scalar field corresponds to BN254's base field and vice versa.)
+ */
+export declare class Fr {
+    static ZERO: Fr;
+    static MODULUS: bigint;
+    static MAX_VALUE: bigint;
+    static SIZE_IN_BYTES: number;
+    value: Uint8Array;
+    constructor(value: Uint8Array | Buffer | bigint);
+    static random(): Fr;
+    static fromBuffer(buffer: Uint8Array | Buffer | BufferReader): Fr;
+    static fromBufferReduce(buffer: Uint8Array | BufferReader): Fr;
+    static fromString(str: string): Fr;
+    toBuffer(): Uint8Array;
+    toString(): string;
+    equals(rhs: Fr): boolean;
+    isZero(): boolean;
+}
+/**
+ * Fq field class.
+ * @dev This class is used to represent elements of BN254 base field or elements in the scalar field of Grumpkin.
+ * (Grumpkin's scalar field corresponds to BN254's base field and vice versa.)
+ */
+export declare class Fq {
+    readonly value: bigint;
+    static MODULUS: bigint;
+    static MAX_VALUE: bigint;
+    static SIZE_IN_BYTES: number;
+    constructor(value: bigint);
+    static random(): Fq;
+    static fromBuffer(buffer: Uint8Array | Buffer | BufferReader): Fq;
+    static fromBufferReduce(buffer: Uint8Array | Buffer | BufferReader): Fq;
+    static fromString(str: string): Fq;
+    toBuffer(): Buffer;
+    toString(): string;
+    equals(rhs: Fq): boolean;
+    isZero(): boolean;
+}
+//# sourceMappingURL=fields.d.ts.map

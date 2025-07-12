@@ -1,4 +1,0 @@
-[workspace]
-members = [
-    "base64_example",
-]

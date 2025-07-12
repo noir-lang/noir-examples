@@ -1,2 +1,7 @@
-base64_encoded = ""
-input = ""
+# For decoding
+do_encode = 0
+input =  [83, 71, 86, 115, 98, 71, 56, 103, 86, 50, 57, 121, 98, 71, 81, 104]
+
+# For encoding
+#do_encode = 1
+#input = [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100, 33, 0, 0, 0, 0]
