@@ -1,0 +1,9 @@
+cache
+out
+proofs
+broadcast
+.env
+plonk_vk.sol
+base64_example/target/*
+js/node_modules
+.DS_Store
