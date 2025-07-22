@@ -81,15 +81,5 @@ The original copyright belongs to the Noir language authors.
 
 We have included the source code in this repository under `circuits/noir_string_search/`.  
 If any modifications are made, they are clearly marked in the relevant files.
-### 🧭 Ecosystem Attribution
 
-This project is indexed in the [Electric Capital Crypto Ecosystems Map](https://github.com/electric-capital/crypto-ecosystems).
-
-**Source**: Electric Capital Crypto Ecosystems  
-**Link**: [https://github.com/electric-capital/crypto-ecosystems](https://github.com/electric-capital/crypto-ecosystems)  
-**Logo**: ![Electric Capital Logo](https://avatars.githubusercontent.com/u/44590959?s=200&v=4)
-
-💡 _If you’re working in open source crypto, [submit your repository here](https://github.com/electric-capital/crypto-ecosystems) to be counted._
-
-Thank you for contributing and for reading the contribution guide! ❤️
 
