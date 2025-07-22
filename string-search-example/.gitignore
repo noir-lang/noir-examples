@@ -1,0 +1,16 @@
+contract/cache
+contract/out
+proofs
+broadcast
+.env
+plonk_vk.sol
+circuits/target/*
+js/node_modules
+.DS_Store
+circuits/noir_string_search/README.md
+circuits/noir_string_search/CHANGELOG.md
+circuits/noir_string_search/CONTRIBUTING.md
+circuits/noir_string_search/release-please-config.json
+.vscode
+circuits/noir_string_search/.release-please-manifest.json
+circuits/noir_string_search/.github

@@ -1,0 +1,8 @@
+[package]
+name = "string_search_example"
+type = "bin"
+authors = ["cypriansakwa"]
+compiler_version = ">=1.0.0"
+
+[dependencies]
+noir_string_search = { path = "./noir_string_search" }
