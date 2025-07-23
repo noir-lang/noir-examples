@@ -6,6 +6,7 @@ broadcast
 plonk_vk.sol
 circuits/target/*
 js/node_modules
+js/.yarn
 .DS_Store
 circuits/noir_string_search/README.md
 circuits/noir_string_search/CHANGELOG.md
