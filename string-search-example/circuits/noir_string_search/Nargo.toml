@@ -1,7 +1,0 @@
-[package]
-name = "noir_string_search"
-type = "lib"
-authors = [""]
-compiler_version = ">=0.36.0"
-
-[dependencies]
