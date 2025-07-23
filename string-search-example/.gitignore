@@ -15,3 +15,5 @@ circuits/noir_string_search/release-please-config.json
 .vscode
 circuits/noir_string_search/.release-please-manifest.json
 circuits/noir_string_search/.github
+.yarn
+yarn.lock
