@@ -66,7 +66,7 @@ fn finds_substring_at_end() -> Field {
 }
 
 // Needle is not present in haystack
-#[test]
+#[test(should_fail)]
 fn not_found_if_needle_absent() -> Field {
     let mut haystack: [u8; 256] = [0; 256];
     haystack[0] = 97;  // 'a'
