@@ -1,7 +1,0 @@
-[package]
-name = "noir_base64_lib"
-type = "lib"
-authors = ["Vedant Chainani <vedantchainani1084@gmail.com>"]
-compiler_version = ">=0.35.0"
-
-[dependencies]
