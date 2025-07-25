@@ -7,3 +7,4 @@ plonk_vk.sol
 circuits/**/target/*
 js/node_modules
 .DS_Store
+js/.yarn
