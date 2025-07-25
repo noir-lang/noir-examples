@@ -5,8 +5,8 @@
     "generate-proof": "tsx ./generate-proof.ts"
   },
   "dependencies": {
-    "@aztec/bb.js": "0.84.0",
-    "@noir-lang/noir_js": "1.0.0-beta.6"
+    "@aztec/bb.js": "0.87.0",
+    "@noir-lang/noir_js": "1.0.0-beta.8"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",

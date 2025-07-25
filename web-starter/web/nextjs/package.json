@@ -2,8 +2,8 @@
   "name": "nextjs-noir",
   "type": "module",
   "dependencies": {
-    "@aztec/bb.js": "0.84.0",
-    "@noir-lang/noir_js": "1.0.0-beta.6",
+    "@aztec/bb.js": "0.87.0",
+    "@noir-lang/noir_js": "1.0.0-beta.8",
     "next": "^15.3.4",
     "react": "18.2.0",
     "react-dom": "18.2.0"
