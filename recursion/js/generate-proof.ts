@@ -11,7 +11,7 @@ import { CompiledCircuit, Noir } from "@noir-lang/noir_js";
     // Generate proof for inner circuit
     const inputs = { x: 3, y: 3 }
     const { witness } = await innerCircuitNoir.execute(inputs);
-    const { proof: innerProofFields, publicInputs: innerPublicInputs } = await innerBackend.generateProofForRecursiveAggregation(witness);
+    const { proof: innerProofFields, publicInputs: innerPublicInputs } = await innerBackend.generateProof(witness);
 
     // Get verification key for inner circuit as fields
     const innerCircuitVerificationKey = await innerBackend.getVerificationKey();
