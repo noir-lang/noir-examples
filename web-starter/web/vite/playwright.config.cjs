@@ -13,9 +13,28 @@ const config = {
         headless: true,
     },
     projects: [
-        { name: 'chromium', use: { browserName: 'chromium' } },
-        { name: 'firefox', use: { browserName: 'firefox' } },
-        { name: 'webkit', use: { browserName: 'webkit' } },
+        {
+            name: 'chromium',
+            use: {
+                browserName: 'chromium',
+                launchOptions: {
+                    args: ['--enable-features=SharedArrayBuffer']
+                }
+            }
+        },
+        {
+            name: 'firefox',
+            use: {
+                browserName: 'firefox',
+                launchOptions: {
+                    firefoxUserPrefs: {
+                        'javascript.options.shared_memory': true
+                    }
+                }
+            }
+        },
+        // Skip webkit as it has limited support for SharedArrayBuffer/Web Workers used by Noir
+        // { name: 'webkit', use: { browserName: 'webkit' } },
     ],
 };
 
