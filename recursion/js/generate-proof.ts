@@ -1,6 +1,6 @@
 import { Barretenberg, RawBuffer, UltraHonkBackend } from "@aztec/bb.js";
-import innerCircuit from "../circuits/inner/target/inner.json" assert { type: "json" };
-import recursiveCircuit from "../circuits/recursive/target/recursive.json" assert { type: "json" };
+import innerCircuit from "../circuits/inner/target/inner.json" with { type: "json" };
+import recursiveCircuit from "../circuits/recursive/target/recursive.json" with { type: "json" };
 import { CompiledCircuit, Noir } from "@noir-lang/noir_js";
 
 (async () => {
@@ -29,7 +29,7 @@ import { CompiledCircuit, Noir } from "@noir-lang/noir_js";
     // Verify recursive proof
     const verified = await recursiveBackend.verifyProof({ proof: recursiveProof, publicInputs: recursivePublicInputs });
     console.log("Recursive proof verified: ", verified);
-    
+
     process.exit(verified ? 0 : 1);
   } catch (error) {
     console.error(error);
