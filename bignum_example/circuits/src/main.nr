@@ -1,5 +1,5 @@
 use noir_bignum::BLS12_381_Fr;
-
+mod test_inputs;
 fn main(
     a: BLS12_381_Fr,
     b: BLS12_381_Fr,
