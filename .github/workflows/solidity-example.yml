@@ -47,6 +47,16 @@ jobs:
         run: |
           ./build.sh
         working-directory: solidity-example/circuits
+        
+      - name: Install npm-check-updates
+        if: github.event_name == 'schedule'
+        working-directory: solidity-example/js
+        run: npm install -g npm-check-updates
+
+      - name: Upgrade dependencies to latest
+        if: github.event_name == 'schedule'
+        working-directory: solidity-example/js
+        run: ncu -u
 
       - name: Install JS dependencies
         working-directory: solidity-example/js
