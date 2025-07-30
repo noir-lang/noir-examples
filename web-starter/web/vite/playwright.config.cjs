@@ -3,13 +3,13 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
     webServer: {
-        command: 'yarn build && yarn serve',
-        port: 5173,
+        command: 'yarn build && yarn preview',
+        port: 4173,
         timeout: 180 * 1000,
         reuseExistingServer: !process.env.CI,
     },
     use: {
-        baseURL: 'http://localhost:5173',
+        baseURL: 'http://localhost:4173',
         headless: true,
     },
     projects: [

@@ -9,6 +9,7 @@
     "dev": "vite",
     "build": "vite build",
     "serve": "vite serve",
+    "preview": "vite preview",
     "test:e2e": "playwright test"
   },
   "devDependencies": {
