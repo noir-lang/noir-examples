@@ -3,18 +3,22 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
     webServer: {
-        command: 'yarn dev',
-        port: 5173,
-        timeout: 120 * 1000,
+        command: 'yarn build && yarn preview',
+        port: 4173,
+        timeout: 180 * 1000,
         reuseExistingServer: !process.env.CI,
     },
     use: {
-        baseURL: 'http://localhost:5173',
+        baseURL: 'http://localhost:4173',
         headless: true,
     },
     projects: [
-        { name: 'chromium', use: { browserName: 'chromium' } },
-        { name: 'firefox', use: { browserName: 'firefox' } },
+        {
+            name: 'chromium', use: { browserName: 'chromium' }},
+        {
+            name: 'firefox',
+            use: { browserName: 'firefox' }
+        },
         { name: 'webkit', use: { browserName: 'webkit' } },
     ],
 };
