@@ -1,4 +1,4 @@
-global HONK_VK_SIZE: u32 = 128;
+global HONK_VK_SIZE: u32 = 112;
 global HONK_PROOF_SIZE: u32 = 456;
 global HONK_IDENTIFIER: u32 = 1;
 

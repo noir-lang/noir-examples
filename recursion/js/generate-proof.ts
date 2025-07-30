@@ -1,4 +1,4 @@
-import { Barretenberg, RawBuffer, UltraHonkBackend } from "@aztec/bb.js";
+import { Barretenberg, deflattenFields, RawBuffer, UltraHonkBackend } from "@aztec/bb.js";
 import innerCircuit from "../circuits/inner/target/inner.json" with { type: "json" };
 import recursiveCircuit from "../circuits/recursive/target/recursive.json" with { type: "json" };
 import { CompiledCircuit, Noir } from "@noir-lang/noir_js";
@@ -11,7 +11,7 @@ import { CompiledCircuit, Noir } from "@noir-lang/noir_js";
     // Generate proof for inner circuit
     const inputs = { x: 3, y: 3 }
     const { witness } = await innerCircuitNoir.execute(inputs);
-    const { proofAsFields: innerProofFields } = await innerBackend.generateRecursiveProofArtifacts(witness, 1);
+    const { proof: innerProofFields, publicInputs: innerPublicInputs } = await innerBackend.generateProof(witness);
 
     // Get verification key for inner circuit as fields
     const innerCircuitVerificationKey = await innerBackend.getVerificationKey();
@@ -22,7 +22,7 @@ import { CompiledCircuit, Noir } from "@noir-lang/noir_js";
     const recursiveCircuitNoir = new Noir(recursiveCircuit as CompiledCircuit);
     const recursiveBackend = new UltraHonkBackend(recursiveCircuit.bytecode, { threads: 1 });
 
-    const recursiveInputs = { proof: innerProofFields, public_inputs: ["3"], verification_key: vkAsFields };
+    const recursiveInputs = { proof: deflattenFields(innerProofFields), public_inputs: innerPublicInputs, verification_key: vkAsFields };
     const { witness: recursiveWitness } = await recursiveCircuitNoir.execute(recursiveInputs);
     const { proof: recursiveProof, publicInputs: recursivePublicInputs } = await recursiveBackend.generateProof(recursiveWitness);
 
