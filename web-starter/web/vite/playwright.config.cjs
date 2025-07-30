@@ -3,9 +3,9 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
     webServer: {
-        command: 'yarn dev',
+        command: 'yarn build && yarn serve',
         port: 5173,
-        timeout: 120 * 1000,
+        timeout: 180 * 1000,
         reuseExistingServer: !process.env.CI,
     },
     use: {
@@ -14,27 +14,12 @@ const config = {
     },
     projects: [
         {
-            name: 'chromium',
-            use: {
-                browserName: 'chromium',
-                launchOptions: {
-                    args: ['--enable-features=SharedArrayBuffer']
-                }
-            }
-        },
+            name: 'chromium', use: { browserName: 'chromium' }},
         {
             name: 'firefox',
-            use: {
-                browserName: 'firefox',
-                launchOptions: {
-                    firefoxUserPrefs: {
-                        'javascript.options.shared_memory': true
-                    }
-                }
-            }
+            use: { browserName: 'firefox' }
         },
-        // Skip webkit as it has limited support for SharedArrayBuffer/Web Workers used by Noir
-        // { name: 'webkit', use: { browserName: 'webkit' } },
+        { name: 'webkit', use: { browserName: 'webkit' } },
     ],
 };
 
