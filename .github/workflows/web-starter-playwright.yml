@@ -39,15 +39,12 @@ jobs:
         with:
           node-version: lts/*
 
-      - name: Install npm-check-updates (vite)
+      - name: Install npm-check-updates and upgrade dependencies (vite)
         if: github.event_name == 'schedule'
         working-directory: web-starter/web/vite
-        run: npm install -g npm-check-updates
-
-      - name: Upgrade dependencies to latest (vite)
-        if: github.event_name == 'schedule'
-        working-directory: web-starter/web/vite
-        run: ncu -u
+        run: |
+          npm install -g npm-check-updates
+          ncu -u
 
       - name: Install JS dependencies (vite)
         working-directory: web-starter/web/vite
@@ -64,15 +61,12 @@ jobs:
         run: |
           yarn test:e2e
 
-      - name: Install npm-check-updates (webpack)
+      - name: Install npm-check-updates and upgrade dependencies (webpack)
         if: github.event_name == 'schedule'
         working-directory: web-starter/web/webpack
-        run: npm install -g npm-check-updates
-
-      - name: Upgrade dependencies to latest (webpack)
-        if: github.event_name == 'schedule'
-        working-directory: web-starter/web/webpack
-        run: ncu -u
+        run: |
+          npm install -g npm-check-updates
+          ncu -u
 
       - name: Install JS dependencies (webpack)
         working-directory: web-starter/web/webpack
@@ -89,15 +83,12 @@ jobs:
         run: |
           yarn test:e2e
           
-      - name: Install npm-check-updates (nextjs)
+      - name: Install npm-check-updates and upgrade dependencies (nextjs)
         if: github.event_name == 'schedule'
         working-directory: web-starter/web/nextjs
-        run: npm install -g npm-check-updates
-
-      - name: Upgrade dependencies to latest (nextjs)
-        if: github.event_name == 'schedule'
-        working-directory: web-starter/web/nextjs
-        run: ncu -u
+        run: |
+          npm install -g npm-check-updates
+          ncu -u
 
       - name: Install JS dependencies (next)
         working-directory: web-starter/web/nextjs
