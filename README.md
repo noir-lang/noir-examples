@@ -1,5 +1,6 @@
 # Noir Examples
 
+ 
 This is a reference repo to help you get started with writing zero-knowledge circuits and applications with [Noir](https://noir-lang.org/).
 
 Each project is an example you can use for whatever you want. Feel free to mix them in order to find the best combination of technology that suits your needs.
