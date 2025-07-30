@@ -2,11 +2,14 @@
   "name": "js",
   "scripts": {
     "generate-proof": "ts-node generate-proof.ts",
-    "test": "node --loader ts-node/esm --test generate-proof.test.ts"
+    "build-contracts": "cd ../contract && forge build",
+    "test": "npm run build-contracts && node --loader ts-node/esm --test generate-proof.test.ts",
+    "test:watch": "npm run build-contracts && node --loader ts-node/esm --test --watch generate-proof.test.ts"
   },
   "dependencies": {
     "@aztec/bb.js": "0.87.0",
-    "@noir-lang/noir_js": "1.0.0-beta.8"
+    "@noir-lang/noir_js": "1.0.0-beta.8",
+    "viem": "^2.21.54"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",
