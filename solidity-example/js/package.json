@@ -2,7 +2,7 @@
   "name": "js",
   "type": "module",
   "scripts": {
-    "generate-proof": "ts-node --esm generate-proof.ts",
+    "generate-proof": "tsx generate-proof.ts",
     "build-contracts": "cd ../contract && forge build",
     "test": "yarn build-contracts && node --import tsx --test generate-proof.test.ts"
   },

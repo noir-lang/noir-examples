@@ -136,52 +136,6 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     console.log("Anvil started successfully");
   });
   
-  after(async () => {
-    if (anvilProcess) {
-      console.log("Stopping Anvil...");
-      anvilProcess.kill('SIGTERM');
-      
-      // Wait for process to exit
-      await new Promise((resolve) => {
-        anvilProcess!.on('exit', () => {
-          console.log("Anvil stopped");
-          resolve(void 0);
-        });
-        
-        // Force kill after 2 seconds if not stopped
-        setTimeout(() => {
-          if (anvilProcess && !anvilProcess.killed) {
-            anvilProcess.kill('SIGKILL');
-          }
-          resolve(void 0);
-        }, 2000);
-      });
-      
-      anvilProcess = null;
-    }
-    
-    // Close any remaining handles
-    if (publicClient) {
-      // Close transport if available
-      if (publicClient.transport && publicClient.transport.close) {
-        publicClient.transport.close();
-      }
-    }
-    
-    if (walletClient) {
-      // Close transport if available  
-      if (walletClient.transport && walletClient.transport.close) {
-        walletClient.transport.close();
-      }
-    }
-    
-    if (testClient) {
-      // Close transport if available
-      if (testClient.transport && testClient.transport.close) {
-        testClient.transport.close();
-      }
-    }
-  });
   test("should deploy contracts", async () => {
     console.log("Deploying Verifier contract...");
     
