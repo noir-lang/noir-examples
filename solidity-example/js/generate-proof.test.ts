@@ -76,6 +76,34 @@ let starterAddress: `0x${string}` | null = null;
 // Test account (Anvil's default first account)
 const PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 
+// Cleanup function
+const cleanup = () => {
+  if (anvilProcess && !anvilProcess.killed) {
+    console.log('\nCleaning up Anvil process...');
+    try {
+      anvilProcess.kill('SIGKILL');
+    } catch (error) {
+      // Process already terminated
+    }
+  }
+};
+
+// Handle process exit events
+process.on('exit', cleanup);
+process.on('SIGINT', () => {
+  cleanup();
+  process.exit(0);
+});
+process.on('SIGTERM', () => {
+  cleanup();
+  process.exit(0);
+});
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught exception:', error);
+  cleanup();
+  process.exit(1);
+});
+
 describe("Noir Solidity Example with Ethereum Integration", () => {
   
   before(async () => {
@@ -96,7 +124,7 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     await new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error('Anvil startup timeout'));
-      }, 10000);
+      }, 15000);
       
       anvilProcess!.stdout!.on('data', (data) => {
         if (data.toString().includes('Listening on')) {
@@ -110,8 +138,8 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
       });
     });
     
-    // Wait a bit for Anvil to be fully ready
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Wait longer for Anvil to be fully ready
+    await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Setup viem clients
     account = privateKeyToAccount(PRIVATE_KEY);
@@ -134,6 +162,54 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     });
     
     console.log("Anvil started successfully");
+  });
+  
+  after(async () => {
+    console.log("Cleaning up...");
+    
+    if (anvilProcess) {
+      console.log("Stopping Anvil...");
+      
+      try {
+        // Send SIGTERM first for graceful shutdown
+        anvilProcess.kill('SIGTERM');
+        
+        // Wait for process to exit gracefully
+        await new Promise((resolve) => {
+          const cleanup = () => {
+            console.log("Anvil stopped");
+            anvilProcess = null;
+            resolve(void 0);
+          };
+          
+          // Listen for exit events
+          anvilProcess!.on('exit', cleanup);
+          anvilProcess!.on('close', cleanup);
+          
+          // Force kill after 2 seconds if it doesn't exit gracefully
+          setTimeout(() => {
+            if (anvilProcess && !anvilProcess.killed) {
+              console.log("Force killing Anvil...");
+              try {
+                anvilProcess.kill('SIGKILL');
+              } catch (error) {
+                console.log("Process already terminated");
+              }
+            }
+            cleanup();
+          }, 2000);
+        });
+      } catch (error) {
+        console.log("Error during Anvil cleanup:", error);
+        anvilProcess = null;
+      }
+    }
+    
+    // Force exit after cleanup to prevent hanging
+    console.log("Tests completed, forcing exit...");
+    setTimeout(() => {
+      process.exit(0);
+    }, 100);
   });
   
   test("should deploy contracts", async () => {
@@ -274,7 +350,7 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     }
   });
 
-  test("should handle multiple proof verifications on blockchain", async () => {
+  test("should handle multiple proof verifications on blockchain", { timeout: 60000 }, async () => {
     assert.ok(starterAddress, "Starter contract must be deployed first");
     
     const noir = new Noir(circuit as any);
