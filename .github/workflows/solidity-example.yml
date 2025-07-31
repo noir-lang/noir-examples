@@ -69,7 +69,7 @@ jobs:
 
       - name: Run TypeScript tests with blockchain integration
         run: |
-          yarn test
+          timeout 60 yarn test
         working-directory: solidity-example/js
 
       - name: Create issue on failure (nightly)
