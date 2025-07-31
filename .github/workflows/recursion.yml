@@ -38,12 +38,12 @@ jobs:
           ./build.sh
         working-directory: recursion/circuits
         
-      - name: Install npm-check-updates and upgrade dependencies
+      - name: Install npm-check-updates and upgrade relevant dependencies
         if: github.event_name == 'schedule'
         working-directory: recursion/js
         run: |
           npm install -g npm-check-updates
-          ncu -u
+          ncu '/^(?:@noir-lang\/|barretenberg)/' -u
           
       - name: Install JS dependencies
         working-directory: recursion/js
