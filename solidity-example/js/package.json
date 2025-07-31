@@ -1,5 +1,6 @@
 {
   "name": "js",
+  "type": "module",
   "scripts": {
     "generate-proof": "ts-node generate-proof.ts",
     "build-contracts": "cd ../contract && forge build",
