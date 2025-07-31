@@ -6,7 +6,7 @@ import { spawn, ChildProcess } from "child_process";
 import { UltraHonkBackend } from "@aztec/bb.js";
 // @ts-ignore
 import { Noir } from "@noir-lang/noir_js";
-import { createTestClient, http, createWalletClient, parseEther, formatEther } from "viem";
+import { createTestClient, http, createWalletClient, createPublicClient, parseEther, formatEther } from "viem";
 import { foundry } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import circuit from "../circuits/target/noir_solidity.json";
@@ -67,6 +67,7 @@ const STARTER_ABI = [
 // Global test state
 let anvilProcess: ChildProcess | null = null;
 let testClient: any;
+let publicClient: any;
 let walletClient: any;
 let account: any;
 let verifierAddress: `0x${string}` | null = null;
@@ -80,19 +81,37 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
   before(async () => {
     console.log("Starting Anvil...");
     
-    // Start Anvil
-    anvilProcess = spawn('anvil', ['--port', '8545', '--host', '0.0.0.0'], {
+    // Start Anvil with higher gas limits
+    anvilProcess = spawn('anvil', [
+      '--port', '8545', 
+      '--host', '0.0.0.0',
+      '--gas-limit', '50000000',
+      '--code-size-limit', '50000000',
+      '--disable-default-create2-deployer'
+    ], {
       stdio: ['ignore', 'pipe', 'pipe']
     });
     
-    // Wait for Anvil to start
-    await new Promise((resolve) => {
+    // Wait for Anvil to start with timeout
+    await new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Anvil startup timeout'));
+      }, 10000);
+      
       anvilProcess!.stdout!.on('data', (data) => {
         if (data.toString().includes('Listening on')) {
+          clearTimeout(timeout);
           resolve(void 0);
         }
       });
+      
+      anvilProcess!.stderr!.on('data', (data) => {
+        console.error('Anvil error:', data.toString());
+      });
     });
+    
+    // Wait a bit for Anvil to be fully ready
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Setup viem clients
     account = privateKeyToAccount(PRIVATE_KEY);
@@ -103,6 +122,11 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
       transport: http('http://127.0.0.1:8545')
     });
     
+    publicClient = createPublicClient({
+      chain: foundry,
+      transport: http('http://127.0.0.1:8545')
+    });
+
     walletClient = createWalletClient({
       account,
       chain: foundry,
@@ -115,8 +139,47 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
   after(async () => {
     if (anvilProcess) {
       console.log("Stopping Anvil...");
-      anvilProcess.kill();
+      anvilProcess.kill('SIGTERM');
+      
+      // Wait for process to exit
+      await new Promise((resolve) => {
+        anvilProcess!.on('exit', () => {
+          console.log("Anvil stopped");
+          resolve(void 0);
+        });
+        
+        // Force kill after 2 seconds if not stopped
+        setTimeout(() => {
+          if (anvilProcess && !anvilProcess.killed) {
+            anvilProcess.kill('SIGKILL');
+          }
+          resolve(void 0);
+        }, 2000);
+      });
+      
       anvilProcess = null;
+    }
+    
+    // Close any remaining handles
+    if (publicClient) {
+      // Close transport if available
+      if (publicClient.transport && publicClient.transport.close) {
+        publicClient.transport.close();
+      }
+    }
+    
+    if (walletClient) {
+      // Close transport if available  
+      if (walletClient.transport && walletClient.transport.close) {
+        walletClient.transport.close();
+      }
+    }
+    
+    if (testClient) {
+      // Close transport if available
+      if (testClient.transport && testClient.transport.close) {
+        testClient.transport.close();
+      }
     }
   });
   test("should deploy contracts", async () => {
@@ -133,7 +196,7 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
       args: [],
     });
     
-    const verifierReceipt = await testClient.waitForTransactionReceipt({ hash: verifierHash });
+    const verifierReceipt = await publicClient.getTransactionReceipt({ hash: verifierHash });
     verifierAddress = verifierReceipt.contractAddress!;
     console.log(`Verifier deployed at: ${verifierAddress}`);
     
@@ -150,7 +213,7 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
       args: [verifierAddress],
     });
     
-    const starterReceipt = await testClient.waitForTransactionReceipt({ hash: starterHash });
+    const starterReceipt = await publicClient.getTransactionReceipt({ hash: starterHash });
     starterAddress = starterReceipt.contractAddress!;
     console.log(`Starter deployed at: ${starterAddress}`);
     
@@ -192,7 +255,7 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     console.log(`Public inputs: ${publicInputs}`);
     
     // Check initial verified count
-    const initialCount = await testClient.readContract({
+    const initialCount = await publicClient.readContract({
       address: starterAddress,
       abi: STARTER_ABI,
       functionName: 'getVerifiedCount',
@@ -219,14 +282,14 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     console.log(`Transaction hash: ${hash}`);
     
     // Wait for transaction confirmation
-    const receipt = await testClient.waitForTransactionReceipt({ hash });
+    const receipt = await publicClient.waitForTransactionReceipt({ hash });
     console.log(`Transaction confirmed in block: ${receipt.blockNumber}`);
     
     // Verify transaction was successful
     assert.equal(receipt.status, 'success', "Transaction should be successful");
     
     // Check that verified count increased
-    const finalCount = await testClient.readContract({
+    const finalCount = await publicClient.readContract({
       address: starterAddress,
       abi: STARTER_ABI,
       functionName: 'getVerifiedCount',
@@ -264,7 +327,7 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     const honk = new UltraHonkBackend(circuit.bytecode, { threads: 1 });
 
     // Get initial count
-    const initialCount = await testClient.readContract({
+    const initialCount = await publicClient.readContract({
       address: starterAddress,
       abi: STARTER_ABI,
       functionName: 'getVerifiedCount',
@@ -287,19 +350,19 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
       });
       
       // Submit verification
-      const hash = await walletClient.writeContract({
+      const hash: `0x${string}` = await walletClient.writeContract({
         address: starterAddress,
         abi: STARTER_ABI,
         functionName: 'verifyEqual',
         args: [`0x${Buffer.from(proof).toString('hex')}` as `0x${string}`, formattedPublicInputs],
       });
       
-      const receipt = await testClient.waitForTransactionReceipt({ hash });
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
       assert.equal(receipt.status, 'success', `Transaction should be successful for x=${inputs.x}, y=${inputs.y}`);
     }
     
     // Check final count
-    const finalCount = await testClient.readContract({
+    const finalCount = await publicClient.readContract({
       address: starterAddress,
       abi: STARTER_ABI,
       functionName: 'getVerifiedCount',
