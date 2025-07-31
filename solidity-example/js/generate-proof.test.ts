@@ -11,59 +11,12 @@ import { foundry } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
 import circuit from "../circuits/target/noir_solidity.json";
 
+import VerifierArtifact from "../contract/out/Verifier.sol/HonkVerifier.json";
+import StarterArtifact from "../contract/out/Starter.sol/Starter.json";
+
 // Contract ABIs
-const VERIFIER_ABI = [
-  {
-    "inputs": [
-      { "internalType": "bytes", "name": "_proof", "type": "bytes" },
-      { "internalType": "bytes32[]", "name": "_publicInputs", "type": "bytes32[]" }
-    ],
-    "name": "verify",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "view",
-    "type": "function"
-  }
-] as const;
-
-const STARTER_ABI = [
-  {
-    "inputs": [{ "internalType": "address", "name": "_verifier", "type": "address" }],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "inputs": [],
-    "name": "getVerifiedCount",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      { "internalType": "bytes", "name": "proof", "type": "bytes" },
-      { "internalType": "bytes32[]", "name": "y", "type": "bytes32[]" }
-    ],
-    "name": "verifyEqual",
-    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "verifier",
-    "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "verifiedCount", 
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "stateMutability": "view",
-    "type": "function"
-  }
-] as const;
-
+const VERIFIER_ABI = VerifierArtifact.abi;
+const STARTER_ABI = StarterArtifact.abi;
 // Global test state
 let anvilProcess: ChildProcess | null = null;
 let testClient: any;
@@ -215,14 +168,10 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
   test("should deploy contracts", async () => {
     console.log("Deploying Verifier contract...");
     
-    // Read the compiled bytecode
-    const verifierBytecode = fs.readFileSync('../contract/out/Verifier.sol/HonkVerifier.json', 'utf-8');
-    const verifierArtifact = JSON.parse(verifierBytecode);
-    
     // Deploy Verifier
     const verifierHash = await walletClient.deployContract({
       abi: VERIFIER_ABI,
-      bytecode: verifierArtifact.bytecode.object as `0x${string}`,
+      bytecode: VerifierArtifact.bytecode.object as `0x${string}`,
       args: [],
     });
     
@@ -232,14 +181,10 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     
     console.log("Deploying Starter contract...");
     
-    // Read the compiled bytecode for Starter
-    const starterBytecode = fs.readFileSync('../contract/out/Starter.sol/Starter.json', 'utf-8');
-    const starterArtifact = JSON.parse(starterBytecode);
-    
     // Deploy Starter with Verifier address
     const starterHash = await walletClient.deployContract({
       abi: STARTER_ABI,
-      bytecode: starterArtifact.bytecode.object as `0x${string}`,
+      bytecode: StarterArtifact.bytecode.object as `0x${string}`,
       args: [verifierAddress],
     });
     
