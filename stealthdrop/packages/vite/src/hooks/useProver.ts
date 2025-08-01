@@ -7,12 +7,6 @@ export type ProofData = {
   proof: Uint8Array;
 };
 
-// @ts-ignore
-import acvm from '@noir-lang/acvm_js/web/acvm_js_bg.wasm?url';
-// @ts-ignore
-import noirc from '@noir-lang/noirc_abi/web/noirc_abi_wasm_bg.wasm?url';
-import initNoirC from '@noir-lang/noirc_abi';
-import initACVM from '@noir-lang/acvm_js';
 
 export function useProver() {
   const [proof, setProof] = useState<ProofData>();
@@ -25,9 +19,6 @@ export function useProver() {
 
     setStatus('executing');
     const stealthdropCircuit = await import('../../../noir/target/stealthdrop.json');
-
-    // @ts-ignore
-    await Promise.all([initACVM(fetch(acvm)), initNoirC(fetch(noirc))]);
 
     const { UltraHonkBackend } = await import('@aztec/bb.js');
 
