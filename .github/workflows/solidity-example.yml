@@ -53,7 +53,7 @@ jobs:
         working-directory: solidity-example/js
         run: |
           npm install -g npm-check-updates
-          ncu '/^(?:@noir-lang\/|barretenberg)/' -u
+          ncu '/^(?:@noir-lang\/|barretenberg|@aztec\/)/' -u
 
       - name: Install JS dependencies
         working-directory: solidity-example/js
