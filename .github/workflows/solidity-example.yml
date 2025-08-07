@@ -67,6 +67,11 @@ jobs:
           cd ..
           (cd contract && forge test --optimize --optimizer-runs 5000 --gas-report -vvv)
 
+      - name: Run TypeScript tests with blockchain integration
+        run: |
+          yarn test
+        working-directory: solidity-example/js
+
       - name: Create issue on failure (nightly)
         if: failure() && github.event_name == 'schedule'
         uses: actions/github-script@v6
