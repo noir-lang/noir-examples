@@ -56,6 +56,12 @@ jobs:
         with:
           node-version: lts/*
 
+      - name: Install matching @aztec/bb.js version (vite)
+        working-directory: web-starter/web/vite
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
+
       - name: Install npm-check-updates and upgrade dependencies (vite)
         if: github.event_name == 'schedule'
         working-directory: web-starter/web/vite
@@ -78,6 +84,12 @@ jobs:
         run: |
           yarn test:e2e
 
+      - name: Install matching @aztec/bb.js version (webpack)
+        working-directory: web-starter/web/webpack
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
+
       - name: Install npm-check-updates and upgrade dependencies (webpack)
         if: github.event_name == 'schedule'
         working-directory: web-starter/web/webpack
@@ -99,6 +111,12 @@ jobs:
         working-directory: web-starter/web/webpack
         run: |
           yarn test:e2e
+
+      - name: Install matching @aztec/bb.js version (nextjs)
+        working-directory: web-starter/web/nextjs
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
 
       - name: Install npm-check-updates and upgrade dependencies (nextjs)
         if: github.event_name == 'schedule'

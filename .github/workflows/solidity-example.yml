@@ -63,6 +63,12 @@ jobs:
           ./build.sh
         working-directory: solidity-example/circuits
 
+      - name: Install matching @aztec/bb.js version
+        working-directory: solidity-example/js
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
+
       - name: Install npm-check-updates and upgrade dependencies
         if: github.event_name == 'schedule'
         working-directory: solidity-example/js
