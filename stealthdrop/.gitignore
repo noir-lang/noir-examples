@@ -42,7 +42,7 @@ proofs
 
 # noir
 crs
-
+packages/noir/target
 # other
 .vscode
 .DS_Store
