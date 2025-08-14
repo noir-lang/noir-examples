@@ -38,9 +38,7 @@ jobs:
             exit 1
           fi
 
-          echo "Using Barretenberg version: $BB_VERSION"
-          curl -L "https://github.com/AztecProtocol/barretenberg/releases/download/v${BB_VERSION}/bb-linux" -o /usr/local/bin/bb
-          chmod +x /usr/local/bin/bb
+          bbup -v $BB_VERSION
 
           echo "bb_version=$BB_VERSION" >> $GITHUB_OUTPUT
           echo "noir_version=$NOIR_VERSION" >> $GITHUB_OUTPUT
