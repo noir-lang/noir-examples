@@ -15,3 +15,21 @@ fn main(
         HONK_IDENTIFIER,
     );
 }
+
+#[test]
+fn test_valid_recursive_proof(
+    verification_key: [Field; 128],
+    proof: [Field; 456],
+    public_inputs: [Field; 1],
+) {
+    main(verification_key, proof, public_inputs);
+}
+
+#[test(should_fail)]
+fn test_invalid_recursive_proof(
+    verification_key: [Field; 128],
+    proof: [Field; 456],
+    public_inputs: [Field; 1],
+) {
+    main(verification_key, proof, public_inputs);
+}
