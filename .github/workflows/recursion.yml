@@ -23,6 +23,11 @@ jobs:
         uses: noir-lang/noirup@v0.1.2
         with:
           toolchain: stable
+          
+      - name: Install bbup
+        run: |
+          curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash
+      
 
       - name: Determine and install compatible Barretenberg CLI
         id: install-bb
