@@ -32,6 +32,7 @@ jobs:
         id: install-bb
         shell: bash
         run: |
+
           sudo apt-get update && sudo apt-get install -y jq
 
           NOIR_VERSION=$(nargo --version | awk '{print $2}')
@@ -46,6 +47,7 @@ jobs:
           fi
 
           bbup -v $BB_VERSION          
+
           echo "PATH=$PATH:/home/runner/.bb" >> $GITHUB_ENV
 
           echo "bb_version=$BB_VERSION" >> $GITHUB_OUTPUT
@@ -97,6 +99,11 @@ jobs:
           bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target --oracle_hash keccak
           cd ..
           (cd contract && forge test --optimize --optimizer-runs 5000 --gas-report -vvv)
+
+      - name: Run TypeScript tests with blockchain integration
+        run: |
+          yarn test
+        working-directory: solidity-example/js
 
       - name: Create issue on failure (nightly)
         if: failure() && github.event_name == 'schedule'
