@@ -53,7 +53,8 @@ const config: HardhatUserConfig = {
     noir: './noir',
   },
   noir: {
-    version: '1.0.0-beta.1',
+    version: '1.0.0-beta.3',
+    bbVersion: '0.72.1',
   },
   mocha: {
     timeout: 1000000,
