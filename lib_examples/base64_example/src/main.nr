@@ -1,5 +1,5 @@
 mod test_inputs;
-use base64::{BASE64_ENCODER, BASE64_DECODER};
+use noir_base64;
 
 // Choose number of encode and/or decode runs
 pub global ENCODE_RUNS: u32 = 3;
@@ -13,16 +13,16 @@ comptime global U: u32 = comptime { TEST_INPUT.as_bytes().len() };
 comptime global B: u32 = comptime {
     let mut q = U / 3;
     let r = U - q * 3;
-    if (r > 0) { q += 1; }; // round up since encoded base64 gets padded
+    if (r > 0) { q += 1; } // round up since encoded base64 gets padded
     q * 4
 };
 
 fn main(input: str<U>, base64_encoded: str<B>) {
     for _ in 0..ENCODE_RUNS {
-        let _encoded: [u8; B] = BASE64_ENCODER.encode(input.as_bytes());
+        let _encoded: [u8; B] = noir_base64::BASE64_ENCODER::encode(input.as_bytes());
     }
     for _ in 0..DECODE_RUNS {
-        let _decoded: [u8; U] = BASE64_DECODER.decode(base64_encoded.as_bytes());
+        let _decoded: [u8; U] = noir_base64::BASE64_DECODER::decode(base64_encoded.as_bytes());
     }
 }
 
