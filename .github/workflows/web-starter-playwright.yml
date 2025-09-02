@@ -24,6 +24,7 @@ jobs:
       - name: Install bbup
         run: |
           curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/master/barretenberg/bbup/install | bash
+          echo "PATH=$PATH:/home/runner/.bb" >> $GITHUB_ENV
 
       - name: Determine and install compatible Barretenberg CLI
         id: install-bb

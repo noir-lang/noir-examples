@@ -45,7 +45,8 @@ jobs:
             exit 1
           fi
 
-          bbup -v $BB_VERSION
+          bbup -v $BB_VERSION          
+          echo "PATH=$PATH:/home/runner/.bb" >> $GITHUB_ENV
 
           echo "bb_version=$BB_VERSION" >> $GITHUB_OUTPUT
           echo "noir_version=$NOIR_VERSION" >> $GITHUB_OUTPUT
