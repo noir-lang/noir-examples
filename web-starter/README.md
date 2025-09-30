@@ -3,7 +3,7 @@
 A simple Noir circuit with browser proving with bb.js
 Has both webpack and vite bundling.
 
-Tested with Noir 1.0.0-beta.6 and bb 0.84.0
+Tested with Noir 1.0.0-beta.11 and bb 0.87.0
 
 ## Setup
 
@@ -15,6 +15,9 @@ Tested with Noir 1.0.0-beta.6 and bb 0.84.0
 
 # webpack
 (cd web/webpack && yarn install)
+
+# nextjs
+(cd web/nextjs && yarn install)
 ```
 
 ## Run
@@ -24,5 +27,8 @@ Tested with Noir 1.0.0-beta.6 and bb 0.84.0
 (cd web/vite && yarn dev)
 
 # webpack
-(cd web/webpack && yarn dev)
+(cd web/webpack && yarn build && yarn preview)
+
+# nextjs
+(cd web/nextjs && yarn build && yarn start)
 ```
