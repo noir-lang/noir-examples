@@ -56,5 +56,66 @@ fn test_haystack_equals_needle() {
     assert(found == true);
     assert(index == 0);
 }
+#[test]
+fn test_empty_needle() {
+    // Empty needle should return (true, 0)
+    let haystack = pad_to_256([104,101,108,108,111], 0);
+    let needle = pad_to_32([], 0);
+    let (found, index) = substring_search(haystack, 5, needle, 0);
+    assert(found == true);
+    assert(index == 0);
+}
 
-// Add more positive tests for chunk boundaries, maximal lengths, etc. as needed.
+#[test]
+fn test_empty_haystack() {
+    // Empty haystack and non-empty needle -> no match
+    let haystack = pad_to_256([], 0);
+    let needle = pad_to_32([97, 98, 99], 0);
+    let (found, index) = substring_search(haystack, 0, needle, 3);
+    assert(found == false);
+    assert(index == 0);
+}
+
+#[test]
+fn test_needle_longer_than_haystack() {
+    // Needle length > haystack length -> (false, 0)
+    let haystack = pad_to_256([97, 98, 99], 0);
+    let needle = pad_to_32([97, 98, 99, 100, 101], 0);
+    let (found, index) = substring_search(haystack, 3, needle, 5);
+    assert(found == false);
+    assert(index == 0);
+}
+
+#[test]
+fn test_match_near_boundary() {
+    // Haystack length near 256, needle length 4 starting at 252
+    let mut data = [0; 256];
+    for i in 0..256 { data[i] = 97; } // fill with 'a'
+    data[252] = 120; data[253] = 121; data[254] = 122; data[255] = 119; // "xyzw" at the end
+    let haystack = pad_to_256(data, 0);
+    let needle = pad_to_32([120, 121, 122, 119], 0);
+    let (found, index) = substring_search(haystack, 256, needle, 4);
+    assert(found == true);
+    assert(index == 252);
+}
+
+#[test(should_fail)]
+fn test_needle_not_found() {
+    // "abcdef", "xyz"
+    let haystack = pad_to_256([97, 98, 99, 100, 101, 102], 0); // "abcdef"
+    let needle = pad_to_32([120, 121, 122], 0);                // "xyz"
+    let (found, index) = substring_search(haystack, 6, needle, 3);
+    assert(found == false);
+    assert(index == 0);
+}
+
+#[test(should_fail)]
+fn test_max_length_inputs_no_match() {
+    // Full 256 haystack of 'a', full 32 needle of 'b' -> no match
+    let haystack = pad_to_256([97; 256], 0);
+    let needle = pad_to_32([98; 32], 0);
+    let (found, index) = substring_search(haystack, 256, needle, 32);
+    assert(found == false);
+    assert(index == 0);
+}
+

@@ -88,7 +88,3 @@ fn finds_substring_at_start() -> Field {
 
 - [Noir](https://noir-lang.org/)
 - [`noir_string_search`](https://github.com/noir-lang/noir_string_search) Noir library
-
-## License
-
-MIT or Apache-2.0
