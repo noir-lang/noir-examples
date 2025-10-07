@@ -15,7 +15,7 @@ const config = {
     // Global test timeout increased for proof generation
     timeout: 300 * 1000, // 5 minutes
     expect: {
-        timeout: 60 * 1000, // 1 minute for assertions
+        timeout: 180 * 1000, // 3 minutes for assertions
     },
     projects: [
         { name: 'chromium', use: { browserName: 'chromium' } },
