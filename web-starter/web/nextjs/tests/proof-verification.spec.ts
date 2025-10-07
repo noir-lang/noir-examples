@@ -2,9 +2,6 @@ import { test, expect, Page } from '@playwright/test';
 
 // Next.js version
 test('proof verification works in the browser', async ({ page }: { page: Page }) => {
-    // Increase timeout for CI environments
-    const isCI = process.env.CI === 'true';
-    const proofTimeout = isCI ? 240000 : 120000; // 4 minutes in CI, 2 minutes locally
     
     await page.goto('/');
     
@@ -19,14 +16,11 @@ test('proof verification works in the browser', async ({ page }: { page: Page })
     // Wait for the result to contain 'Verified:' with increased timeout
     let resultText = '';
     try {
-        await expect(page.locator('#result')).toContainText('Verified:', { timeout: proofTimeout });
+        await expect(page.locator('#result')).toContainText('Verified:', { timeout: 300000 });
         resultText = await page.locator('#result').innerText();
     } catch (e) {
         // Debug: print the current contents of #result if the check fails
         resultText = await page.locator('#result').innerText();
-        console.log('DEBUG: #result contents at failure:', resultText);
-        console.log('DEBUG: Is CI environment:', isCI);
-        console.log('DEBUG: Proof timeout used:', proofTimeout);
         throw e;
     }
     // Check that the result contains 'Verified: true' (or similar)

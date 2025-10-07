@@ -6,7 +6,6 @@ const config = {
         command: 'yarn build && yarn start',
         port: 3000,
         timeout: 180 * 1000, // Increased to 3 minutes for CI
-        reuseExistingServer: !process.env.CI,
     },
     use: {
         baseURL: 'http://localhost:3000',
