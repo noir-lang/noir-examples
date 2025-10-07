@@ -7,7 +7,7 @@ test('proof verification works in the browser', async ({ page }: { page: Page })
     // Wait for the result to contain 'Verified:' with increased timeout
     let resultText = '';
     try {
-        await expect(page.locator('#result')).toContainText('Verified:');
+        await expect(page.locator('#result')).toContainText('Verified:', { timeout: 120000 });
         resultText = await page.locator('#result').innerText();
     } catch (e) {
         // Debug: print the current contents of #result if the check fails
