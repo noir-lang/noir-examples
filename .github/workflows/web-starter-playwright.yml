@@ -81,6 +81,9 @@ jobs:
 
       - name: Run Playwright tests (next)
         working-directory: web-starter/web/nextjs
+        env:
+          CI: true
+          NODE_OPTIONS: "--max-old-space-size=4096"
         run: |
           yarn test:e2e
 
