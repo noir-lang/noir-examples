@@ -24,7 +24,7 @@ jobs:
       - name: Install Nargo
         uses: noir-lang/noirup@v0.1.2
         with:
-          toolchain: stable
+          toolchain: 1.0.0-beta.11
           
       - name: Run Noir unit tests
         working-directory: solidity-example/circuits
