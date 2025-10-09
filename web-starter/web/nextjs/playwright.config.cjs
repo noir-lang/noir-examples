@@ -19,7 +19,8 @@ const config = {
     projects: [
         { name: 'chromium', use: { browserName: 'chromium' } },
         { name: 'firefox', use: { browserName: 'firefox' } },
-        { name: 'webkit', use: { browserName: 'webkit' } },
+        // WebKit skipped in CI due to high memory usage during proof generation
+        ...(process.env.CI ? [] : /** @type {any} */ ([{ name: 'webkit', use: { browserName: 'webkit' } }])),
     ],
 };
 
