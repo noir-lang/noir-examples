@@ -11,8 +11,8 @@ const config = {
         baseURL: 'http://localhost:3000',
         headless: true,
     },
-    // Global test timeout increased for proof generation
-    timeout: 3000000, // 50 minutes
+    // Global test timeout for proof generation
+    timeout: 300000, // 5 minutes
     expect: {
         timeout: 180 * 1000, // 3 minutes for assertions
     },
