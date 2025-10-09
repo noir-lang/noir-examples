@@ -12,7 +12,7 @@ const config = {
         headless: true,
     },
     // Global test timeout increased for proof generation
-    timeout: 3000 * 1000, // 5 minutes
+    timeout: 3000000, // 50 minutes
     expect: {
         timeout: 180 * 1000, // 3 minutes for assertions
     },
