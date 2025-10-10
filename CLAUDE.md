@@ -150,9 +150,13 @@ Common pattern across examples using `@noir-lang/noir_js` and `@aztec/bb.js`:
 ## Version Compatibility
 
 Different examples may use different Noir/bb versions:
-- `solidity-example/`: Noir 1.0.0-beta.8, bb 0.87.0
+- `solidity-example/`: Noir 1.0.0-beta.11, bb 0.87.0
 - `recursion/`: Noir 1.0.0-beta.6, bb 0.84.0
 - `web-starter/`: Noir 1.0.0-beta.11, bb 0.87.0
+- `bignum_example/`: Noir 1.0.0-beta.9+
+- `lib_examples/base64_example/`: Noir 0.36.0+
+- `noir_by_example/`: Noir 0.34.0+ (varies by example)
+- `stealthdrop/`: Noir 1.0.0-beta.1, bb 0.67.0
 
 Check each project's README for specific version requirements. Version mismatches between nargo and bb can cause compilation or proof generation issues.
 
