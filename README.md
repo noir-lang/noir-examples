@@ -1,12 +1,24 @@
 # Noir Examples
 
- 
+
 This is a reference repo to help you get started with writing zero-knowledge circuits and applications with [Noir](https://noir-lang.org/).
 
 Each project is an example you can use for whatever you want. Feel free to mix them in order to find the best combination of technology that suits your needs.
 
-- Solidity Example: [`./solidity-example`](./solidity-example)
-- Recursion: [`./recursion`](./recursion/)
+## Examples
+
+### End-to-End Integration Examples
+
+- **[Solidity Example](./solidity-example)** - Complete workflow: Noir circuit → JavaScript proof generation → Solidity on-chain verification
+- **[Recursion](./recursion)** - Demonstrates recursive proof generation where one circuit verifies another circuit's proof
+- **[Web Starter](./web-starter)** - Browser-based proof generation with Vite, Webpack, and Next.js bundler examples
+- **[Stealthdrop](./stealthdrop)** - Privacy-preserving airdrop using PLUME nullifiers, ecrecover, and Merkle trees
+
+### Library & Feature Examples
+
+- **[Bignum Example](./bignum_example)** - Using `noir-bignum` library for BLS12-381 field arithmetic
+- **[Base64 Example](./lib_examples/base64_example)** - Base64 encoding/decoding with gate count benchmarking
+- **[Noir by Example](./noir_by_example)** - Noir syntax examples side-by-side with Rust equivalents (loops, generics, macros)
 
 ## Starter
 
