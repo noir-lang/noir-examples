@@ -229,32 +229,32 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.8.0.tgz#cee43d801fcef9644b11b8194857695acd5f815a"
   integrity sha512-jCs9ldd7NwzpgXDIf6P3+NrHh9/sD6CQdxHyjQI+h/6rDNo88ypBxxz45UDuZHz9r3tNz7N/VInSVoVdtXEI4A==
 
-"@noir-lang/acvm_js@1.0.0-beta.8":
-  version "1.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-1.0.0-beta.8.tgz#29fc40123cbc60882b276896a6627f1dcea01e19"
-  integrity sha512-gSJgRlgwR74oTuJiyxYYiZUms0JmnO2cyTgOHYzElwScEGfkeWI8si1NJDidmxZsD7xKD/YqHZwdnuRFIuflhw==
+"@noir-lang/acvm_js@1.0.0-beta.11":
+  version "1.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@noir-lang/acvm_js/-/acvm_js-1.0.0-beta.11.tgz#6bb73c51e5d55b215ea3876040d1dc761f15ec98"
+  integrity sha512-g1CeqJlWNyJx1j+1t9sm3MxnDChbWSHa9UOOIQYBskxczhUHuUVfYve3xbe0DwSEiIBQ3gmTIKDmRPs+QboPvA==
 
-"@noir-lang/noir_js@1.0.0-beta.8":
-  version "1.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@noir-lang/noir_js/-/noir_js-1.0.0-beta.8.tgz#cef10673b486f20ee5c270bd153bffbb9bcbe2e1"
-  integrity sha512-OwgQGezLH5jhRIOkU8T5Cii1skIWnDC7CFUmEY9Ns//kgBMRqUxWzd7JvVIiV1gUjynJlOcv4rMQlsc7NCzPMA==
+"@noir-lang/noir_js@1.0.0-beta.11":
+  version "1.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noir_js/-/noir_js-1.0.0-beta.11.tgz#8e6326d7e12ea05b4397782c9f4e0aa35f563555"
+  integrity sha512-pZlz5/mGooHBUnucUULmbdU3gicxbaCg7t+wNoBN45JuFMU4vV32As4C1aTNNJDpDFaGupV7yXKVRcsJNTZ49w==
   dependencies:
-    "@noir-lang/acvm_js" "1.0.0-beta.8"
-    "@noir-lang/noirc_abi" "1.0.0-beta.8"
-    "@noir-lang/types" "1.0.0-beta.8"
+    "@noir-lang/acvm_js" "1.0.0-beta.11"
+    "@noir-lang/noirc_abi" "1.0.0-beta.11"
+    "@noir-lang/types" "1.0.0-beta.11"
     pako "^2.1.0"
 
-"@noir-lang/noirc_abi@1.0.0-beta.8":
-  version "1.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@noir-lang/noirc_abi/-/noirc_abi-1.0.0-beta.8.tgz#e16ff1978a271560a75a9e66a574447670a0b343"
-  integrity sha512-ytCJwKtDp0VWjevtmi8P7r6iO//+mx9UgCqyk36bZCNmOtIE59GgFtOfmyzgWAXsjUQmHZe2MJ+krtQA0UFdAA==
+"@noir-lang/noirc_abi@1.0.0-beta.11":
+  version "1.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@noir-lang/noirc_abi/-/noirc_abi-1.0.0-beta.11.tgz#920c8f96a13af95b427071ebf4b6722de0de5156"
+  integrity sha512-D8nBgDGYe8uu4meu9ctGo52KIa0NeE/u2GBQi4DHJzE7/q5dVEqSyVVPImOyZWpvjPvb6thySxcDWbqY6JxOiw==
   dependencies:
-    "@noir-lang/types" "1.0.0-beta.8"
+    "@noir-lang/types" "1.0.0-beta.11"
 
-"@noir-lang/types@1.0.0-beta.8":
-  version "1.0.0-beta.8"
-  resolved "https://registry.yarnpkg.com/@noir-lang/types/-/types-1.0.0-beta.8.tgz#8242ead8e58bcebff6c9e3591b02948dc95ecb0a"
-  integrity sha512-2ey2Axo5DpqwPLPsBg/3Rj6cxMIiIxrf80SSYe58q/4375uEYSZj7BM3TNMcdkZJKf1oJ4UwBNArn4BPCulRPA==
+"@noir-lang/types@1.0.0-beta.11":
+  version "1.0.0-beta.11"
+  resolved "https://registry.yarnpkg.com/@noir-lang/types/-/types-1.0.0-beta.11.tgz#c27f29debfd4be82565879172c36e36832969c96"
+  integrity sha512-b9zeK/uxecsOKxsgqRszNYtj7Z3A9k//GF4uQIzvYbDWyrPGgnfi297ysXZ8lqKV4xBSQ93qNp+VzW4XaTBGjQ==
 
 "@scure/base@~1.2.5":
   version "1.2.6"

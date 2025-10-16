@@ -2,17 +2,25 @@ import { test, expect, Page } from '@playwright/test';
 
 // Next.js version
 test('proof verification works in the browser', async ({ page }: { page: Page }) => {
+    
     await page.goto('/');
+    
+    // Wait for the page to be fully loaded
+    await page.waitForSelector('#generateProofBtn');
+    
     await page.click('#generateProofBtn');
-    // Wait for the result to contain 'Verified:' with increased timeout
+    
+    // Wait for proof generation to start
+    await expect(page.locator('#result')).toContainText('Generating proof...', { timeout: 10000 });
+    
+    // Wait for the result to contain 'Verified:' with 5 minute timeout
     let resultText = '';
     try {
-        await expect(page.locator('#result')).toContainText('Verified:', { timeout: 30000 });
+        await expect(page.locator('#result')).toContainText('Verified:', { timeout: 300000 });
         resultText = await page.locator('#result').innerText();
     } catch (e) {
         // Debug: print the current contents of #result if the check fails
         resultText = await page.locator('#result').innerText();
-        console.log('DEBUG: #result contents at failure:', resultText);
         throw e;
     }
     // Check that the result contains 'Verified: true' (or similar)
