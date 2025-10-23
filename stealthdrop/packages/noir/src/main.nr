@@ -1,14 +1,31 @@
-use ecrecover::secp256k1::PubKey;
-use noir_bigcurve::curves::secp256k1::{Secp256k1, Secp256k1Fq, Secp256k1Scalar};
-use noir_bigcurve::scalar_field::ScalarField;
+use noir_bigcurve::curves::secp256k1::{Secp256k1, Secp256k1_Fq, Secp256k1Scalar};
+use noir_bigcurve::scalar_field::{ScalarField, ScalarFieldTrait};
 
+use array_helpers::u8_32_to_u8_64;
 // use plume::plume_v2;
-use plume::Plume;
+use bignum::BigNum;
+use plume::{Plume, PlumeVerifier};
+use plume::curves::secp256k1::hash_to_curve;
 use std::hash::poseidon2::Poseidon2::hash;
 use trees::merkle::MerkleTree;
+use trees::types::{MembershipProver, MT_Creator};
+use keccak256::keccak256;
 
-type BN = Secp256k1Fq;
 global DEPTH: u32 = 12;
+
+
+fn to_eth_address(pub_key_x: [u8; 32], pub_key_y: [u8; 32]) -> Field {
+    let pub_key = array_helpers::u8_32_to_u8_64(pub_key_x, pub_key_y);
+    let hashed_pub_key = keccak256(pub_key, 64);
+
+    let mut addr: Field = 0;
+    for i in 0..20 {
+        // shift left by 8 and add the new value
+        addr = (addr * 256) + hashed_pub_key[i + 12] as Field;
+    }
+
+    addr
+}
 
 fn hasher(leaves: [Field; 2]) -> Field {
     hash(leaves, 2)
@@ -27,29 +44,28 @@ fn main(
     eligible_index: Field,
     claimer_priv: Field,
 ) -> pub Field {
-    let c_bn = Secp256k1Fq::from_be_bytes(c);
+    let c_bn = Secp256k1_Fq::from_be_bytes(c);
     let scalar_c: Secp256k1Scalar = ScalarField::from_bignum(c_bn);
 
-    let s_bn = Secp256k1Fq::from_be_bytes(s);
+    let s_bn = Secp256k1_Fq::from_be_bytes(s);
     let scalar_s: Secp256k1Scalar = ScalarField::from_bignum(s_bn);
 
     let pubkey_bg = Secp256k1 {
-        x: Secp256k1Fq::from_be_bytes(pub_key_x),
-        y: Secp256k1Fq::from_be_bytes(pub_key_y),
+        x: Secp256k1_Fq::from_be_bytes(pub_key_x),
+        y: Secp256k1_Fq::from_be_bytes(pub_key_y),
         is_infinity: false,
     };
 
     let nullifier = Secp256k1 {
-        x: Secp256k1Fq::from_be_bytes(nullifier_x),
-        y: Secp256k1Fq::from_be_bytes(nullifier_y),
+        x: Secp256k1_Fq::from_be_bytes(nullifier_x),
+        y: Secp256k1_Fq::from_be_bytes(nullifier_y),
         is_infinity: false,
     };
 
-    let plume = Plume::new(message, scalar_c, scalar_s, pubkey_bg, nullifier);
+    let plume = Plume::new(message, scalar_c, scalar_s, pubkey_bg, nullifier, hash_to_curve);
 
     let (_, _) = plume.plume_v2();
-    let pubkey = PubKey::from_xy(pub_key_x, pub_key_y);
-    let address = pubkey.to_eth_address();
+    let address = to_eth_address(pub_key_x, pub_key_y);
 
     let mut mt = MerkleTree::from(eligible_root, hasher);
     mt.membership(address, eligible_index, eligible_path);

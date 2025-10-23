@@ -7,8 +7,8 @@
     "deploy": "hardhat vars set holesky ${DEPLOYER_PK} && hardhat deploy --network holesky"
   },
   "dependencies": {
-    "@aztec/bb.js": "0.67.0",
-    "@noir-lang/noir_js": "1.0.0-beta.1",
+    "@aztec/bb.js": "0.84.0",
+    "@noir-lang/noir_js": "1.0.0-beta.6",
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
     "@zk-kit/lean-imt": "^2.2.2",
     "hardhat": "^2.18.1",
@@ -19,9 +19,6 @@
   "devDependencies": {
     "chai": "^4.3.10",
     "typescript": "^5.0.0"
-  },
-  "resolutions": {
-    "@aztec/bb.js": "0.67.0"
   },
   "trustedDependencies": [
     "plume-sig"

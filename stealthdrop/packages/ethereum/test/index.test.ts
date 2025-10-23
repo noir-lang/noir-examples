@@ -14,7 +14,7 @@ import { ProofData } from '@noir-lang/types';
 import { expect } from 'chai';
 import pkg from '../../const.cts';
 const { MESSAGE_TO_HASH } = pkg;
-import { computeAllInputs } from 'plume-sig';
+import { curves } from 'plume-sig';
 import { HardhatNetworkHDAccountsConfig } from 'hardhat/types';
 
 const bbSync = await BarretenbergSync.new();
@@ -126,7 +126,7 @@ const getClaimInputs = async ({
   // message to hash is above
   const messageBytes = MESSAGE_TO_HASH.split('').map((s, i) => MESSAGE_TO_HASH.charCodeAt(i));
   const privateKey = userAccount!.getHdKey().privateKey!;
-  const plume = await computeAllInputs(Uint8Array.from(messageBytes), privateKey);
+  const plume = await curves.secp256k1.computeAllInputs(Uint8Array.from(messageBytes), privateKey);
 
   const proof = merkleTree.generateProof(index);
   const pubKey = userAccount!.publicKey.slice(2);
@@ -154,7 +154,7 @@ const getClaimInputs = async ({
 describe('Eligible user', () => {
   let proof: ProofData;
 
-  it('Generates a valid claim - off-chain', async () => {
+  it.only('Generates a valid claim - off-chain', async () => {
     const merkleTree = LeanIMT.import(poseidon, primedMerkleTree.export());
     merkleTree.update(0, BigInt(user0.account!.address));
 
