@@ -1,13 +1,13 @@
 use ecrecover::secp256k1::PubKey;
 use noir_bigcurve::curves::secp256k1::{Secp256k1, Secp256k1Fq, Secp256k1Scalar};
 use noir_bigcurve::scalar_field::ScalarField;
-
-// use plume::plume_v2;
+use plume::curves::secp256k1::hash_to_curve;
 use plume::Plume;
+use plume::PlumeVerifier;
 use std::hash::poseidon2::Poseidon2::hash;
 use trees::merkle::MerkleTree;
+use trees::types::{MembershipProver, MT_Creator};
 
-type BN = Secp256k1Fq;
 global DEPTH: u32 = 12;
 
 fn hasher(leaves: [Field; 2]) -> Field {
@@ -17,7 +17,7 @@ fn hasher(leaves: [Field; 2]) -> Field {
 fn main(
     pub_key_x: [u8; 32],
     pub_key_y: [u8; 32],
-    message: pub [u8; 8], // signthis
+    message: pub [u8; 8],
     c: [u8; 32],
     s: [u8; 32],
     nullifier_x: pub [u8; 32],
@@ -45,7 +45,14 @@ fn main(
         is_infinity: false,
     };
 
-    let plume = Plume::new(message, scalar_c, scalar_s, pubkey_bg, nullifier);
+    let plume = Plume::new(
+        message,
+        scalar_c,
+        scalar_s,
+        pubkey_bg,
+        nullifier,
+        hash_to_curve,
+    );
 
     let (_, _) = plume.plume_v2();
     let pubkey = PubKey::from_xy(pub_key_x, pub_key_y);

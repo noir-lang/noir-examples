@@ -9,8 +9,6 @@
     "gen": "bun run utils/mt/generateAddresses.ts"
   },
   "dependencies": {
-    "@aztec/bb.js": "0.67.0",
-    "@noir-lang/noir_js": "1.0.0-beta.1",
     "@nomicfoundation/hardhat-network-helpers": "1.0.12",
     "@nomicfoundation/hardhat-toolbox-viem": "3.0.0",
     "@nomicfoundation/hardhat-viem": "2.0.6",
@@ -30,7 +28,6 @@
     "hardhat": "^2.18.1",
     "hardhat-gas-reporter": "^1.0.8",
     "hardhat-plugin-noir": "0.3.0-next.0",
-    "plume-sig": "https://gitpkg.vercel.app/signorecello/zk-nullifier-sig/typescript?main&scripts.postinstall=npm%20run%20build",
     "postcss": "^8.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -50,8 +47,5 @@
     "@vitejs/plugin-react-swc": "^3.5.0",
     "typescript": "^5.0.0",
     "vite": "^5.0.6"
-  },
-  "resolutions": {
-    "@aztec/bb.js": "0.67.0"
   }
 }
