@@ -194,7 +194,7 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
     // Use valid inputs: x=3, y=3 -> 3*2+3=9 ✓
     const inputs = { x: 3, y: 3 };
     const { witness } = await noir.execute(inputs);
-    const { proof, publicInputs } = await honk.generateProof(witness, { keccak: true });
+    const { proof, publicInputs } = await honk.generateProof(witness, { keccakZK: true });
 
     console.log("Proof generated successfully");
     console.log(`Public inputs: ${publicInputs}`);
