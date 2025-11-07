@@ -11,6 +11,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import circuit from "../circuits/target/noir_solidity.json";
 import VerifierArtifact from "../contract/out/Verifier.sol/HonkVerifier.json";
 import StarterArtifact from "../contract/out/Starter.sol/Starter.json";
+import ZKTranscriptLibArtifact from "../contract/out/Verifier.sol/ZKTranscriptLib.json";
 
 // Constants
 const PRIVATE_KEY = '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80'; // Anvil's first account
@@ -153,12 +154,31 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
   });
 
   test("should deploy contracts", async () => {
+    console.log("Deploying ZKTranscriptLib library...");
+
+    // Deploy ZKTranscriptLib library first
+    const libHash = await walletClient.deployContract({
+      abi: ZKTranscriptLibArtifact.abi,
+      bytecode: ZKTranscriptLibArtifact.bytecode.object as `0x${string}`,
+      args: [],
+    });
+
+    const libReceipt = await publicClient.waitForTransactionReceipt({ hash: libHash });
+    const libAddress = libReceipt.contractAddress!;
+    console.log(`ZKTranscriptLib deployed at: ${libAddress}`);
+
     console.log("Deploying Verifier contract...");
 
-    // Deploy Verifier
+    // Link the library into the Verifier bytecode
+    const linkedBytecode = (VerifierArtifact.bytecode.object as string).replace(
+      /__\$[0-9a-fA-F]{34}\$__/g,
+      libAddress.slice(2).toLowerCase()
+    );
+
+    // Deploy Verifier with linked bytecode
     const verifierHash = await walletClient.deployContract({
       abi: VerifierArtifact.abi,
-      bytecode: VerifierArtifact.bytecode.object as `0x${string}`,
+      bytecode: `0x${linkedBytecode.replace(/^0x/, '')}` as `0x${string}`,
       args: [],
     });
 
