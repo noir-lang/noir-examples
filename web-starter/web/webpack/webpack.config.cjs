@@ -35,6 +35,9 @@ module.exports = {
   },
   resolve: {
     extensions: ['.ts', '.js'], // <-- add this so imports work without extensions
+    fallback: {
+      buffer: require.resolve('buffer/')
+    }
   },
   plugins: [
     new HtmlWebpackPlugin({

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UltraHonkBackend, BarretenbergVerifier } from '@aztec/bb.js';
+import { UltraHonkBackend } from '@aztec/bb.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -12,7 +12,7 @@ async function initializeCircuit() {
     const circuitPath = path.resolve(process.cwd(), '../../circuits/target/noir_uh_starter.json');
     const circuitData = await fs.readFile(circuitPath, 'utf-8');
     circuit = JSON.parse(circuitData);
-    honk = new UltraHonkBackend(circuit.bytecode, { 
+    honk = new UltraHonkBackend(circuit.bytecode, {
       threads: 8,
 
       // By default, bb.js downloads CRS files to ~/.bb-crs. For serverless environments where 
@@ -36,11 +36,11 @@ export default async function handler(
     await initializeCircuit();
 
     const { proof, publicInputs } = req.body;
-    
+
     if (!proof || !publicInputs) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Missing proof or publicInputs',
-        verified: false 
+        verified: false
       });
     }
 
@@ -61,23 +61,23 @@ export default async function handler(
     } else {
       throw new Error('Invalid proof format');
     }
-    
+
     const publicInputsArray = Array.isArray(publicInputs) ? publicInputs : [publicInputs];
-    
-    const verified = await honk.verifyProof({ 
-      proof: proofArray, 
-      publicInputs: publicInputsArray 
+
+    const verified = await honk.verifyProof({
+      proof: proofArray,
+      publicInputs: publicInputsArray
     });
-    
-    return res.status(200).json({ 
+
+    return res.status(200).json({
       verified,
       message: verified ? 'Proof verified successfully' : 'Proof verification failed'
     });
   } catch (error) {
     console.error('Server-side verification error:', error);
-    return res.status(500).json({ 
-      error: String(error), 
-      verified: false 
+    return res.status(500).json({
+      error: String(error),
+      verified: false
     });
   }
 }
