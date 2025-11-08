@@ -104,10 +104,6 @@ forge script script/Deploy.s.sol:DeployScript --rpc-url <RPC_URL> --broadcast --
   - `base64_example/` - Base64 encoding/decoding using `noir-base64` library
   - Uses workspace structure with shared Nargo.toml
 
-- **`stealthdrop/`** - Complex example using ecrecover, Merkle trees, and PLUME signatures
-  - Demonstrates integration of multiple cryptographic libraries
-  - Uses `noir_bigcurve`, `ecrecover`, and custom merkle tree implementations
-
 - **`noir_by_example/`** - Small focused examples of Noir language features
   - `loops/` - Loop constructs in Noir
   - `generic_traits/` - Generic types and traits
@@ -133,7 +129,7 @@ fn main(private_input: Field, public_output: pub Field) {
 
 ### JavaScript Proof Generation Pattern
 
-Common pattern across examples using `@noir-lang/noir_js` and `@aztec/bb.js`:
+Common pattern across examples using `@noir-lang/noir_js` (v1.0.0-beta.15) and `@aztec/bb.js` (v3.0.0-nightly.20251104):
 1. Import compiled circuit artifacts from `target/` directory
 2. Initialize Noir program with artifacts
 3. Generate witness from inputs
@@ -149,14 +145,17 @@ Common pattern across examples using `@noir-lang/noir_js` and `@aztec/bb.js`:
 
 ## Version Compatibility
 
-Different examples may use different Noir/bb versions:
-- `solidity-example/`: Noir 1.0.0-beta.11, bb 0.87.0
-- `recursion/`: Noir 1.0.0-beta.6, bb 0.84.0
-- `web-starter/`: Noir 1.0.0-beta.11, bb 0.87.0
-- `bignum_example/`: Noir 1.0.0-beta.9+
+**Recent Updates (November 2025):**
+- All main examples updated to Noir 1.0.0-beta.15 and bb.js 3.0.0-nightly.20251104
+- The `stealthdrop/` example has been removed from the repository
+
+Current version information:
+- `solidity-example/`: Noir 1.0.0-beta.15, bb.js 3.0.0-nightly.20251104
+- `recursion/`: Noir 1.0.0-beta.15, bb.js 3.0.0-nightly.20251104
+- `web-starter/`: Noir 1.0.0-beta.15, bb.js 3.0.0-nightly.20251104
+- `bignum_example/`: Noir 1.0.0+ (>=1.0.0)
 - `lib_examples/base64_example/`: Noir 0.36.0+
 - `noir_by_example/`: Noir 0.34.0+ (varies by example)
-- `stealthdrop/`: Noir 1.0.0-beta.1, bb 0.67.0
 
 Check each project's README for specific version requirements. Version mismatches between nargo and bb can cause compilation or proof generation issues.
 
