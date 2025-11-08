@@ -12,6 +12,11 @@ const config = {
         baseURL: 'http://localhost:5173',
         headless: true,
     },
+    // Global test timeout for proof generation
+    timeout: 300000, // 5 minutes
+    expect: {
+        timeout: 180 * 1000, // 3 minutes for assertions
+    },
     projects: [
         { name: 'chromium', use: { browserName: 'chromium' } },
         { name: 'firefox', use: { browserName: 'firefox' } },
