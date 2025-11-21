@@ -4,13 +4,18 @@
 const config = {
     webServer: {
         command: 'yarn build && yarn preview',
-        port: 3000,
+        port: 3002,
         timeout: 120 * 1000,
         reuseExistingServer: !process.env.CI,
     },
     use: {
-        baseURL: 'http://localhost:3000',
+        baseURL: 'http://localhost:3002',
         headless: true,
+    },
+    // Global test timeout for proof generation
+    timeout: 300000, // 5 minutes
+    expect: {
+        timeout: 180 * 1000, // 3 minutes for assertions
     },
     projects: [
         { name: 'chromium', use: { browserName: 'chromium' } },

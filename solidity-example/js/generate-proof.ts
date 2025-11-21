@@ -12,7 +12,7 @@ import { Noir } from "@noir-lang/noir_js";
 
     const inputs = { x: 3, y: 3 }
     const { witness } = await noir.execute(inputs);
-    const { proof, publicInputs } = await honk.generateProof(witness, { keccak: true });
+    const { proof, publicInputs } = await honk.generateProof(witness, { keccakZK: true });
 
     // save proof to file
     fs.writeFileSync("../circuits/target/proof", proof);

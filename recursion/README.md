@@ -8,8 +8,8 @@ E2E example of generating a recursive proof using Noir and bb.js.
 ### Version used
 
 ```
-Noir 1.0.0-beta.6
-bb 0.84.0
+Noir 1.0.0-beta.15
+bb 3.0.0-nightly.20251104
 ```
 
 ### Steps
