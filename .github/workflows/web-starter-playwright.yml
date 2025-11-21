@@ -21,14 +21,34 @@ jobs:
         with:
           toolchain: 1.0.0-beta.15
 
-      - name: Install bb
+      - name: Install bbup
         run: |
           curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
           echo "PATH=$PATH:/home/runner/.bb" >> $GITHUB_ENV
 
-      - name: Run bbup
+      - name: Determine and install compatible Barretenberg CLI
+        id: install-bb
+        shell: bash
         run: |
-          bbup
+          sudo apt-get update && sudo apt-get install -y jq
+
+          NOIR_VERSION=$(nargo --version | awk '{print $2}')
+          echo "Detected Noir version: $NOIR_VERSION"
+
+          curl -sL https://raw.githubusercontent.com/AztecProtocol/aztec-packages/master/barretenberg/bbup/bb-versions.json -o bb-versions.json
+          BB_VERSION=$(jq -r --arg v "$NOIR_VERSION" '.[$v]' bb-versions.json)
+
+          if [ "$BB_VERSION" = "null" ]; then
+            echo "No compatible bb version for Noir $NOIR_VERSION"
+            exit 1
+          fi
+
+          bbup -v $BB_VERSION
+
+          echo "bb_version=$BB_VERSION" >> $GITHUB_OUTPUT
+          echo "noir_version=$NOIR_VERSION" >> $GITHUB_OUTPUT
+
+          bb --version
 
       - name: Build circuits
         run: |
@@ -38,6 +58,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
+
+      - name: Install matching @aztec/bb.js version (vite)
+        working-directory: web-starter/web/vite
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
+
+      - name: Install npm-check-updates and upgrade dependencies (vite)
+        if: github.event_name == 'schedule'
+        working-directory: web-starter/web/vite
+        run: |
+          npm install -g npm-check-updates
+          ncu '/^(?:@noir-lang\/|barretenberg|@aztec\/)/' -u
 
       - name: Install JS dependencies (vite)
         working-directory: web-starter/web/vite
@@ -54,6 +87,19 @@ jobs:
         run: |
           yarn test:e2e
 
+      - name: Install matching @aztec/bb.js version (webpack)
+        working-directory: web-starter/web/webpack
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
+
+      - name: Install npm-check-updates and upgrade dependencies (webpack)
+        if: github.event_name == 'schedule'
+        working-directory: web-starter/web/webpack
+        run: |
+          npm install -g npm-check-updates
+          ncu '/^(?:@noir-lang\/|barretenberg|@aztec\/)/' -u
+
       - name: Install JS dependencies (webpack)
         working-directory: web-starter/web/webpack
         run: |
@@ -68,6 +114,19 @@ jobs:
         working-directory: web-starter/web/webpack
         run: |
           yarn test:e2e
+
+      - name: Install matching @aztec/bb.js version (nextjs)
+        working-directory: web-starter/web/nextjs
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
+
+      - name: Install npm-check-updates and upgrade dependencies (nextjs)
+        if: github.event_name == 'schedule'
+        working-directory: web-starter/web/nextjs
+        run: |
+          npm install -g npm-check-updates
+          ncu '/^(?:@noir-lang\/|barretenberg|@aztec\/)/' -u
 
       - name: Install JS dependencies (next)
         working-directory: web-starter/web/nextjs
