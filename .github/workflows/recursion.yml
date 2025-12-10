@@ -23,20 +23,54 @@ jobs:
         uses: noir-lang/noirup@v0.1.2
         with:
           toolchain: stable
-
-      - name: Install bb
+          
+      - name: Install bbup
         run: |
           curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
           echo "PATH=$PATH:/home/runner/.bb" >> $GITHUB_ENV
+      
 
-      - name: Run bbup
+      - name: Determine and install compatible Barretenberg CLI
+        id: install-bb
+        shell: bash
         run: |
-          bbup
+          sudo apt-get update && sudo apt-get install -y jq
+
+          NOIR_VERSION=$(nargo --version | awk '{print $2}')
+          echo "Detected Noir version: $NOIR_VERSION"
+
+          curl -sL https://raw.githubusercontent.com/AztecProtocol/aztec-packages/master/barretenberg/bbup/bb-versions.json -o bb-versions.json
+          BB_VERSION=$(jq -r --arg v "$NOIR_VERSION" '.[$v]' bb-versions.json)
+
+          if [ "$BB_VERSION" = "null" ]; then
+            echo "No compatible bb version for Noir $NOIR_VERSION"
+            exit 1
+          fi
+
+          bbup -v $BB_VERSION
+
+          echo "bb_version=$BB_VERSION" >> $GITHUB_OUTPUT
+          echo "noir_version=$NOIR_VERSION" >> $GITHUB_OUTPUT
+
+          bb --version
 
       - name: Build circuits
         run: |
           ./build.sh
         working-directory: recursion/circuits
+
+      - name: Install matching @aztec/bb.js version
+        working-directory: recursion/js
+        run: |
+          BB_VERSION=${{ steps.install-bb.outputs.bb_version }}
+          yarn add @aztec/bb.js@$BB_VERSION --exact
+
+      - name: Install npm-check-updates and upgrade relevant dependencies
+        if: github.event_name == 'schedule'
+        working-directory: recursion/js
+        run: |
+          npm install -g npm-check-updates
+          ncu '/^(?:@noir-lang\/|barretenberg|@aztec\/)/' -u
 
       - name: Install JS dependencies
         working-directory: recursion/js
