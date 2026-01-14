@@ -1,4 +1,4 @@
-import { UltraHonkBackend } from "@aztec/bb.js";
+import { Barretenberg, UltraHonkBackend } from "@aztec/bb.js";
 import circuit from "../../circuits/target/noir_uh_starter.json" with { type: "json" };
 import { Noir } from "@noir-lang/noir_js";
 
@@ -14,8 +14,9 @@ async function generateProof(): Promise<void> {
     try {
         log('Generating proof...');
 
+        const api = await Barretenberg.new({ threads: 8 });
         const noir = new Noir(circuit as any);
-        const honk = new UltraHonkBackend(circuit.bytecode, { threads: 8 });
+        const honk = new UltraHonkBackend(circuit.bytecode, api);
 
         const inputs = { x: 3, y: 3 };
         const { witness } = await noir.execute(inputs);

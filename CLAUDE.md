@@ -129,7 +129,7 @@ fn main(private_input: Field, public_output: pub Field) {
 
 ### JavaScript Proof Generation Pattern
 
-Common pattern across examples using `@noir-lang/noir_js` (v1.0.0-beta.15) and `@aztec/bb.js` (v3.0.0-nightly.20251104):
+Common pattern across examples using `@noir-lang/noir_js` (v1.0.0-beta.18) and `@aztec/bb.js` (v3.0.0-nightly.20260102):
 1. Import compiled circuit artifacts from `target/` directory
 2. Initialize Noir program with artifacts
 3. Generate witness from inputs
@@ -145,14 +145,14 @@ Common pattern across examples using `@noir-lang/noir_js` (v1.0.0-beta.15) and `
 
 ## Version Compatibility
 
-**Recent Updates (November 2025):**
-- All main examples updated to Noir 1.0.0-beta.15 and bb.js 3.0.0-nightly.20251104
+**Recent Updates (January 2026):**
+- All main examples updated to Noir 1.0.0-beta.18 and bb.js 3.0.0-nightly.20260102
 - The `stealthdrop/` example has been removed from the repository
 
 Current version information:
-- `solidity-example/`: Noir 1.0.0-beta.15, bb.js 3.0.0-nightly.20251104
-- `recursion/`: Noir 1.0.0-beta.15, bb.js 3.0.0-nightly.20251104
-- `web-starter/`: Noir 1.0.0-beta.15, bb.js 3.0.0-nightly.20251104
+- `solidity-example/`: Noir 1.0.0-beta.18, bb.js 3.0.0-nightly.20260102
+- `recursion/`: Noir 1.0.0-beta.18, bb.js 3.0.0-nightly.20260102
+- `web-starter/`: Noir 1.0.0-beta.18, bb.js 3.0.0-nightly.20260102
 - `bignum_example/`: Noir 1.0.0+ (>=1.0.0)
 - `lib_examples/base64_example/`: Noir 0.36.0+
 - `noir_by_example/`: Noir 0.34.0+ (varies by example)

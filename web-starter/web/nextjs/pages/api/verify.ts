@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UltraHonkBackend } from '@aztec/bb.js';
+import { Barretenberg, UltraHonkBackend } from '@aztec/bb.js';
 import { promises as fs } from 'fs';
 import path from 'path';
 
@@ -12,13 +12,14 @@ async function initializeCircuit() {
     const circuitPath = path.resolve(process.cwd(), '../../circuits/target/noir_uh_starter.json');
     const circuitData = await fs.readFile(circuitPath, 'utf-8');
     circuit = JSON.parse(circuitData);
-    honk = new UltraHonkBackend(circuit.bytecode, {
+    const api = await Barretenberg.new({
       threads: 8,
 
-      // By default, bb.js downloads CRS files to ~/.bb-crs. For serverless environments where 
+      // By default, bb.js downloads CRS files to ~/.bb-crs. For serverless environments where
       // this path isn't writable, configure an alternate path (e.g. /tmp) using crsPath option
       // crsPath: `/tmp`
     });
+    honk = new UltraHonkBackend(circuit.bytecode, api);
   }
 }
 
