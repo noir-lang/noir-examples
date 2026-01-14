@@ -24,7 +24,7 @@ jobs:
       - name: Install Nargo
         uses: noir-lang/noirup@v0.1.2
         with:
-          toolchain: 1.0.0-beta.15
+          toolchain: 1.0.0-beta.18
 
       - name: Run Noir unit tests
         working-directory: solidity-example/circuits
@@ -63,7 +63,7 @@ jobs:
         working-directory: solidity-example/circuits
         run: |
           nargo execute
-          bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target --oracle_hash keccak
+          bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target --verifier_target evm
           cd ..
           (cd contract && forge test --optimize --optimizer-runs 5000 --gas-report -vvv)
 
