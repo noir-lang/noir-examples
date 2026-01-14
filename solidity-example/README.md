@@ -6,7 +6,7 @@ An example repo to verify Noir circuits (with bb backend) using a Solidity verif
 - `/contract` - Foundry project with a Solidity verifier and a Test contract that reads proof from a file and verifies it.
 - `/js` - JS code to generate proof and save as a file.
 
-Tested with Noir 1.0.0-beta.15 and bb 3.0.0-nightly.20251104
+Tested with Noir 1.0.0-beta.18 and bb 3.0.0-nightly.20260102
 
 ### Installation / Setup
 
@@ -42,7 +42,7 @@ cd circuits
 nargo execute
 
 # Generate proof
-bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target --oracle_hash keccak
+bb prove -b ./target/noir_solidity.json -w target/noir_solidity.gz -o ./target --verifier_target evm
 
 # Run foundry test to read generated proof and verify
 cd ..

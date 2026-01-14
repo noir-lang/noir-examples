@@ -12,7 +12,6 @@ Each project is an example you can use for whatever you want. Feel free to mix t
 - **[Solidity Example](./solidity-example)** - Complete workflow: Noir circuit → JavaScript proof generation → Solidity on-chain verification
 - **[Recursion](./recursion)** - Demonstrates recursive proof generation where one circuit verifies another circuit's proof
 - **[Web Starter](./web-starter)** - Browser-based proof generation with Vite, Webpack, and Next.js bundler examples
-- **[Stealthdrop](./stealthdrop)** - Privacy-preserving airdrop using PLUME nullifiers, ecrecover, and Merkle trees
 
 ### Library & Feature Examples
 
