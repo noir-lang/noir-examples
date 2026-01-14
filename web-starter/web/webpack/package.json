@@ -2,8 +2,8 @@
   "name": "js",
   "type": "module",
   "dependencies": {
-    "@aztec/bb.js": "3.0.0-nightly.20251104",
-    "@noir-lang/noir_js": "1.0.0-beta.15",
+    "@aztec/bb.js": "3.0.0-nightly.20260102",
+    "@noir-lang/noir_js": "1.0.0-beta.18",
     "buffer": "^6.0.3"
   },
   "scripts": {

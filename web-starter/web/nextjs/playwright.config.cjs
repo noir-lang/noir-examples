@@ -3,12 +3,12 @@
 /** @type {import('@playwright/test').PlaywrightTestConfig} */
 const config = {
     webServer: {
-        command: 'yarn build && yarn start',
-        port: 3000,
+        command: 'yarn build && yarn start -p 3002',
+        port: 3002,
         timeout: 180 * 1000, // Increased to 3 minutes for CI
     },
     use: {
-        baseURL: 'http://localhost:3000',
+        baseURL: 'http://localhost:3002',
         headless: true,
     },
     // Global test timeout for proof generation

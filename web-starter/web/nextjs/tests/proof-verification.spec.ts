@@ -29,21 +29,22 @@ test('proof verification works in the browser', async ({ page }: { page: Page })
 
 test('proof is correctly verified server side using Pages Router', async () => {
     // Import dependencies for proof generation
-    const { UltraHonkBackend } = await import('@aztec/bb.js');
+    const { Barretenberg, UltraHonkBackend } = await import('@aztec/bb.js');
     const { Noir } = await import('@noir-lang/noir_js');
-    
+
     // Import circuit data
     const circuit = await import('../../../circuits/target/noir_uh_starter.json', { with: { type: 'json' } });
 
     // Prepare inputs matching the circuit
+    const api = await Barretenberg.new({ threads: 8 });
     const noir = new Noir(circuit.default as any);
-    const honk = new UltraHonkBackend(circuit.default.bytecode, { threads: 8 });
+    const honk = new UltraHonkBackend(circuit.default.bytecode, api);
     const inputs = { x: 3, y: 3 };
     const { witness } = await noir.execute(inputs);
     const { proof, publicInputs } = await honk.generateProof(witness);
 
     // POST to the Pages Router API endpoint
-    const res = await fetch('http://localhost:3000/api/verify', {
+    const res = await fetch('http://localhost:3002/api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ proof, publicInputs })
