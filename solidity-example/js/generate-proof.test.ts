@@ -2,7 +2,7 @@ import { test, describe, before, after } from "node:test";
 import { strict as assert } from "node:assert";
 import fs from "fs";
 import { spawn, ChildProcess } from "child_process";
-import { UltraHonkBackend } from "@aztec/bb.js";
+import { Barretenberg, UltraHonkBackend } from "@aztec/bb.js";
 // @ts-ignore
 import { Noir } from "@noir-lang/noir_js";
 import { http, createWalletClient, createPublicClient } from "viem";
@@ -209,12 +209,13 @@ describe("Noir Solidity Example with Ethereum Integration", () => {
 
     console.log("Generating proof...");
     const noir = new Noir(circuit as any);
-    const honk = new UltraHonkBackend(circuit.bytecode, { threads: 1 });
+    const api = await Barretenberg.new({ threads: 1 });
+    const honk = new UltraHonkBackend(circuit.bytecode, api);
 
     // Use valid inputs: x=3, y=3 -> 3*2+3=9 ✓
     const inputs = { x: 3, y: 3 };
     const { witness } = await noir.execute(inputs);
-    const { proof, publicInputs } = await honk.generateProof(witness, { keccakZK: true });
+    const { proof, publicInputs } = await honk.generateProof(witness, { verifierTarget: 'evm' });
 
     console.log("Proof generated successfully");
     console.log(`Public inputs: ${publicInputs}`);
