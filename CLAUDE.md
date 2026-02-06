@@ -154,8 +154,8 @@ Current version information:
 - `recursion/`: Noir 1.0.0-beta.18, bb.js 3.0.0-nightly.20260102
 - `web-starter/`: Noir 1.0.0-beta.18, bb.js 3.0.0-nightly.20260102
 - `bignum_example/`: Noir 1.0.0+ (>=1.0.0)
-- `lib_examples/base64_example/`: Noir 0.36.0+
-- `noir_by_example/`: Noir 0.34.0+ (varies by example)
+- `lib_examples/base64_example/`: Noir 1.0.0-beta.18
+- `noir_by_example/`: Noir 1.0.0-beta.18
 
 Check each project's README for specific version requirements. Version mismatches between nargo and bb can cause compilation or proof generation issues.
 
