@@ -19,7 +19,7 @@ jobs:
       - name: Install Nargo
         uses: noir-lang/noirup@v0.1.2
         with:
-          toolchain: 1.0.0-beta.18
+          toolchain: 1.0.0-beta.19
 
       - name: Install bb
         run: |
@@ -28,7 +28,7 @@ jobs:
 
       - name: Run bbup
         run: |
-          bbup
+          bbup -v 4.1.0
 
       - name: Build circuits
         run: |
@@ -89,10 +89,10 @@ jobs:
 
       - name: Create issue on failure (nightly)
         if: failure() && github.event_name == 'schedule'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
-            github.issues.create({
+            github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: '[Nightly] Web-starter Playwright workflow failed',
