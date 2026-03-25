@@ -2,7 +2,7 @@
   "name": "js",
   "type": "module",
   "dependencies": {
-    "@aztec/bb.js": "4.1.0",
+    "@aztec/bb.js": "4.1.1",
     "@noir-lang/noir_js": "1.0.0-beta.19",
     "buffer": "^6.0.3"
   },
