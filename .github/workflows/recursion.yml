@@ -31,7 +31,7 @@ jobs:
 
       - name: Run bbup
         run: |
-          bbup -v 4.1.0
+          bbup -v 4.1.1
 
       - name: Build circuits
         run: |
