@@ -116,3 +116,7 @@ USDC.e gas costs were based on conditions as of 2026-04-29.
 **Proof verification costs**
 
 Proof verification cost 3,092,616 (0.068038 USDC.e as of 2026-04-29). [Sample transaction](https://explore.tempo.xyz/tx/0x3a3cd1aa96abc267ba34b6ccea1d7bc2a509215a8fc3e22f0bad1f3aa413ddc1).
+
+##### Upcoming optimizations
+
+Once the improvements in https://github.com/AztecProtocol/aztec-packages/pull/20495 are released, Barretenberg's proof verification gas costs will be brought down from ~3,000,000 gas to ~700,000 gas.
