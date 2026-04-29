@@ -82,7 +82,9 @@ Get [number of verified proofs](./contract/Starter.sol#L14) on-chain
 forge script script/VerifyProof.s.sol:GetVerifiedCount --rpc-url https://mainnet.base.org --broadcast --legacy
 ```
 
-#### Cost on Base Mainnet
+#### Mainnet gas costs
+
+##### Base
 
 Verifier deployed at: 0x519845DF3Ead9be1B1217d422f5b40a4d43e737D
 Starter deployed at: 0xaf78eFEf8B958eBa80D64e78fdBE655DC58e133b
@@ -90,3 +92,27 @@ Starter deployed at: 0xaf78eFEf8B958eBa80D64e78fdBE655DC58e133b
 Deployment cost of verifier contract: 0.000028411358047473 ETH ($0.11 when ETH = ~3800 USD) - [Sample TX](https://basescan.org/tx/0x68059d485544a909366d672174eb788678806acfd501be220d162c0ca0c13730)
 
 Proof verification cost : 0.000009590438665493 ETH ($0.04 when ETH = ~3800 USD) - [Sample Tx](https://basescan.org/tx/0x8a8324e64c8a5534b318acfd3e7514c8c35fdba46f0b6a74f8ab3e46c4877114)
+
+##### Tempo
+
+**Environment**
+
+- Noir 1.0.0-beta.20
+- bb 5.0.0-nightly.20260324
+- bb.js 5.0.0-nightly.20260324
+- forge parameter `--optimizer-runs 1`
+
+**Deployment costs**
+
+| Contract | Gas used | Cost | Transaction |
+| --- | ---: | ---: | ---: |
+| ZKTranscriptLib deployment | 6,981,166 | 0.167548 USDC.e | [Sample](https://explore.tempo.xyz/tx/0x8e4e2a8f91ffb742ab35481abf50eea84815b13ebab803d657ff44d796501249) |
+| Verifier deployment | 25,156,680 | 0.603761 USDC.e | [Sample](https://explore.tempo.xyz/tx/0x10964f7a67ebd41ea9c14add95b40a5435fe96f292211fd835029d9e51c4ba75) |
+| Starter deployment | 1,621,325 | 0.038912 USDC.e | [Sample](https://explore.tempo.xyz/tx/0x2a36785468d9e45b5ed26b3467dd9cd197f2513994da33228c74f5f31a6c1a12) |
+| Total deployment | 33,759,171 | 0.810221 USDC.e | [Sample](https://explore.tempo.xyz/tx/0x3a3cd1aa96abc267ba34b6ccea1d7bc2a509215a8fc3e22f0bad1f3aa413ddc1) |
+
+USDC.e gas costs were based on conditions as of 2026-04-29.
+
+**Proof verification costs**
+
+Proof verification cost 3,092,616 (0.068038 USDC.e as of 2026-04-29). [Sample transaction](https://explore.tempo.xyz/tx/0x3a3cd1aa96abc267ba34b6ccea1d7bc2a509215a8fc3e22f0bad1f3aa413ddc1).
